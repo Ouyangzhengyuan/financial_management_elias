@@ -1,6 +1,6 @@
 package pers.elias.financial_management.model;
 
-import pers.elias.financial_management.utils.DateToString;
+import pers.elias.financial_management.utils.DateStringConvert;
 
 import java.util.Date;
 
@@ -45,7 +45,7 @@ public class AccountCurrentResult {
     }
 
     public void setDate(Date date) {
-        this.dateConverted = DateToString.dateToString(date);
+        this.dateConverted = DateStringConvert.dateToString(date);
         this.date = date;
     }
 

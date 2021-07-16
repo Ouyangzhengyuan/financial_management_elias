@@ -485,15 +485,11 @@
             });
         });
 
-        function renderSecondCategory(firstExpenseCategory){
-
-        }
-
         //分类模板事件
         form.on('select(categoryTemplate)', function (data) {
             //提交数据 返回后台 查询对应的二级分类
             var categoryTemplateName = data.value;
-            var dataTemplate;
+            //查询模板绑定的数据
             $.ajax({
                 url: '/categoryTemplate/categoryTemplateSingle?categoryTemplateName=' + categoryTemplateName,
                 data: categoryTemplateName,
@@ -501,30 +497,14 @@
                 type: 'post',
                 success: function (data) {
                     if (data.success) {
-                        dataTemplate = data;
-                        firstExpenseCategory = data.data[0];
-                        // 根据一级分类名称重新渲染二级分类
-                        $.ajax({
-                            url: '/categoryEx/secondExpenseCategory.json?firstExpenseCategory=' + firstExpenseCategory,
-                            data: firstExpenseCategory,
-                            dataType: 'json',
-                            type: 'post',
-                            success: function (data) {
-                                if (data.msg === "操作成功") {
-                                    $("#second_expense_category").empty(); //防止重复渲染
-                                    for (i = 0; i < data.data.length; i++) {
-                                        $("#second_expense_category").append("<option>" + data.data[i] + "</option>");
-                                    }
-                                    form.render('select');
-                                } else {
-
-                                }
-                            }
-                        });
-                        $("#first_expense_category").val(dataTemplate.data[0]);
-                        layer.msg($("#second_expense_category").val);
-                        $("#second_expense_category").val(dataTemplate.data[1]);
-                        $("#account_type").val(dataTemplate.data[2]);
+                        //渲染一级分类选项
+                        $("#first_expense_category").val(data.data[0]);
+                        //渲染二级分类选项
+                        $("#second_expense_category").empty();
+                        $("#second_expense_category").prepend("<option>" + data.data[1] + "</option>");
+                        $("#second_expense_category").val(data.data[1]);
+                        //渲染金融账户分类选项
+                        $("#account_type").val(data.data[2]);
                         form.render('select');
                     } else {
 
@@ -541,7 +521,17 @@
                 dataType: 'json',
                 type: 'post',
                 success: function (data) {
-
+                    if (data.success) {
+                        layer.msg(
+                            data.message,
+                            {time: 1000},
+                            function () {
+                                window.parent.location.reload();//刷新父页面
+                                parent.layer.close(index);//关闭弹出层
+                            });
+                    } else {
+                        layer.msg(data.message);
+                    }
                 }
             });
             return false;

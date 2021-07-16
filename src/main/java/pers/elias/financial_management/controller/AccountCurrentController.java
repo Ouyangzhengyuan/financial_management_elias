@@ -9,15 +9,24 @@ import pers.elias.financial_management.component.AjaxResult;
 import pers.elias.financial_management.component.GlobalAccountInfo;
 import pers.elias.financial_management.model.AccountCurrent;
 import pers.elias.financial_management.model.AccountCurrentResult;
+import pers.elias.financial_management.model.AccountType;
+import pers.elias.financial_management.model.CategorySecond;
 import pers.elias.financial_management.service.impl.AccountBookService;
 import pers.elias.financial_management.service.impl.AccountCurrentService;
+import pers.elias.financial_management.service.impl.AccountTypeService;
+import pers.elias.financial_management.service.impl.CategorySecondService;
+import pers.elias.financial_management.utils.DateStringConvert;
 import pers.elias.financial_management.utils.PageBean;
 
+import java.text.ParseException;
 import java.util.List;
 
 @Controller
 @RequestMapping("/accountCurrent")
 public class AccountCurrentController {
+    @Autowired
+    private AjaxResult ajaxResult;
+
     @Autowired
     private GlobalAccountInfo globalAccountInfo;
 
@@ -26,6 +35,12 @@ public class AccountCurrentController {
 
     @Autowired
     private AccountBookService accountBookService;
+
+    @Autowired
+    private CategorySecondService categorySecondService;
+
+    @Autowired
+    private AccountTypeService accountTypeService;
 
     /**
      * 查询所有流水
@@ -56,13 +71,49 @@ public class AccountCurrentController {
      */
     @ResponseBody
     @RequestMapping("/addAccountCurrent")
-    public AjaxResult addAccountCurrent(AccountCurrentResult accountCurrentResult){
-        accountCurrentResult.setUser_name(globalAccountInfo.getUserName());
-        accountCurrentResult.setAccount_book_id(globalAccountInfo.getAccountBookId());
-        accountCurrentResult.setIn_ex_status('支');
-        System.out.println(accountCurrentResult.toString());
-        AjaxResult ajaxResult = new AjaxResult();
-        ajaxResult.setSuccess(true);
-        return ajaxResult;
+    public AjaxResult addAccountCurrent(AccountCurrentResult accountCurrentResult) {
+        try{
+            //二级分类实体
+            CategorySecond categorySecond = new CategorySecond();
+            categorySecond.setUserName(globalAccountInfo.getUserName());
+            categorySecond.setAccountBookId(globalAccountInfo.getAccountBookId());
+            categorySecond.setInExStatus("支");
+            categorySecond.setSecondCategoryName(accountCurrentResult.getSecond_category_name());
+            //查询当前二级分类id
+            Integer secondCategoryId = categorySecondService.selectIdByCategorySecond(categorySecond);
+            //金融账户实体
+            AccountType accountType = new AccountType();
+            accountType.setUserName(globalAccountInfo.getUserName());
+            accountType.setAccountBookId(globalAccountInfo.getAccountBookId());
+            accountType.setAccountTypeName(accountCurrentResult.getAccount_type_name());
+            //查询当前金融账户id
+            Integer accountTypeId = accountTypeService.selectIdByAccountType(accountType);
+            //创建账本流水实体对象
+            AccountCurrent accountCurrent = new AccountCurrent();
+            //设置用户
+            accountCurrent.setUserName(globalAccountInfo.getUserName());
+            //设置账本
+            accountCurrent.setAccountBookId(globalAccountInfo.getAccountBookId());
+            //设置日期
+            accountCurrent.setDate(DateStringConvert.stringToDate(accountCurrentResult.getDateConverted()));
+            //设置二级分类id
+            accountCurrent.setSecondCategoryId(secondCategoryId);
+            //设置支出
+            accountCurrent.setInExStatus("支");
+            //设置金额
+            accountCurrent.setAmount(accountCurrentResult.getAmount());
+            //设置金融账户id
+            accountCurrent.setAccountTypeId(accountTypeId);
+            //设置备注
+            accountCurrentService.insert(accountCurrent);
+            ajaxResult.setSuccess(true);
+            ajaxResult.setMessage("添加成功！");
+            return ajaxResult;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            ajaxResult.setSuccess(false);
+            ajaxResult.setMessage("添加失败！");
+            return ajaxResult;
+        }
     }
 }

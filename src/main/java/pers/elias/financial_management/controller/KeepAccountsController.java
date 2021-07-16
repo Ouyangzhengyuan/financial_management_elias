@@ -46,13 +46,12 @@ public class KeepAccountsController {
     @RequestMapping("/toKeepAccounts")
     public String keepAccounts(HttpServletRequest request, Model model) {
         //设置日期和格式
-        Date date = new Date();
-        String currentDate = String.format("%tF", date);
+        String currentDate = String.format("%tF", new Date());
         //获取当前用户
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         //添加全局用户
         globalAccountInfo.setUserName(userName);
-        //设置页面显示
+        //显示当前用户
         request.setAttribute("userName", userName);
         //表单当前日期
         model.addAttribute("date", currentDate);
