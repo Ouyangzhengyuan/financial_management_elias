@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<!-- 头部区域（可配合layui已有的水平导航） -->
+<div class="layui-header" th:fragment="header-div">
+    <div class="layui-logo" style="font-size: 21px; width: 300px">Financial Management - 记账</div>
+    <!-- 头部区域（可配合layui已有的水平导航） -->
+    <ul class="layui-nav layui-layout-left" style="padding-left: 200px">
+        <li class="layui-nav-item">
+            <a href="">概览</a>
+        </li>
+        <li class="layui-nav-item layui-this">
+            <a href="">记账</a>
+        </li>
+        <li class="layui-nav-item"><a href="">账户</a></li>
+        <li class="layui-nav-item"><a href="">设置</a></li>
+    </ul>
+    <!--    账户设置    -->
+    <ul class="layui-nav layui-layout-right">
+        <li class="layui-nav-item">
+            <a href="">
+                <div style="color: #009688">
+                    <i class="layui-icon layui-icon-username" style="font-size: 30px;"></i>
+                    <span th:text="${#request.getAttribute('userName')}"></span>
+                </div>
+                <!-- 个人中心 -->
+            </a>
+            <dl class="layui-nav-child">
+                <dd><a href="">
+                    <i class="layui-icon layui-icon-user" style="font-size: 20px; color: #5FB878"></i>
+                    基本资料</a></dd>
+                <dd><a href="">
+                    <i class="layui-icon layui-icon-set" style="font-size: 20px; color: #2F4056"></i>
+                    安全设置</a></dd>
+                <dd>
+                    <a th:href="@{/logout}">
+                        <i class="layui-icon layui-icon-logout" style="font-size: 20px; color: #FF5722"></i>
+                        安全退出
+                    </a>
+                </dd>
+            </dl>
+        </li>
+    </ul>
+</div>
+
+<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+<div class="layui-side layui-bg-black" th:fragment="accountBook">
+    <div class="layui-side-scroll">
+        <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+        <ul class="layui-nav layui-nav-tree" lay-filter="all">
+            <li class="layui-nav-item layui-nav-itemed" id="menu">
+                <a href="javascript:">
+                    <i class="layui-icon layui-icon-read" style="font-size: 15px; margin-right: 15px"></i>
+                    所有账本
+                    <i class="layui-icon layui-icon-down layui-nav-more"></i>
+                </a>
+                <dl class="layui-nav-child" id="accountBook">
+                    <dd>
+                        <a href="javascript:">
+                            <i class="layui-icon layui-icon-addition" style="font-size: 15px"></i>
+                            添加账本
+                            <i style="margin-right: 35px"></i>
+                        </a>
+                    </dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+</div>
+</html>

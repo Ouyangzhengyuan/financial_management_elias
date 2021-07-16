@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Financial Management - 个人财务管理系统 - 登录</title>
+    <link rel="stylesheet" th:href="@{/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/common.css}" media="all">
+    <style>
+        .login-box {
+            width: 400px;
+            height: 300px;
+            position: absolute;
+            margin: auto;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .login-box header {
+            color: #393D49;
+            font-size: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .layui-form-item {
+            text-align: center;
+        }
+
+        .layui-form-item .layui-input-inline {
+            float: none;
+            width: 400px;
+            text-align: center;
+        }
+
+        .layui-form-item .layui-input-block {
+            margin: 0;
+        }
+
+        .layui-input {
+            display: inline;
+            width: 250px;
+        }
+
+        #checkbox-autoLogin{
+            float: left;
+            margin-left: 85px;
+        }
+
+        #forgetPass{
+            float: right;
+            margin-right: 57px;
+            line-height: 35px;
+        }
+
+        .layui-icon{
+            font-size: 20px;
+            color:darkgray;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <header><h1>个人财务管理系统</h1></header>
+    <form class="layui-form" action=""  method="post">
+        <div class="layui-form-item">
+            <div class="layui-input-inline">
+                <label for="userName"><i class="layui-icon layui-icon-username"></i></label>
+                <input type="text" name="userName" required lay-verify="userName" placeholder="请输入用户名"
+                       class="layui-input" id="userName"></div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-inline">
+                <label for="userPass" class="layui-icon layui-icon-password"></label>
+                <label>
+                    <input type="password" name="userPass" required lay-verify="userPass" placeholder="请输入密码"
+                           autocomplete="off" class="layui-input" id="userPass">
+                </label>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <div id="checkbox-autoLogin"><input type="checkbox" name="rememberMe" value="true" title="自动登录" id="autoLogin"></div>
+                <div id="forgetPass"><a href="javascript:forgetPass()">忘记密码？</a></div>
+            </div>
+        </div>
+
+        <input type="hidden" th:value="${msg}" id="msg">
+
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="margin-left: 20px">
+<!--                <input type="submit" value="登录">-->
+                <button class="layui-btn" lay-submit lay-filter="doLogin" style="width: 250px">登录</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script th:src="@{/layui.js}" charset="utf-8"></script>
+<script type="text/javascript">
+
+    function forgetPass(){
+        layer.msg("请致电管理员！");
+    }
+
+    layui.use(['form', 'layer', 'jquery', 'element'], function () {
+        // 操作对象
+        var form = layui.form;
+        var $ = layui.jquery;
+        var element = layui.element;
+
+        form.verify({
+            userName: function (value, item) {
+                if(value === ''){
+                    return "请输入用户名！"
+                }
+            },
+            userPass: function (value, item) {
+                if(value === ''){
+                    return "请输入用户密码！"
+                }
+            }
+        });
+
+        //表单提交
+        // form.on('submit(doLogin)', function (data) {
+        //     $.ajax({
+        //         url: '/doLogin',
+        //         data: data.field,
+        //         dataType: 'json',
+        //         type: 'post',
+        //         success: function (data) {
+        //             if (data.success) {
+        //                 layer.msg(data.message);
+        //         } else {
+        //                 layer.msg(data.message);
+        //             }
+        //         }
+        //     });
+        //     return false;
+        // });
+    });
+</script>
+</body>
+</html>

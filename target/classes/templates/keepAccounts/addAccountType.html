@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/common.css}" media="all">
+    <title>添加金融账户</title>
+</head>
+<body>
+<form class="layui-form" style="margin: 30px">
+    <div class="layui-form-item">
+        <label class="layui-form-label">金融账户：</label>
+        <div class="layui-input-inline">
+            <input type="text" name="accountTypeName" required lay-verify="accountTypeName" placeholder="请输入金融账户名称"
+                   autocomplete="off" class="layui-input" style="width: 180px"/>
+        </div>
+    </div>
+
+    <div class="layui-form-item" style="text-align: center; margin: 0">
+        <div class="layui-input-block" style="text-align: center; margin: 0">
+            <button class="layui-btn" lay-submit lay-filter="accountTypeName">立即提交</button>
+        </div>
+    </div>
+</form>
+
+<script th:src="@{/layui.js}" charset="utf-8"></script>
+<script type="text/javascript">
+    //使用 layui 框架
+    layui.use(['layer', 'element', 'jquery', 'form'], function () {
+        var element = layui.element;
+        var layer = layui.layer;
+        var $ = layui.jquery;
+        var form = layui.form;
+
+        //表单验证
+        form.verify({
+            accountTypeName: function (value, item) {
+                if (value.trim() === '') {
+                    return "请输入金融账户名称!";
+                }
+            }
+        });
+
+        //提交表单
+        form.on('submit(accountTypeName)', function (data) {
+            $.ajax({
+                url: '/accountType/addAccountTy.do',
+                data: data.field,
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    if (data.success) {
+                        layer.msg(
+                            data.message,
+                            {time: 1000},
+                            function(){
+                                window.parent.location.reload();//刷新父页面
+                                parent.layer.close(index);//关闭弹出层
+                            });
+                    } else {
+                        layer.msg(data.message);
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>
