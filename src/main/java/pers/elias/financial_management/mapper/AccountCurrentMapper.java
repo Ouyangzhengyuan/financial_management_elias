@@ -5,6 +5,7 @@ import pers.elias.financial_management.model.AccountCurrent;
 import pers.elias.financial_management.model.AccountCurrentResult;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface AccountCurrentMapper {
@@ -59,10 +60,35 @@ public interface AccountCurrentMapper {
     /**
      * 查询所有流水
      */
-    List<AccountCurrentResult> selectAllByAccountCurrent(AccountCurrent accountCurrent);
+    List<AccountCurrentResult> selectAllByAccountCurrent(Map<String, Object> paramMap);
+
+    /**
+     * id 查询
+     */
+    AccountCurrentResult selectById(Integer id);
+
+    /**
+     * 查询总数
+     */
+    Integer selectCount(Map<String, Object> paramMap);
 
     /**
      * 条件查询
      */
     List<AccountCurrentResult> selectByConditions(AccountCurrent accountCurrent);
+
+    /**
+     * 日常支出总额
+     */
+    List<Double> selectDailyExpense(AccountCurrent accountCurrent);
+
+    /**
+     * 月支出总额
+     */
+    List<Double> selectMonthlyExpense(AccountCurrent accountCurrent);
+
+    /**
+     * 年支出总额
+     */
+    List<Double> selectYearlyExpense(AccountCurrent accountCurrent);
 }

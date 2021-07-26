@@ -57,7 +57,7 @@
         amount, account_type_id, remarks
         )
         values (#{id,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, #{accountBookId,jdbcType=INTEGER},
-        #{date,jdbcType=DATE}, #{secondCategoryId,jdbcType=INTEGER}, #{inExStatus,jdbcType=VARCHAR},
+        #{date,jdbcType=TIMESTAMP}, #{secondCategoryId,jdbcType=INTEGER}, #{inExStatus,jdbcType=VARCHAR},
         #{amount,jdbcType=DOUBLE}, #{accountTypeId,jdbcType=INTEGER}, #{remarks,jdbcType=VARCHAR}
         )
     </insert>
@@ -108,7 +108,7 @@
                 #{accountBookId,jdbcType=INTEGER},
             </if>
             <if test="date != null">
-                #{date,jdbcType=DATE},
+                #{date,jdbcType=TIMESTAMP},
             </if>
             <if test="secondCategoryId != null">
                 #{secondCategoryId,jdbcType=INTEGER},
@@ -142,7 +142,7 @@
                 account_book_id = #{accountBookId,jdbcType=INTEGER},
             </if>
             <if test="date != null">
-                date = #{date,jdbcType=DATE},
+                date = #{date,jdbcType=TIMESTAMP},
             </if>
             <if test="secondCategoryId != null">
                 second_category_id = #{secondCategoryId,jdbcType=INTEGER},
@@ -171,7 +171,7 @@
         update account_current
         set user_name = #{userName,jdbcType=VARCHAR},
         account_book_id = #{accountBookId,jdbcType=INTEGER},
-        date = #{date,jdbcType=DATE},
+        date = #{date,jdbcType=TIMESTAMP},
         second_category_id = #{secondCategoryId,jdbcType=INTEGER},
         in_ex_status = #{inExStatus,jdbcType=VARCHAR},
         amount = #{amount,jdbcType=DOUBLE},
@@ -179,7 +179,67 @@
         remarks = #{remarks,jdbcType=VARCHAR}
         where id = #{id,jdbcType=INTEGER}
     </update>
-    <select id="selectAllByAccountCurrent" parameterType="pers.elias.financial_management.model.AccountCurrent" resultType="pers.elias.financial_management.model.AccountCurrentResult">
+    <select id="selectAllByAccountCurrent" resultType="pers.elias.financial_management.model.AccountCurrentResult">
+        select
+        ac.id,
+        ac.user_name,
+        ac.date,
+        cs.second_category_name,
+        ac.in_ex_status,
+        ac.amount,
+        at.account_type_name,
+        ac.remarks
+        from
+        account_current ac,
+        category_second cs,
+        account_type at
+        where
+        ac.user_name = cs.user_name
+        and
+        ac.account_book_id = cs.account_book_id
+        and
+        ac.second_category_id = cs.id
+        and
+        ac.account_type_id = at.id
+        and
+        ac.user_name = #{userName}
+        and
+        ac.account_book_id = #{accountBookId}
+        and
+        ac.in_ex_status = #{inExStatus}
+        and
+        DATE_FORMAT( date, '%Y-%m' ) = #{dateConverted}
+        ORDER BY ac.date DESC
+        limit #{startIndex},#{pagesize}
+    </select>
+
+    <select id="selectCount" resultType="Integer">
+        select
+        count(*)
+        from
+        account_current ac,
+        category_second cs,
+        account_type at
+        where
+        ac.user_name = cs.user_name
+        and
+        ac.account_book_id = cs.account_book_id
+        and
+        ac.second_category_id = cs.id
+        and
+        ac.account_type_id = at.id
+        and
+        ac.user_name = #{userName}
+        and
+        ac.account_book_id = #{accountBookId}
+        and
+        ac.in_ex_status = #{inExStatus}
+        and
+        DATE_FORMAT( date, '%Y-%m' ) = #{dateConverted}
+    </select>
+
+    <select id="selectByConditions" parameterType="pers.elias.financial_management.model.AccountCurrent"
+            resultType="pers.elias.financial_management.model.AccountCurrentResult">
         select
         ac.id,
         ac.user_name,
@@ -208,11 +268,46 @@
         and
         ac.in_ex_status = #{inExStatus}
     </select>
-    <select id="selectByConditions" parameterType="pers.elias.financial_management.model.AccountCurrent" resultType="pers.elias.financial_management.model.AccountCurrentResult">
-        select
+
+    <select id="selectDailyExpense" parameterType="pers.elias.financial_management.model.AccountCurrent"
+            resultType="Integer">
+        SELECT
+            ac.amount
+        FROM
+            account_current ac
+        WHERE
+            ac.user_name = #{user_name}
+            and
+            ac.account_book_id = #{accountBookId}
+            and
+            ac.in_ex_status = #{inExStatus}
+            and
+            date_format(date, '%Y-%m-%d') = #{dateConverted}
+    </select>
+
+    <select id="selectMonthlyExpense" parameterType="pers.elias.financial_management.model.AccountCurrent"
+            resultType="Double">
+        SELECT
+            ac.amount
+        FROM
+            account_current ac
+        WHERE
+            ac.user_name = #{userName}
+            and
+            ac.account_book_id = #{accountBookId}
+            and
+            ac.in_ex_status = #{inExStatus}
+            and
+            date_format(date, '%Y-%m') = #{dateConverted}
+    </select>
+
+    <select id="selectById" parameterType="Integer"
+            resultType="pers.elias.financial_management.model.AccountCurrentResult">
+ select
         ac.id,
         ac.user_name,
         ac.date,
+        cf.first_category_name,
         cs.second_category_name,
         ac.in_ex_status,
         ac.amount,
@@ -220,6 +315,7 @@
         ac.remarks
         from
         account_current ac,
+        category_first cf,
         category_second cs,
         account_type at
         where
@@ -230,11 +326,9 @@
         ac.second_category_id = cs.id
         and
         ac.account_type_id = at.id
-        and
-        ac.user_name = #{userName}
-        and
-        ac.account_book_id = #{accountBookId}
-        and
-        ac.in_ex_status = #{inExStatus}
+		and
+	    cs.first_category_id = cf.id
+		and
+		ac.id = #{id}
     </select>
 </mapper>

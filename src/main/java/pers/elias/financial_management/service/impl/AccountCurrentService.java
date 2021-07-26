@@ -6,12 +6,13 @@ import pers.elias.financial_management.mapper.AccountCurrentMapper;
 import pers.elias.financial_management.model.AccountCurrent;
 import pers.elias.financial_management.model.AccountCurrentResult;
 import pers.elias.financial_management.service.IAccountCurrentService;
+import pers.elias.financial_management.utils.PageBean;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AccountCurrentService implements IAccountCurrentService {
-
     @Autowired
     private AccountCurrentMapper accountCurrentMapper;
 
@@ -46,7 +47,42 @@ public class AccountCurrentService implements IAccountCurrentService {
     }
 
     @Override
-    public List<AccountCurrentResult> selectAllByAccountCurrent(AccountCurrent accountCurrent) {
-        return accountCurrentMapper.selectAllByAccountCurrent(accountCurrent);
+    public PageBean<AccountCurrentResult>selectAllByAccountCurrent(Map<String, Object> paramMap) {
+        PageBean<AccountCurrentResult> pageBean = new PageBean<>((Integer) paramMap.get("pageno"),(Integer) paramMap.get("pagesize"));
+
+        Integer startIndex = pageBean.getStartIndex();
+        paramMap.put("startIndex",startIndex);
+        List<AccountCurrentResult> datas = accountCurrentMapper.selectAllByAccountCurrent(paramMap);
+        pageBean.setDatas(datas);
+
+        Integer totalsize = accountCurrentMapper.selectCount(paramMap);
+        pageBean.setTotalsize(totalsize);
+        return pageBean;
+    }
+
+
+    @Override
+    public List<AccountCurrentResult> selectByConditions(AccountCurrent accountCurrent) {
+        return accountCurrentMapper.selectByConditions(accountCurrent);
+    }
+
+    @Override
+    public List<Double> selectDailyExpense(AccountCurrent accountCurrent) {
+        return accountCurrentMapper.selectDailyExpense(accountCurrent);
+    }
+
+    @Override
+    public List<Double> selectMonthlyExpense(AccountCurrent accountCurrent) {
+        return accountCurrentMapper.selectMonthlyExpense(accountCurrent);
+    }
+
+    @Override
+    public List<Double> selectYearlyExpense(AccountCurrent accountCurrent) {
+        return accountCurrentMapper.selectYearlyExpense(accountCurrent);
+    }
+
+    @Override
+    public AccountCurrentResult selectById(Integer id) {
+        return accountCurrentMapper.selectById(id);
     }
 }

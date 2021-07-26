@@ -1,6 +1,6 @@
 package pers.elias.financial_management.model;
 
-import pers.elias.financial_management.utils.DateStringConvert;
+import pers.elias.financial_management.utils.DateTimeUtil;
 
 import java.util.Date;
 
@@ -10,6 +10,7 @@ public class AccountCurrentResult {
     private Integer account_book_id;
     private Date date;
     private String dateConverted;
+    private String first_category_name;
     private String second_category_name;
     private char in_ex_status;
     private Double amount;
@@ -45,7 +46,7 @@ public class AccountCurrentResult {
     }
 
     public void setDate(Date date) {
-        this.dateConverted = DateStringConvert.dateToString(date);
+        this.dateConverted = DateTimeUtil.dateSimpleToString(date);
         this.date = date;
     }
 
@@ -97,13 +98,23 @@ public class AccountCurrentResult {
         this.dateConverted = dateConverted;
     }
 
+    public String getFirst_category_name() {
+        return first_category_name;
+    }
+
+    public void setFirst_category_name(String first_category_name) {
+        this.first_category_name = first_category_name;
+    }
+
     @Override
     public String toString() {
         return "AccountCurrentResult{" +
                 "id=" + id +
                 ", user_name='" + user_name + '\'' +
+                ", account_book_id=" + account_book_id +
                 ", date=" + date +
                 ", dateConverted='" + dateConverted + '\'' +
+                ", first_category_name='" + first_category_name + '\'' +
                 ", second_category_name='" + second_category_name + '\'' +
                 ", in_ex_status=" + in_ex_status +
                 ", amount=" + amount +

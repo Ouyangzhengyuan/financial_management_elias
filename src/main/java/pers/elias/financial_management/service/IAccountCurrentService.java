@@ -2,8 +2,10 @@ package pers.elias.financial_management.service;
 
 import pers.elias.financial_management.model.AccountCurrent;
 import pers.elias.financial_management.model.AccountCurrentResult;
+import pers.elias.financial_management.utils.PageBean;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IAccountCurrentService {
     /**
@@ -57,6 +59,30 @@ public interface IAccountCurrentService {
     /**
      * 查询所有流水
      */
-    List<AccountCurrentResult> selectAllByAccountCurrent(AccountCurrent accountCurrent);
+    PageBean<AccountCurrentResult> selectAllByAccountCurrent(Map<String, Object> paramMap);
 
+    /**
+     * 条件查询
+     */
+    List<AccountCurrentResult> selectByConditions(AccountCurrent accountCurrent);
+
+    /**
+     * 日常支出总额
+     */
+    List<Double> selectDailyExpense(AccountCurrent accountCurrent);
+
+    /**
+     * 月支出总额
+     */
+    List<Double> selectMonthlyExpense(AccountCurrent accountCurrent);
+
+    /**
+     * 年支出总额
+     */
+    List<Double> selectYearlyExpense(AccountCurrent accountCurrent);
+
+    /**
+     * id 查询
+     */
+    AccountCurrentResult selectById(Integer id);
 }

@@ -4,17 +4,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import pers.elias.financial_management.component.AjaxResult;
 import pers.elias.financial_management.component.DateRange;
 import pers.elias.financial_management.component.GlobalAccountInfo;
+import pers.elias.financial_management.model.AccountCurrent;
+import pers.elias.financial_management.model.AccountCurrentResult;
 import pers.elias.financial_management.service.impl.AccountBookService;
 import pers.elias.financial_management.service.impl.AccountTypeService;
 import pers.elias.financial_management.service.impl.CategoryFirstService;
 import pers.elias.financial_management.service.impl.CategorySecondService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/keepAccounts")
@@ -45,16 +50,16 @@ public class KeepAccountsController {
      */
     @RequestMapping("/toKeepAccounts")
     public String keepAccounts(HttpServletRequest request, Model model) {
-        //设置日期和格式
-        String currentDate = String.format("%tF", new Date());
+        //获取当前日期和时间
+//        String currentDate = DateTimeUtil.getSimpleDateTime();
         //获取当前用户
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         //添加全局用户
         globalAccountInfo.setUserName(userName);
-        //显示当前用户
+        //设置显示当前用户
         request.setAttribute("userName", userName);
-        //表单当前日期
-        model.addAttribute("date", currentDate);
+        //设置表单当前日期
+//        model.addAttribute("date", currentDate);
         //账目清单日期范围
         model.addAttribute("dateRange", dateRange.getDateRange());
         return "keepAccounts/keepAccounts";
@@ -90,5 +95,13 @@ public class KeepAccountsController {
     @RequestMapping("/addCategoryTemplate")
     public String addCategoryTemplate(){
         return "keepAccounts/addCategoryTemplate";
+    }
+
+    /**
+     * 跳转编辑本行流水
+     */
+    @RequestMapping(value = "/editAccountCurrent")
+    public String editAccountCurrent(@ModelAttribute("accountCurrentId") Integer accountCurrentId){
+        return "keepAccounts/editAccountCurrent";
     }
 }
