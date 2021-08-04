@@ -1,8 +1,5 @@
 package pers.elias.financial_management.component;
 
-/**
- * 账本头像上传组件
- */
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,6 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.UUID;
 
+/**
+ * 账本头像上传
+ */
 @Component
 public class FileUpload {
     private String filename;

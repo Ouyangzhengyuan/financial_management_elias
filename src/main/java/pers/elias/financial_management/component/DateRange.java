@@ -3,6 +3,10 @@ package pers.elias.financial_management.component;
 import org.springframework.stereotype.Component;
 import java.util.Calendar;
 
+/**
+ * 获取简单格式的日期范围
+ * 比如： 2021-01-01 ~ 2021-01-31
+ */
 @Component
 public class DateRange {
     private Calendar calendar;

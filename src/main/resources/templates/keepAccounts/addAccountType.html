@@ -54,8 +54,11 @@
                             data.message,
                             {time: 1000},
                             function(){
-                                window.parent.location.reload();//刷新父页面
-                                parent.layer.close(index);//关闭弹出层
+                                window.localStorage.setItem("isRenderSelect", "1");
+                                // 获取当前窗口索引
+                                var index = parent.layer.getFrameIndex(window.name);
+                                // 关闭当前窗口
+                                window.parent.layer.close(index);//关闭当前窗口
                             });
                     } else {
                         layer.msg(data.message);

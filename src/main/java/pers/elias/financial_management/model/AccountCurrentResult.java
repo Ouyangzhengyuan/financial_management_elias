@@ -1,6 +1,7 @@
 package pers.elias.financial_management.model;
 
 import pers.elias.financial_management.utils.DateTimeUtil;
+import pers.elias.financial_management.utils.KeepTwoDecimals;
 
 import java.util.Date;
 
@@ -12,8 +13,9 @@ public class AccountCurrentResult {
     private String dateConverted;
     private String first_category_name;
     private String second_category_name;
-    private char in_ex_status;
+    private String in_ex_status;
     private Double amount;
+    private String amountString;
     private String account_type_name;
     private String remarks;
 
@@ -58,11 +60,11 @@ public class AccountCurrentResult {
         this.second_category_name = second_category_name;
     }
 
-    public char getIn_ex_status() {
+    public String getIn_ex_status() {
         return in_ex_status;
     }
 
-    public void setIn_ex_status(char in_ex_status) {
+    public void setIn_ex_status(String in_ex_status) {
         this.in_ex_status = in_ex_status;
     }
 
@@ -71,6 +73,7 @@ public class AccountCurrentResult {
     }
 
     public void setAmount(Double amount) {
+        this.amountString = KeepTwoDecimals.keepTwoDeci(amount);
         this.amount = amount;
     }
 
@@ -106,6 +109,14 @@ public class AccountCurrentResult {
         this.first_category_name = first_category_name;
     }
 
+    public String getAmountString() {
+        return amountString;
+    }
+
+    public void setAmountString(String amountString) {
+        this.amountString = amountString;
+    }
+
     @Override
     public String toString() {
         return "AccountCurrentResult{" +
@@ -118,6 +129,7 @@ public class AccountCurrentResult {
                 ", second_category_name='" + second_category_name + '\'' +
                 ", in_ex_status=" + in_ex_status +
                 ", amount=" + amount +
+                ", amountString='" + amountString + '\'' +
                 ", account_type_name='" + account_type_name + '\'' +
                 ", remarks='" + remarks + '\'' +
                 '}';

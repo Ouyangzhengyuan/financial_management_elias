@@ -2,6 +2,9 @@
   <dictionary name="Elias">
     <words>
       <w>laydate</w>
+      <w>laypage</w>
+      <w>layui</w>
+      <w>templet</w>
     </words>
   </dictionary>
 </component>

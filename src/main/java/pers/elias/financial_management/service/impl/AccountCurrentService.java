@@ -82,6 +82,21 @@ public class AccountCurrentService implements IAccountCurrentService {
     }
 
     @Override
+    public List<Double> selectDailyIncome(AccountCurrent accountCurrent) {
+        return accountCurrentMapper.selectDailyIncome(accountCurrent);
+    }
+
+    @Override
+    public List<Double> selectMonthlyIncome(AccountCurrent accountCurrent) {
+        return accountCurrentMapper.selectMonthlyIncome(accountCurrent);
+    }
+
+    @Override
+    public List<Double> selectYearlyIncome(AccountCurrent accountCurrent) {
+        return accountCurrentMapper.selectYearlyIncome(accountCurrent);
+    }
+
+    @Override
     public AccountCurrentResult selectById(Integer id) {
         return accountCurrentMapper.selectById(id);
     }

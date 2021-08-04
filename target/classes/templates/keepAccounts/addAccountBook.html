@@ -9,7 +9,7 @@
 <body>
 <form class="layui-form" style="margin: 30px">
     <div class="layui-form-item">
-        <label class="layui-form-label">账本名称�?</label>
+        <label class="layui-form-label">账本名称：</label>
         <div class="layui-input-inline">
             <input type="text" name="accountBookName" required lay-verify="accountBookName" placeholder="请输入账本名"
                    autocomplete="off" class="layui-input" style="width: 180px"/>
@@ -54,8 +54,8 @@
                             data.message,
                             {time: 1000},
                             function(){
-                            window.parent.location.reload();//刷新父页�?
-                            parent.layer.close(index);//关闭弹出�?
+                                window.parent.location.reload();//刷新父页面
+                                parent.layer.close(index);//关闭弹出层
                         });
                     } else {
                         layer.msg(data.message);

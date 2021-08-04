@@ -21,6 +21,7 @@
         <label class="layui-form-label" for="dateTime">日期时间</label>
         <div class="layui-input-inline">
             <input type="hidden" th:value="${accountCurrentId}" id="accountCurrentId" name="id">
+            <input type="hidden" id="in-ex-status" name="in_ex_status">
             <input type="text" name="dateConverted" required lay-verify="dateTime"
                    placeholder="请输入日期时间" autocomplete="off" class="layui-input" id="dateTime"/>
         </div>
@@ -34,16 +35,16 @@
     </div>
 
     <div class="layui-form-item">
-        <label class="layui-form-label" for="firstExCategory">一级分类</label>
+        <label class="layui-form-label" for="first-category">一级分类</label>
         <div class="layui-input-inline">
-            <select name="first_category_name" id="firstExCategory" lay-filter="firstExCategory">
+            <select name="first_category_name" id="first-category" lay-filter="first-category">
                 <option></option>
             </select>
         </div>
 
-        <label class="layui-form-label" for="secondExCategory">二级分类</label>
+        <label class="layui-form-label" for="second-category">二级分类</label>
         <div class="layui-input-inline">
-            <select name="second_category_name" id="secondExCategory">
+            <select name="second_category_name" id="second-category">
                 <option></option>
             </select>
         </div>
@@ -110,17 +111,20 @@
                 if (data.success) {
                     //获取本行流水数据
                     var dateTime = data.data.dateConverted;//日期
-                    var accountType = data.data.account_type_name;//金融账户
-                    var firstExCategory = data.data.first_category_name;//一级分类
-                    var secondExCategory = data.data.second_category_name;//二级分类
+                    var firstCategory = data.data.first_category_name;//一级分类
+                    var secondCategory = data.data.second_category_name;//二级分类
+                    var inExStatus = data.data.in_ex_status; //获取收支属性
                     var amount = data.data.amount;//金额明细
+                    var accountType = data.data.account_type_name;//金融账户
                     var remarks = data.data.remarks;//备注
+                    //渲染收支属性
+                    $("#in-ex-status").val(inExStatus);
                     //渲染日期
                     $("#dateTime").val(dateTime);
                     //渲染金融账户
                     renderAccountType(accountType);
                     //渲染一级分类和二级分类
-                    renderFirstExCategory(firstExCategory, secondExCategory);
+                    renderFirstCategory(firstCategory, secondCategory, inExStatus);
                     //渲染金额明细
                     $("#amount").val(amount);
                     //渲染备注
@@ -153,34 +157,35 @@
             });
         }
 
-        //渲染一级支出
-        function renderFirstExCategory(firstExCategory, secondExCategory) {
-            var f_e_c = $("#firstExCategory");
+        //渲染一级分类
+        function renderFirstCategory(firstCategoryName, secondCategoryName, inExStatus) {
+            var f_c = $("#first-category");
             $.ajax({
-                url: '/categoryEx/firstExpenseCategory.json',
+                url: '/category/firstCategoryList?inExStatus=' + inExStatus,
+                data: inExStatus,
                 dataType: 'json',
                 type: 'post',
                 success: function (data) {
                     if (data.msg === "操作成功") {
-                        f_e_c.empty(); //清空列表 避免重复提交渲染
+                        f_c.empty(); //清空列表 避免重复提交渲染
                         for (var i = 0; i < data.data.length; i++) {
-                            f_e_c.append("<option>" + data.data[i] + "</option>");
+                            f_c.append("<option>" + data.data[i] + "</option>");
                         }
-                        f_e_c.val(firstExCategory);//将列表设置为当前数据
+                        f_c.val(firstCategoryName);//将列表设置为当前数据
                         form.render('select'); //刷新渲染
-                        var fEc = f_e_c.val(); //获取一级支出
-                        renderSecondExpenseCategory(fEc, secondExCategory); //渲染二级支出
+                        var f_c_n = f_c.val(); //获取一级支出
+                        renderSecondCategory(f_c_n, secondCategoryName, inExStatus); //渲染二级支出
                     }
                 }
             });
         }
 
         //渲染二级支出
-        function renderSecondExpenseCategory(firstExpenseCategory, secondExCategory) {
-            var s_e_c = $("#secondExCategory");
+        function renderSecondCategory(firstCategoryName, secondCategoryName, inExStatus) {
+            var s_e_c = $("#second-category");
             $.ajax({
-                url: '/categoryEx/secondExpenseCategory.json?firstExpenseCategory=' + firstExpenseCategory,
-                data: firstExpenseCategory,
+                url: '/category/secondCategoryList',
+                data: {firstCategoryName: firstCategoryName, inExStatus: inExStatus},
                 dataType: 'json',
                 type: 'post',
                 success: function (data) {
@@ -189,8 +194,8 @@
                         for (var i = 0; i < data.data.length; i++) {
                             s_e_c.append("<option>" + data.data[i] + "</option>");
                         }
-                        if (secondExCategory != null) {
-                            s_e_c.val(secondExCategory);//将列表设置为当前数据
+                        if (secondCategoryName != null) {
+                            s_e_c.val(secondCategoryName);//将列表设置为当前数据
                         } else {
                             //渲染一级分类对应的二级分类
                             s_e_c.val(data.data[0]);
@@ -204,10 +209,11 @@
         }
 
         //一级支出事件
-        form.on('select(firstExCategory)', function (data) {
+        form.on('select(first-category)', function (data) {
             //提交数据 返回后台 查询对应的二级分类
-            var firstExpenseCategory = data.value;
-            renderSecondExpenseCategory(firstExpenseCategory, null);
+            var inExStatus = $("#in-ex-status").val();
+            var firstCategoryName = data.value;
+            renderSecondCategory(firstCategoryName, null, inExStatus);
         });
 
         //提交表单
@@ -223,9 +229,23 @@
                             data.message,
                             {time: 1000},
                             function () {
-                                //获取当前窗口索引
-                                var index = parent.layer.getFrameIndex(window.name);
-                                parent.layer.close(index);//关闭当前窗口
+                                var isTableReload = true;
+                                $.ajax({
+                                    url: '/tableReload/setTableReload?isTableReload=' + isTableReload,
+                                    data: isTableReload,
+                                    dataType: 'json',
+                                    type: 'post',
+                                    success: function (data) {
+                                        if(data.success){
+                                            // 获取当前窗口索引
+                                            var index = parent.layer.getFrameIndex(window.name);
+                                            // 关闭当前窗口
+                                            window.parent.layer.close(index);//关闭当前窗口
+                                        }else{
+                                            layer.msg(data.msg);
+                                        }
+                                    }
+                                });
                             }
                         );
                     } else {

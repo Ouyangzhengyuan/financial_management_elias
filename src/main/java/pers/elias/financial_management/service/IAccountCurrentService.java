@@ -67,7 +67,12 @@ public interface IAccountCurrentService {
     List<AccountCurrentResult> selectByConditions(AccountCurrent accountCurrent);
 
     /**
-     * 日常支出总额
+     * id 查询
+     */
+    AccountCurrentResult selectById(Integer id);
+
+    /**
+     * 日支出总额
      */
     List<Double> selectDailyExpense(AccountCurrent accountCurrent);
 
@@ -82,7 +87,17 @@ public interface IAccountCurrentService {
     List<Double> selectYearlyExpense(AccountCurrent accountCurrent);
 
     /**
-     * id 查询
+     * 日收入总额
      */
-    AccountCurrentResult selectById(Integer id);
+    List<Double> selectDailyIncome(AccountCurrent accountCurrent);
+
+    /**
+     * 月收入总额
+     */
+    List<Double> selectMonthlyIncome(AccountCurrent accountCurrent);
+
+    /**
+     * 年收入总额
+     */
+    List<Double> selectYearlyIncome(AccountCurrent accountCurrent);
 }

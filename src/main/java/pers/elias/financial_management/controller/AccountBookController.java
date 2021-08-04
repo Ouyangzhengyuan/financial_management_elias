@@ -9,15 +9,20 @@ import pers.elias.financial_management.component.AjaxResult;
 import pers.elias.financial_management.component.GlobalAccountInfo;
 import pers.elias.financial_management.model.AccountBook;
 import pers.elias.financial_management.service.impl.AccountBookService;
+import pers.elias.financial_management.service.impl.RedisService;
+
 import java.util.List;
 
+/**
+ * 账本控制器
+ */
 @Controller
 @RequestMapping("/accountBook")
 public class AccountBookController {
     @Autowired //异步更新
     private AjaxResult ajaxResult;
 
-    @Autowired //全局账户信息
+    @Autowired //账户信息
     private GlobalAccountInfo globalAccountInfo;
 
     @Autowired //账本服务
@@ -25,17 +30,14 @@ public class AccountBookController {
 
     /**
      * 查询账本
-     * 渲染账本
      */
     @ResponseBody
-    @RequestMapping("/accountBook.json")
+    @RequestMapping("/accountBookList")
     public String accountBook() {
-        //查询当前用户所有账本
-        List<String> accountBookList = accountBookService.selectAllByUserName(globalAccountInfo.getUserName());
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("code", 200);
         jsonObject.put("msg", "操作成功");
-        jsonObject.put("data", accountBookList);
+        jsonObject.put("data", accountBookService.selectAllByUserName(globalAccountInfo.getUserName()));
         return jsonObject.toString();
     }
 
@@ -47,7 +49,7 @@ public class AccountBookController {
     public AjaxResult addAccountBook(String accountBookName) {
         try {
             //判断账本是否存在
-            if (accountBookService.hasAccountBook(globalAccountInfo.getUserName(), accountBookName)) {
+            if (accountBookService.hasAccountBook(globalAccountInfo.getUserName(), accountBookName.trim())) {
                 //匹配当前用户和账本
                 AccountBook accountBook = new AccountBook();
                 accountBook.setUserName(globalAccountInfo.getUserName());

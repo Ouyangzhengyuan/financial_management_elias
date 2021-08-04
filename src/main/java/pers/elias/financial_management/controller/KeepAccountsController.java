@@ -5,21 +5,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import pers.elias.financial_management.component.AjaxResult;
 import pers.elias.financial_management.component.DateRange;
 import pers.elias.financial_management.component.GlobalAccountInfo;
-import pers.elias.financial_management.model.AccountCurrent;
-import pers.elias.financial_management.model.AccountCurrentResult;
 import pers.elias.financial_management.service.impl.AccountBookService;
 import pers.elias.financial_management.service.impl.AccountTypeService;
 import pers.elias.financial_management.service.impl.CategoryFirstService;
 import pers.elias.financial_management.service.impl.CategorySecondService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/keepAccounts")
@@ -69,16 +65,17 @@ public class KeepAccountsController {
      * 跳转添加账本对话框
      */
     @RequestMapping("/addAccountBook")
-    public String addAccountBook() {
+    public String addAccountBook(String inExStatus) {
+        System.out.println(inExStatus);
         return "keepAccounts/addAccountBook";
     }
 
     /**
-     * 跳转添加支出分类
+     * 跳转添加分类
      */
-    @RequestMapping("/addExpenseCategory")
-    public String addFirstCategory() {
-        return "keepAccounts/addExpenseCategory";
+    @RequestMapping("/addCategory")
+    public String addCategory(@ModelAttribute("inExStatus") String inExStatus) {
+        return "keepAccounts/addCategory";
     }
 
     /**
@@ -93,7 +90,7 @@ public class KeepAccountsController {
      * 跳转添加模板
      */
     @RequestMapping("/addCategoryTemplate")
-    public String addCategoryTemplate(){
+    public String addCategoryTemplate(@ModelAttribute("inExStatus") String inExStatus){
         return "keepAccounts/addCategoryTemplate";
     }
 

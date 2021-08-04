@@ -4,7 +4,6 @@ import cn.hutool.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import pers.elias.financial_management.component.AjaxResult;
 import pers.elias.financial_management.component.GlobalAccountInfo;
@@ -43,9 +42,9 @@ public class CategoryTemplateController {
     /**
      * 查询所有分类模板
      */
-    @RequestMapping("/categoryTemplateList.json")
+    @RequestMapping("/categoryTemplateList")
     @ResponseBody
-    public String categoryTemplateList(String accountBookName) {
+    public String categoryTemplateList(String accountBookName, String inExStatus) {
         JSONObject jsonObject = new JSONObject();
         try {
             globalAccountInfo.setAccountBookName(accountBookName);
@@ -53,7 +52,7 @@ public class CategoryTemplateController {
             CategoryTemplate categoryTemplate = new CategoryTemplate();
             categoryTemplate.setUserName(globalAccountInfo.getUserName());
             categoryTemplate.setAccountBookId(accountBookId);
-            categoryTemplate.setInExStatus("支");
+            categoryTemplate.setInExStatus(inExStatus);
             List<String> categoryTemplateList = categoryTemplateService.selectAllByCategoryTemplate(categoryTemplate);
             jsonObject.put("code", 200);
             jsonObject.put("msg", "操作成功");
@@ -68,18 +67,18 @@ public class CategoryTemplateController {
     }
 
     /**
-     * 查询单个分类模板
+     * 查询指定分类模板绑定的数据
      */
     @RequestMapping("/categoryTemplateSingle")
     @ResponseBody
-    public String categoryTemplateSingle(String categoryTemplateName){
+    public String categoryTemplateSingle(String categoryTemplateName, String inExStatus){
         JSONObject jsonObject = new JSONObject();
         try{
             //创建分类模板实体
             CategoryTemplate categoryTemplate = new CategoryTemplate();
             categoryTemplate.setUserName(globalAccountInfo.getUserName());
             categoryTemplate.setAccountBookId(globalAccountInfo.getAccountBookId());
-            categoryTemplate.setInExStatus("支");
+            categoryTemplate.setInExStatus(inExStatus);
             categoryTemplate.setTemplateName(categoryTemplateName);
             //执行分类模板查询
             CategoryTemplate cT = categoryTemplateService.selectByCategoryTemplate(categoryTemplate);
@@ -112,7 +111,12 @@ public class CategoryTemplateController {
      */
     @RequestMapping("/addCategoryTemplate.do")
     @ResponseBody
-    public AjaxResult addCategoryTemplate(String templateName, String accountTypeName, String firstExCategoryName, String secondCategoryName) {
+    public AjaxResult addCategoryTemplate(String templateName, String accountTypeName, String firstCategoryName, String secondCategoryName, String inExStatus) {
+        System.out.println(templateName);
+        System.out.println(accountTypeName);
+        System.out.println(firstCategoryName);
+        System.out.println(secondCategoryName);
+        System.out.println(inExStatus);
         try {
             //反向查询 账本id
             Integer accountBookId = accountBookService.selectIdByUserNameAndBook(globalAccountInfo);
@@ -127,21 +131,21 @@ public class CategoryTemplateController {
             CategoryFirst categoryFirst = new CategoryFirst();
             categoryFirst.setUserName(globalAccountInfo.getUserName());
             categoryFirst.setAccountBookId(globalAccountInfo.getAccountBookId());
-            categoryFirst.setInExStatus("支");
-            categoryFirst.setFirstCategoryName(firstExCategoryName);
+            categoryFirst.setInExStatus(inExStatus);
+            categoryFirst.setFirstCategoryName(firstCategoryName);
             Integer categoryFirstId = categoryFirstService.selectIdByCategoryFirst(categoryFirst);
             //反向查询 二级分类 id
             CategorySecond categorySecond = new CategorySecond();
             categorySecond.setUserName(globalAccountInfo.getUserName());
             categorySecond.setAccountBookId(globalAccountInfo.getAccountBookId());
-            categorySecond.setInExStatus("支");
+            categorySecond.setInExStatus(inExStatus);
             categorySecond.setSecondCategoryName(secondCategoryName);
             Integer categorySecondId = categorySecondService.selectIdByCategorySecond(categorySecond);
             //创建模板实体对象
             CategoryTemplate categoryTemplate = new CategoryTemplate();
             categoryTemplate.setUserName(globalAccountInfo.getUserName());
             categoryTemplate.setAccountBookId(globalAccountInfo.getAccountBookId());
-            categoryTemplate.setInExStatus("支");
+            categoryTemplate.setInExStatus(inExStatus);
             categoryTemplate.setAccountTypeId(accountTypeId);
             categoryTemplate.setCategoryFirstId(categoryFirstId);
             categoryTemplate.setCategorySecondId(categorySecondId);

@@ -48,6 +48,7 @@ public class AccountTypeService implements IAccountTypeService {
         return accountTypeMapper.selectAccountTypeName(accountBookId);
     }
 
+    @Override
     public boolean isExists(AccountType accountType) {
         for(String accountTypeName: accountTypeMapper.selectAccountTypeName(accountType.getAccountBookId())){
             if(accountType.getAccountTypeName().equals(accountTypeName)){

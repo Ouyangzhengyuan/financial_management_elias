@@ -7,9 +7,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+/**
+ * 文件复制
+ */
 @Component
 public class FileCopy {
-    public boolean copyFile(String targetFilePath, File fileSource) {
+    public void copyFile(String targetFilePath, File fileSource) {
         try {
             File targetFile = new File(targetFilePath, fileSource.getName());
             if (!targetFile.exists()) {
@@ -24,10 +27,8 @@ public class FileCopy {
             }
             fis.close();
             fos.close();
-            return true;
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
         }
     }
 }

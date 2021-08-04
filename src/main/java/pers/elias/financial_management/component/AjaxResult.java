@@ -4,6 +4,9 @@ import org.springframework.stereotype.Component;
 
 import javax.xml.crypto.Data;
 
+/**
+ * 异步更新结果
+ */
 @Component
 public class AjaxResult {
     private boolean success;

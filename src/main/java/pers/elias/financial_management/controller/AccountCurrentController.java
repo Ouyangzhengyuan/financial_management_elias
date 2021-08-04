@@ -25,7 +25,6 @@ import pers.elias.financial_management.service.impl.CategorySecondService;
 import pers.elias.financial_management.utils.DateTimeUtil;
 import pers.elias.financial_management.utils.PageBean;
 
-import java.text.ParseException;
 import java.util.*;
 
 @Controller
@@ -68,7 +67,6 @@ public class AccountCurrentController {
         //设置实体字段
         paramMap.put("userName", globalAccountInfo.getUserName());
         paramMap.put("accountBookId", accountBookId);
-        paramMap.put("inExStatus", "支");
         paramMap.put("dateConverted", dateSubstring);
         //查询流水
         PageBean<AccountCurrentResult> pageBean = accountCurrentService.selectAllByAccountCurrent(paramMap);
@@ -108,7 +106,7 @@ public class AccountCurrentController {
             CategorySecond categorySecond = new CategorySecond();
             categorySecond.setUserName(globalAccountInfo.getUserName());
             categorySecond.setAccountBookId(globalAccountInfo.getAccountBookId());
-            categorySecond.setInExStatus("支");
+            categorySecond.setInExStatus(accountCurrentResult.getIn_ex_status());
             categorySecond.setSecondCategoryName(accountCurrentResult.getSecond_category_name());
             //查询当前二级分类id
             Integer secondCategoryId = categorySecondService.selectIdByCategorySecond(categorySecond);
@@ -129,8 +127,8 @@ public class AccountCurrentController {
             accountCurrent.setDate(DateTimeUtil.stringToDate(accountCurrentResult.getDateConverted()));
             //设置二级分类id
             accountCurrent.setSecondCategoryId(secondCategoryId);
-            //设置支出
-            accountCurrent.setInExStatus("支");
+            //设置收支属性
+            accountCurrent.setInExStatus(accountCurrentResult.getIn_ex_status());
             //设置金额
             accountCurrent.setAmount(accountCurrentResult.getAmount());
             //设置金融账户id
@@ -151,7 +149,7 @@ public class AccountCurrentController {
     }
 
     /**
-     * 根秀流水
+     * 更新流水
      */
     @ResponseBody
     @RequestMapping("/update")
@@ -174,7 +172,7 @@ public class AccountCurrentController {
             CategorySecond categorySecond = new CategorySecond();
             categorySecond.setUserName(globalAccountInfo.getUserName());
             categorySecond.setAccountBookId(globalAccountInfo.getAccountBookId());
-            categorySecond.setInExStatus("支");
+            categorySecond.setInExStatus(accountCurrentResult.getIn_ex_status());
             categorySecond.setSecondCategoryName(accountCurrentResult.getSecond_category_name());
             //查询当前二级分类id
             Integer secondCategoryId = categorySecondService.selectIdByCategorySecond(categorySecond);

@@ -16,22 +16,22 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 
 /**
- * 账本头像
+ * 账本头像控制器
  */
 @Controller
 @RequestMapping("/accountBookHeader")
 public class AccountBookHeaderController {
     @Autowired
-    private FileCopy fileCopy;
+    private FileCopy fileCopy;//文件复制
 
     @Autowired
-    private FileUpload fileUpload;
+    private FileUpload fileUpload;//文件上传
 
-    @Autowired //全局账户信息
-    private GlobalAccountInfo globalAccountInfo;
+    @Autowired
+    private GlobalAccountInfo globalAccountInfo;//账户信息
 
-    @Autowired //账本头像服务
-    private AccountBookHeaderService accountBookHeaderService;
+    @Autowired
+    private AccountBookHeaderService accountBookHeaderService;//账本头像服务
 
     /**
      * 账本头像上传
@@ -96,7 +96,7 @@ public class AccountBookHeaderController {
     }
 
     /**
-     * 读取用户账本头像路径
+     * 读取用户账本头像
      */
     @RequestMapping("/getHeaderPath")
     @ResponseBody
@@ -125,6 +125,5 @@ public class AccountBookHeaderController {
             jsonObject.put("msg", "账本头像读取失败！");
             return jsonObject.toString();
         }
-
     }
 }

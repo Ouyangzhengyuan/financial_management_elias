@@ -206,8 +206,6 @@
         and
         ac.account_book_id = #{accountBookId}
         and
-        ac.in_ex_status = #{inExStatus}
-        and
         DATE_FORMAT( date, '%Y-%m' ) = #{dateConverted}
         ORDER BY ac.date DESC
         limit #{startIndex},#{pagesize}
@@ -232,8 +230,6 @@
         ac.user_name = #{userName}
         and
         ac.account_book_id = #{accountBookId}
-        and
-        ac.in_ex_status = #{inExStatus}
         and
         DATE_FORMAT( date, '%Y-%m' ) = #{dateConverted}
     </select>
@@ -269,6 +265,37 @@
         ac.in_ex_status = #{inExStatus}
     </select>
 
+    <select id="selectById" parameterType="Integer"
+            resultType="pers.elias.financial_management.model.AccountCurrentResult">
+        select
+        ac.id,
+        ac.user_name,
+        ac.date,
+        cf.first_category_name,
+        cs.second_category_name,
+        ac.in_ex_status,
+        ac.amount,
+        at.account_type_name,
+        ac.remarks
+        from
+        account_current ac,
+        category_first cf,
+        category_second cs,
+        account_type at
+        where
+        ac.user_name = cs.user_name
+        and
+        ac.account_book_id = cs.account_book_id
+        and
+        ac.second_category_id = cs.id
+        and
+        ac.account_type_id = at.id
+		and
+	    cs.first_category_id = cf.id
+		and
+		ac.id = #{id}
+    </select>
+
     <select id="selectDailyExpense" parameterType="pers.elias.financial_management.model.AccountCurrent"
             resultType="Integer">
         SELECT
@@ -301,34 +328,19 @@
             date_format(date, '%Y-%m') = #{dateConverted}
     </select>
 
-    <select id="selectById" parameterType="Integer"
-            resultType="pers.elias.financial_management.model.AccountCurrentResult">
- select
-        ac.id,
-        ac.user_name,
-        ac.date,
-        cf.first_category_name,
-        cs.second_category_name,
-        ac.in_ex_status,
-        ac.amount,
-        at.account_type_name,
-        ac.remarks
-        from
-        account_current ac,
-        category_first cf,
-        category_second cs,
-        account_type at
-        where
-        ac.user_name = cs.user_name
-        and
-        ac.account_book_id = cs.account_book_id
-        and
-        ac.second_category_id = cs.id
-        and
-        ac.account_type_id = at.id
-		and
-	    cs.first_category_id = cf.id
-		and
-		ac.id = #{id}
+    <select id="selectMonthlyIncome" parameterType="pers.elias.financial_management.model.AccountCurrent"
+            resultType="Double">
+        SELECT
+            ac.amount
+        FROM
+            account_current ac
+        WHERE
+            ac.user_name = #{userName}
+            and
+            ac.account_book_id = #{accountBookId}
+            and
+            ac.in_ex_status = #{inExStatus}
+            and
+            date_format(date, '%Y-%m') = #{dateConverted}
     </select>
 </mapper>

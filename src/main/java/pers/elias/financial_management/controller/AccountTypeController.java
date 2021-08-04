@@ -11,7 +11,6 @@ import pers.elias.financial_management.model.AccountType;
 import pers.elias.financial_management.service.impl.AccountBookService;
 import pers.elias.financial_management.service.impl.AccountTypeService;
 
-import javax.sound.midi.Soundbank;
 import java.util.List;
 
 @Controller
@@ -38,14 +37,7 @@ public class AccountTypeController {
         JSONObject jsonObject = new JSONObject();
         try {
             if(accountBookName != null){
-                if(accountBookName.trim().equals("所有账本")){
-                    jsonObject.put("code", 200);
-                    jsonObject.put("msg", "一级分类读取失败");
-                    return jsonObject.toString();
-                }
-                if(!accountBookName.trim().isEmpty()){
-                    globalAccountInfo.setAccountBookName(accountBookName);
-                }
+                globalAccountInfo.setAccountBookName(accountBookName);
             }
             //反向查询账本id
             Integer accountBookId = accountBookService.selectIdByUserNameAndBook(globalAccountInfo);
@@ -78,7 +70,7 @@ public class AccountTypeController {
             accountType.setAccountBookId(accountBookId);
             accountType.setAccountTypeName(accountTypeName);
             //判断账户是否存在
-            if(!accountTypeService.isExists(accountType)){
+            if (!accountTypeService.isExists(accountType)) {
                 accountTypeService.insert(accountType);
                 ajaxResult.setSuccess(true);
                 ajaxResult.setMessage("添加成功");

@@ -91,4 +91,19 @@ public interface AccountCurrentMapper {
      * 年支出总额
      */
     List<Double> selectYearlyExpense(AccountCurrent accountCurrent);
+
+    /**
+     * 日收入总额
+     */
+    List<Double> selectDailyIncome(AccountCurrent accountCurrent);
+
+    /**
+     * 月收入总额
+     */
+    List<Double> selectMonthlyIncome(AccountCurrent accountCurrent);
+
+    /**
+     * 年收入总额
+     */
+    List<Double> selectYearlyIncome(AccountCurrent accountCurrent);
 }

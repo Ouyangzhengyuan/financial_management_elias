@@ -1,11 +1,9 @@
 package pers.elias.financial_management.config;
 
-import com.sun.org.apache.xpath.internal.operations.And;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
@@ -56,7 +54,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 //设置cookies失效时间
                 .tokenValiditySeconds(24 * 60 * 60)
                 .and()
-                // 防止报Refused to display in a frame because it set 'X-Frame-Options' to 'DENY'错误
+//                 防止报Refused to display in a frame because it set 'X-Frame-Options' to 'DENY'错误
                 .headers().frameOptions().disable()
                 .and()
                 .csrf().disable();

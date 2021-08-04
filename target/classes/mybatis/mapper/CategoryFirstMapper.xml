@@ -164,8 +164,11 @@
         category_first
         where
         account_book_id = #{accountBookId}
-        and
-        in_ex_status = #{inExStatus}
+        <if test="inExStatus != null">
+            and
+            in_ex_status = #{inExStatus}
+        </if>
+
         and
         first_category_name = #{firstCategoryName}
     </select>
@@ -178,8 +181,8 @@
         cf.user_name = #{userName}
         and
         cf.account_book_id = #{accountBookId}
-        and
-        cf.in_ex_status = #{inExStatus}
+            and
+            cf.in_ex_status = #{inExStatus}
         and
         cf.first_category_name = #{firstCategoryName}
     </select>
