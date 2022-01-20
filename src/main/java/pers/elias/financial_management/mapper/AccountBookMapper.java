@@ -1,7 +1,7 @@
 package pers.elias.financial_management.mapper;
 
 import org.springframework.stereotype.Repository;
-import pers.elias.financial_management.component.GlobalAccountInfo;
+import pers.elias.financial_management.bean.GlobalAccountInfo;
 import pers.elias.financial_management.model.AccountBook;
 
 import java.util.List;
@@ -70,4 +70,9 @@ public interface AccountBookMapper {
      * 反向查询id
      */
     Integer selectIdByUserNameAndBook(GlobalAccountInfo globalAccountInfo);
+
+    /**
+     * 通过用户名删除
+     */
+    int deleteByUserName(String userName);
 }

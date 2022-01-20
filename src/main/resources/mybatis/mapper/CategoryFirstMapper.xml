@@ -133,13 +133,15 @@
 
     <select id="selectAllByCategoryFirst" parameterType="pers.elias.financial_management.model.CategoryFirst"
             resultType="String">
-    select first_category_name
-    from category_first
-    where
-    account_book_id = #{accountBookId}
-    and
-    in_ex_status = #{inExStatus}
-  </select>
+        select first_category_name
+        from category_first
+        where
+        account_book_id = #{accountBookId}
+        <if test="inExStatus != null">
+            and
+            in_ex_status = #{inExStatus}
+        </if>
+    </select>
 
     <delete id="deleteByCategoryFirst" parameterType="pers.elias.financial_management.model.CategoryFirst">
     delete from category_first
@@ -157,7 +159,8 @@
         <result column="first_category_name" jdbcType="VARCHAR" property="firstCategoryName"/>
     </resultMap>
 
-    <select id="selectByCategoryFirst" parameterType="pers.elias.financial_management.model.CategoryFirst" resultMap="categoryFirstResultMap">
+    <select id="selectByCategoryFirst" parameterType="pers.elias.financial_management.model.CategoryFirst"
+            resultMap="categoryFirstResultMap">
         select
         id, user_name, account_book_id, in_ex_status, first_category_name
         from
@@ -168,12 +171,12 @@
             and
             in_ex_status = #{inExStatus}
         </if>
-
         and
         first_category_name = #{firstCategoryName}
     </select>
 
-    <select id="selectIdByCategoryFirst" parameterType="pers.elias.financial_management.model.CategoryFirst" resultType="Integer">
+    <select id="selectIdByCategoryFirst" parameterType="pers.elias.financial_management.model.CategoryFirst"
+            resultType="Integer">
         select
         cf.id
         from category_first cf
@@ -181,9 +184,19 @@
         cf.user_name = #{userName}
         and
         cf.account_book_id = #{accountBookId}
+        <if test="inExStatus != null">
             and
             cf.in_ex_status = #{inExStatus}
+        </if>
         and
         cf.first_category_name = #{firstCategoryName}
     </select>
+
+    <delete id="deleteByUserName" parameterType="String">
+        delete from category_first where user_name = #{userName}
+    </delete>
+
+    <delete id="deleteByAccountBookId" parameterType="Integer">
+        delete from category_first where account_book_id = #{accountBookId}
+    </delete>
 </mapper>

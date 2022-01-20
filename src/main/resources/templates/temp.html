@@ -1,0 +1,178 @@
+<!--日常收支报表面板-->
+<div id="daily-in-ex-panel" style="display: none">
+    <!-- 选项卡 -->
+    <div class="layui-tab layui-tab-brief" lay-filter="daily-in-ex-tab">
+        <!-- 选项卡标题 -->
+        <ul class="layui-tab-title">
+            <li class="layui-this"><h3>支出报表</h3></li>
+            <li><h3>收入报表</h3></li>
+        </ul>
+        <!-- 选项卡容器 -->
+        <div class="layui-tab-content">
+            <!-- 支出报表 -->
+            <div class="layui-tab-item layui-show">
+                <!--表单搜索-->
+                <div id="form-search">
+                    <form class="layui-form">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" for="search-first-category">
+                                一级分类：
+                            </label>
+                            <div class="layui-input-inline">
+                                <select name="first_category_name" class="first-category"
+                                        id="search-first-category"
+                                        lay-filter="search-first-category">
+                                </select>
+                            </div>
+
+                            <label class="layui-form-label" for="search-second-category">
+                                二级分类：
+                            </label>
+                            <div class="layui-input-inline">
+                                <select name="second_category_name" class="second-category"
+                                        id="search-second-category">
+                                </select>
+                            </div>
+                            <label class="layui-form-label"
+                                   for="search-account-type">金融账户：</label>
+                            <div class="layui-input-inline">
+                                <select name="account_type_name" class="account-type"
+                                        id="search-account-type">
+                                    <option>金融账户</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" for="search-date">
+                                日期时间：
+                            </label>
+                            <div class="layui-input-inline">
+                                <input type="text" class="layui-input date" id="search-date"
+                                       name="dateRange"
+                                       style="width: 120px" autocomplete="off"
+                                       placeholder="选择日期时间">
+                            </div>
+
+                            <label class="layui-form-label" for="search-remarks">备注：
+                                <a><i class="layui-icon"
+                                      style="font-size: 15px"></i></a></label>
+                            <div class="layui-input-inline"
+                                 style="width: 120px; margin-right: 0">
+                                <input type="text" name="remarks" id="search-remarks"
+                                       placeholder="备注"
+                                       autocomplete="off"
+                                       class="layui-input remarks" width="380px"
+                                       lay-verify="remarks">
+                            </div>
+
+                            <button class="layui-btn" lay-submit lay-filter="search">
+                                <i class="layui-icon layui-icon-search"></i>
+                                确定
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <hr>
+
+                <div class="chart-title">
+                    <h2>支出堆积表：</h2>
+                    <span class="now-date"></span>
+                </div>
+
+                <hr>
+
+                <!--支出堆积表-->
+                <div class="chartContainer" id="chartContainer-ex"></div>
+
+                <!--支出数据表格-->
+                <div>
+                    <table id="categoryExTable"></table>
+                </div>
+
+            </div>
+
+            <!-- 收入报表 -->
+            <div class="layui-tab-item">
+                <!--表单搜索-->
+                <div id="form-search">
+                    <form class="layui-form">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" for="search-first-category-in">
+                                一级分类：
+                            </label>
+                            <div class="layui-input-inline">
+                                <select name="first_category_name" class="first-category"
+                                        id="search-first-category-in"
+                                        lay-filter="search-first-category-in">
+                                </select>
+                            </div>
+
+                            <label class="layui-form-label" for="search-second-category-in">
+                                二级分类：
+                            </label>
+                            <div class="layui-input-inline">
+                                <select name="second_category_name" class="second-category"
+                                        id="search-second-category-in">
+                                </select>
+                            </div>
+                            <label class="layui-form-label"
+                                   for="search-account-type-in">金融账户：</label>
+                            <div class="layui-input-inline">
+                                <select name="account_type_name" class="account-type"
+                                        id="search-account-type-in">
+                                    <option>金融账户</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" for="search-date-in">
+                                日期时间：
+                            </label>
+                            <div class="layui-input-inline">
+                                <input type="text" class="layui-input date" id="search-date-in"
+                                       name="dateRange"
+                                       style="width: 120px" autocomplete="off"
+                                       placeholder="选择日期时间">
+                            </div>
+
+                            <label class="layui-form-label" for="search-remarks-in">备注：
+                                <a><i class="layui-icon"
+                                      style="font-size: 15px"></i></a></label>
+                            <div class="layui-input-inline"
+                                 style="width: 120px; margin-right: 0">
+                                <input type="text" name="remarks" id="search-remarks-in"
+                                       placeholder="备注"
+                                       autocomplete="off"
+                                       class="layui-input remarks" width="380px"
+                                       lay-verify="remarks">
+                            </div>
+                            <button class="layui-btn" lay-submit lay-filter="search-in">
+                                <i class="layui-icon layui-icon-search"></i>
+                                确定
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <hr>
+
+                <div class="chart-title">
+                    <h2>收入堆积表：</h2>
+                    <span class="now-date"></span>
+                </div>
+
+                <hr>
+
+                <div class="chartContainer" id="chartContainer-in"></div>
+
+                <!--数据表格-->
+                <div>
+                    <table id="categoryInTable"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

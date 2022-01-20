@@ -1,518 +1,650 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Financial Management - 记账</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
     <link rel="stylesheet" th:href="@{/css/layui.css}" media="all">
     <link rel="stylesheet" th:href="@{/css/common.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/keepAccounts.css}" media="all">
     <style>
-        .layui-form .layui-input-inline {
-            width: 120px;
-        }
+        /* 移动端 */
+        @media screen and (max-width: 768px) {
+            .layui-layout-admin .layui-layout-left,
+            .layui-layout-admin .layui-body,
+            .layui-layout-admin .layui-footer {
+                left: 0;
+            }
 
-        .layui-form-label {
-            width: 100px;
-        }
-
-        #form-search .layui-form-label {
-            width: 80px;
-        }
-
-        #account-total-list .amount {
-            font-size: 16px;
-        }
-
-        #account-total-list .separator {
-            color: lightgrey;
-            margin-left: 12px;
-            margin-right: 12px;
+            .layui-layout-admin .layui-side {
+                left: -300px;
+            }
         }
     </style>
 </head>
-<body class="layui-layout-body">
-<div class="layui-layout layui-layout-admin">
-    <!-- 头部区域（菜单栏） -->
-    <div th:replace="/common/header::header-div"></div>
+<body>
+<div class="layui-layout layui-layout-admin" style="min-width: 1300px">
+    <!--头部区域-->
+    <div class="layui-header">
+        <div class="layui-logo layui-hide-xs" style="width: 300px; font-size: 21px">Financial Management - 记账</div>
+        <!-- 头部区域（可配合layui 已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left" style="padding-left: 150px">
+            <!-- 移动端显示 -->
+            <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft"
+                style="margin-left: -150px">
+                <a href="javascript:">
+                    账本
+                    <i class="layui-icon layui-icon-spread-left"></i>
+                </a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs">
+                <a href="/overView">概览</a>
+            </li>
+            <li class="layui-nav-item layui-this layui-hide-xs">
+                <a href="/keepAccounts">记账</a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs"><a href="/account">账户</a></li>
+            <li class="layui-nav-item layui-hide-xs"><a href="/statement">报表</a></li>
+            <li class="layui-nav-item layui-hide-xs"><a href="/setting">设置</a></li>
+        </ul>
 
-    <!-- 左侧导航区域（账本） -->
-    <div class="layui-side layui-bg-black">
-        <div class="layui-side-scroll">
-            <!-- 左侧导航区域（账本） -->
-            <ul class="layui-nav layui-nav-tree" lay-filter="all">
-                <li class="layui-nav-item layui-nav-itemed" id="menu">
-                    <a href="javascript:">
-                        <i class="layui-icon layui-icon-read" style="font-size: 15px; margin-right: 15px"></i>
-                        所有账本
-                        <i class="layui-icon layui-icon-down layui-nav-more"></i>
-                    </a>
-                    <dl class="layui-nav-child" id="dl-account-book">
-                        <dd id="accountBook">
-                            <a href="javascript:">
-                                <i class="layui-icon layui-icon-addition" style="font-size: 15px"></i>
-                                添加账本
-                                <i style="margin-right: 35px"></i>
-                            </a>
-                        </dd>
-                    </dl>
-                </li>
-            </ul>
-        </div>
+        <!--    账户设置    -->
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="">
+                    <div style="color: #009688">
+                        <i class="layui-icon layui-icon-username" style="font-size: 30px;"></i>
+                        <span th:text="${userName}" id="user-name"></span>
+                    </div>
+                    <!-- 个人中心 -->
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="/setting">
+                        <i class="layui-icon layui-icon-user" style="font-size: 20px; color: #5FB878"></i>
+                        基本资料</a></dd>
+                    <dd><a href="">
+                        <i class="layui-icon layui-icon-set" style="font-size: 20px; color: #2F4056"></i>
+                        安全设置</a></dd>
+                    <dd>
+                        <a th:href="@{/logout}">
+                            <i class="layui-icon layui-icon-logout" style="font-size: 20px; color: #FF5722"></i>
+                            安全退出
+                        </a>
+                    </dd>
+                </dl>
+            </li>
+        </ul>
     </div>
 
-    <!--  内容主体 body  -->
-    <div class="layui-body" style="margin: 15px">
-        <!--   选项卡  -->
-        <div class="layui-tab layui-tab-brief" lay-filter="keepAccounts" style="margin: 0; background-color: white">
-            <ul class="layui-tab-title">
-                <li class="layui-this" lay-id="支出">支出</li>
-                <li lay-id="收入">收入</li>
-            </ul>
-            <!--  选项卡 tab 容器 -->
-            <div class="layui-tab-content" style="margin-bottom: -25px">
-                <!-- 选项卡面板（支出） -->
-                <div class="layui-tab-item layui-show">
-                    <div style="height: 160px; ">
-                        <!-- 账本头像 -->
-                        <div style="float:left; margin-left: 70px; width: 140px; height: 140px">
-                            <img width="140" height="140" class="accountBookHeaderImg" alt="" src="">
-                            <div style="height: 38px;">
-                                <a href="javascript:" title="上传头像"><i class="layui-icon" style="color: #009688"
-                                                                      id="accountBookHeader">&#xe67c;</i></a>
+    <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll" id="account-book"></div>
+    </div>
+
+    <!--内容主体-->
+    <div class="layui-body layui-anim layui-anim-downbit">
+        <!-- 内容主体区域 -->
+        <div style="padding: 15px;">
+            <div class="layui-card layui-panel">
+                <!--   选项卡  -->
+                <div class="layui-tab layui-tab-brief" lay-filter="keepAccounts" style="padding: 15px; height: 200px">
+                    <ul class="layui-tab-title">
+                        <li class="layui-this" lay-id="支出">支出</li>
+                        <li lay-id="收入">收入</li>
+                    </ul>
+                    <!--  选项卡 tab 容器 -->
+                    <div class="layui-tab-content" style="text-align: center;">
+                        <!-- 选项卡面板（支出） -->
+                        <div class="layui-tab-item layui-show">
+                            <div style="display: inline-block">
+                                <!-- 账本头像 -->
+                                <div style="width: 140px; height: 140px; float:left;">
+                                    <img width="140" height="140" class="accountBookHeaderImg" alt="" src="">
+                                    <div style="height: 38px;">
+                                        <a href="javascript:" title="上传头像"><i class="layui-icon" style="color: #009688"
+                                                                              id="accountBookHeader">&#xe67c;</i></a>
+                                    </div>
+                                </div>
+
+                                <!-- 记账面板-->
+                                <div class="layui-form" style="float:left; width: 805px">
+                                    <div class="layui-form-item">
+                                        <input type="hidden" name="in_ex_status" value="支">
+                                        <label class="layui-form-label" for="first-expense-category">
+                                            一级分类：
+                                            <a href="javascript:" class="add-category" title="添加分类">
+                                                <i class="layui-icon layui-icon-addition"
+                                                   style="font-size: 15px; margin: 0;"></i></a>
+                                        </label>
+                                        <div class="layui-input-inline">
+                                            <select name="first_category_name" id="first-expense-category"
+                                                    lay-filter="first_expense_category" class="first-category">
+                                                <option></option>
+                                            </select>
+                                        </div>
+
+                                        <label class="layui-form-label" for="second-expense-category">
+                                            二级分类：
+                                            <a href="javascript:" class="add-category" title="添加分类"><i
+                                                    class="layui-icon layui-icon-addition"
+                                                    style="font-size: 15px; margin: 0;"></i></a>
+                                        </label>
+                                        <div class="layui-input-inline">
+                                            <select name="second_category_name" id="second-expense-category"
+                                                    class="second-category">
+                                                <option></option>
+                                            </select>
+                                        </div>
+
+                                        <label class="layui-form-label" for="account-type">金融账户：
+                                            <a href="javascript:" title="添加金融账户" class="add-account-type">
+                                                <i class="layui-icon layui-icon-addition"
+                                                   style="font-size: 15px; margin: 0"></i></a>
+                                        </label>
+                                        <div class="layui-input-inline">
+                                            <select name="account_type_name" id="account-type" class="account-type">
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label" for="date">
+                                            日期时间：
+                                            <a><i class="layui-icon" style="font-size: 15px; margin-left: 18px"></i></a>
+                                        </label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" class="layui-input date" id="date" name="dateConverted"
+                                                   style="width: 130px; font-size: smaller">
+                                        </div>
+
+                                        <label class="layui-form-label" for="amount">
+                                            金额明细：
+                                            <a><i class="layui-icon" style="font-size: 15px; margin-left: 18px"></i></a>
+                                        </label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" name="amount" required lay-verify="amountEx"
+                                                   placeholder="金额明细" autocomplete="off" class="layui-input amount"
+                                                   id="amount" style="width: 130px">
+                                        </div>
+
+                                        <label class="layui-form-label" for="category-template">
+                                            分类模板：
+                                            <a href="javascript:" class="add-category-template" title="添加分类模板">
+                                                <i class="layui-icon layui-icon-addition"
+                                                   style="font-size: 15px; margin: 0"></i></a>
+                                        </label>
+                                        <div class="layui-input-inline">
+                                            <select id="category-template" name="categoryTemplate"
+                                                    lay-filter="categoryTemplate" class="category-template">
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label" for="remarks">备注：
+                                            <a><i class="layui-icon"
+                                                  style="font-size: 15px; margin-left: 15px"></i></a></label>
+                                        <div class="layui-input-inline" style="width: 380px">
+                                            <input type="text" name="remarks" id="remarks" placeholder="备注"
+                                                   autocomplete="off"
+                                                   class="layui-input" lay-verify="remarksEx" style="width: 390px">
+                                        </div>
+                                        <button class="layui-btn" lay-submit lay-filter="addAccountCurrent"
+                                                style="margin-left: -137px">立即保存
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 记账面板-->
-                        <div class="layui-form" style="float:right; margin-right: 120px;">
-                            <div class="layui-form-item">
-                                <input type="hidden" name="in_ex_status" value="支">
-                                <label class="layui-form-label" for="first-expense-category">
-                                    一级分类：
-                                    <a href="javascript:" class="add-category" title="添加分类">
-                                        <i class="layui-icon layui-icon-addition"
-                                           style="font-size: 15px; margin: 0"></i></a>
-                                </label>
-                                <div class="layui-input-inline">
-                                    <select name="first_expense_category" id="first-expense-category"
-                                            lay-filter="first_expense_category" class="first-category">
-                                        <option>一级分类</option>
-                                    </select>
+                        <!--选项卡面板（收入）-->
+                        <div class="layui-tab-item">
+                            <div style="display: inline-block">
+                                <!-- 账本头像 -->
+                                <div style="width: 140px; height: 140px; float:left;">
+                                    <img width="140" height="140" class="accountBookHeaderImg" alt="" src="">
+                                    <div style="height: 38px;">
+                                        <a href="javascript:" title="上传头像"><i class="layui-icon" style="color: #009688"
+                                                                              id="accountBookHeader">&#xe67c;</i></a>
+                                    </div>
                                 </div>
+                                <!-- 记账面板-->
+                                <div class="layui-form" style="float:left; width: 805px">
+                                    <div class="layui-form-item">
+                                        <input type="hidden" name="in_ex_status" value="收">
+                                        <label class="layui-form-label" for="first-income-category">
+                                            一级分类：
+                                            <a href="javascript:" class="add-category" title="添加分类">
+                                                <i class="layui-icon layui-icon-addition"
+                                                   style="font-size: 15px; margin: 0"></i></a>
+                                        </label>
+                                        <div class="layui-input-inline">
+                                            <select name="first_category_name"
+                                                    lay-filter="first-income-category" id="first-income-category">
+                                            </select>
+                                        </div>
 
-                                <label class="layui-form-label" for="second-expense-category">
-                                    二级分类：
-                                    <a href="javascript:" class="add-category" title="添加分类"><i
-                                            class="layui-icon layui-icon-addition"
-                                            style="font-size: 15px; margin: 0"></i></a>
-                                </label>
-                                <div class="layui-input-inline">
-                                    <select name="second_category_name" id="second-expense-category"
-                                            class="second-category">
-                                        <option>二级分类</option>
-                                    </select>
-                                </div>
+                                        <label class="layui-form-label" for="second-income-category">
+                                            二级分类：
+                                            <a href="javascript:" class="add-category" title="添加分类"><i
+                                                    class="layui-icon layui-icon-addition"
+                                                    style="font-size: 15px; margin: 0"></i></a>
+                                        </label>
+                                        <div class="layui-input-inline">
+                                            <select name="second_category_name" id="second-income-category">
+                                            </select>
+                                        </div>
 
-                                <label class="layui-form-label" for="account-type">金融账户：
-                                    <a href="javascript:" title="添加金融账户">
-                                        <i class="layui-icon layui-icon-addition"
-                                           style="font-size: 15px; margin: 0"></i></a>
-                                </label>
-                                <div class="layui-input-inline">
-                                    <select name="account_type_name" id="account-type" class="account-type">
-                                        <option>金融账户</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label" for="date">
-                                    日期时间：
-                                    <a><i class="layui-icon" style="font-size: 15px; margin-left: 15px"></i></a>
-                                </label>
-                                <div class="layui-input-inline">
-                                    <input type="text" class="layui-input date" id="date" name="dateConverted"
-                                           style="width: 150px">
-                                </div>
+                                        <label class="layui-form-label" for="account-type-income">金融账户：
+                                            <a href="javascript:" title="添加金融账户" class="add-account-type">
+                                                <i class="layui-icon layui-icon-addition"
+                                                   style="font-size: 15px; margin: 0"></i></a>
+                                        </label>
+                                        <div class="layui-input-inline">
+                                            <select name="account_type_name" id="account-type-income"
+                                                    class="account-type">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label" for="date-income">
+                                            日期时间：
+                                            <a><i class="layui-icon" style="font-size: 15px; margin-left: 18px"></i></a>
+                                        </label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" class="layui-input date" name="dateConverted"
+                                                   style="font-size: smaller; width: 130px" id="date-income">
+                                        </div>
 
-                                <label class="layui-form-label" for="amount">
-                                    金额明细：
-                                    <a><i class="layui-icon" style="font-size: 15px; margin-left: 15px"></i></a>
-                                </label>
-                                <div class="layui-input-inline">
-                                    <input type="text" name="amount" required lay-verify="amount"
-                                           placeholder="金额明细" autocomplete="off" class="layui-input amount" id="amount">
-                                </div>
+                                        <label class="layui-form-label" for="amount-income">
+                                            金额明细：
+                                            <a><i class="layui-icon" style="font-size: 15px; margin-left: 18px"></i></a>
+                                        </label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" name="amount" id="amount-income" required
+                                                   lay-verify="amountIn"
+                                                   placeholder="金额明细" autocomplete="off" class="layui-input amount"
+                                                   style="width: 130px">
+                                        </div>
 
-                                <label class="layui-form-label" for="category-template">
-                                    分类模板：
-                                    <a href="javascript:" class="add-category-template" title="添加分类模板">
-                                        <i class="layui-icon layui-icon-addition"
-                                           style="font-size: 15px; margin: 0"></i></a>
-                                </label>
-                                <div class="layui-input-inline">
-                                    <select id="category-template" name="categoryTemplate"
-                                            lay-filter="categoryTemplate" class="category-template">
-                                        <option>分类模板</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label" for="remarks">备注：
-                                    <a><i class="layui-icon"
-                                          style="font-size: 15px; margin-left: 15px"></i></a></label>
-                                <div class="layui-input-inline" style="width: 380px">
-                                    <input type="text" name="remarks" id="remarks" placeholder="备注" autocomplete="off"
-                                           class="layui-input" width="380px" lay-verify="remarks">
-                                </div>
+                                        <label class="layui-form-label" for="category-template-income">
+                                            分类模板：
+                                            <a href="javascript:" class="add-category-template" title="添加分类模板">
+                                                <i class="layui-icon layui-icon-addition"
+                                                   style="font-size: 15px; margin: 0"></i></a>
+                                        </label>
+                                        <div class="layui-input-inline">
+                                            <select name="categoryTemplate"
+                                                    lay-filter="category-template-income" id="category-template-income">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label" for="remarks-income">备注：
+                                            <a><i class="layui-icon"
+                                                  style="font-size: 15px; margin-left: 15px"></i></a></label>
+                                        <div class="layui-input-inline" style="width: 380px">
+                                            <input type="text" name="remarks" placeholder="备注" autocomplete="off"
+                                                   class="layui-input" lay-verify="remarksIn" id="remarks-income"
+                                                   style="width: 390px">
+                                        </div>
 
-                                <button class="layui-btn" lay-submit lay-filter="addAccountCurrent"
-                                        style="margin-left: 26px">立即保存
-                                </button>
+                                        <button class="layui-btn" lay-submit lay-filter="addAccountCurrentIncome"
+                                                style="margin-left: -137px">立即保存
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 选项卡面板（收入）-->
-                <div class="layui-tab-item">
-                    <div style="height: 160px; ">
-                        <!-- 账本头像 -->
-                        <div style="float:left; margin-left: 70px; width: 140px; height: 140px">
-                            <img width="140" height="140" class="accountBookHeaderImg" alt="" src="">
-                            <div style="height: 38px;">
-                                <a href="javascript:" title="上传头像"><i class="layui-icon" style="color: #009688"
-                                >&#xe67c;</i></a>
-                            </div>
-                        </div>
-
-                        <!-- 记账面板-->
-                        <div class="layui-form" style="float:right; margin-right: 120px;">
-                            <div class="layui-form-item">
-                                <input type="hidden" name="in_ex_status" value="收">
-                                <label class="layui-form-label" for="first-income-category">
-                                    一级分类：
-                                    <a href="javascript:" class="add-category" title="添加分类">
-                                        <i class="layui-icon layui-icon-addition"
-                                           style="font-size: 15px; margin: 0"></i></a>
-                                </label>
-                                <div class="layui-input-inline">
-                                    <select name="first_category_name"
-                                            lay-filter="first-income-category" id="first-income-category">
-                                        <option>一级分类</option>
-                                    </select>
-                                </div>
-
-                                <label class="layui-form-label" for="second-income-category">
-                                    二级分类：
-                                    <a href="javascript:" class="add-category" title="添加分类"><i
-                                            class="layui-icon layui-icon-addition"
-                                            style="font-size: 15px; margin: 0"></i></a>
-                                </label>
-                                <div class="layui-input-inline">
-                                    <select name="second_category_name" id="second-income-category">
-                                        <option>二级分类</option>
-                                    </select>
-                                </div>
-
-                                <label class="layui-form-label" for="account-type-income">金融账户：
-                                    <a href="javascript:" title="添加金融账户">
-                                        <i class="layui-icon layui-icon-addition"
-                                           style="font-size: 15px; margin: 0"></i></a>
-                                </label>
-                                <div class="layui-input-inline">
-                                    <select name="account_type_name" id="account-type-income" class="account-type">
-                                        <option>金融账户</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label" for="date-income">
-                                    日期时间：
-                                    <a><i class="layui-icon" style="font-size: 15px; margin-left: 15px"></i></a>
-                                </label>
-                                <div class="layui-input-inline">
-                                    <input type="text" class="layui-input date" name="dateConverted"
-                                           style="width: 150px" id="date-income">
-                                </div>
-
-                                <label class="layui-form-label" for="amount-income">
-                                    金额明细：
-                                    <a><i class="layui-icon" style="font-size: 15px; margin-left: 15px"></i></a>
-                                </label>
-                                <div class="layui-input-inline">
-                                    <input type="text" name="amount" id="amount-income" required lay-verify="amount"
-                                           placeholder="金额明细" autocomplete="off" class="layui-input amount">
-                                </div>
-
-                                <label class="layui-form-label" for="category-template-income">
-                                    分类模板：
-                                    <a href="javascript:" class="add-category-template" title="添加分类模板">
-                                        <i class="layui-icon layui-icon-addition"
-                                           style="font-size: 15px; margin: 0"></i></a>
-                                </label>
-                                <div class="layui-input-inline">
-                                    <select name="categoryTemplate"
-                                            lay-filter="category-template-income" id="category-template-income">
-                                        <option>分类模板</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label" for="remarks-income">备注：
-                                    <a><i class="layui-icon"
-                                          style="font-size: 15px; margin-left: 15px"></i></a></label>
-                                <div class="layui-input-inline" style="width: 380px">
-                                    <input type="text" name="remarks" placeholder="备注" autocomplete="off"
-                                           class="layui-input" width="380px" lay-verify="remarks" id="remarks-income">
-                                </div>
-
-                                <button class="layui-btn" lay-submit lay-filter="addAccountCurrentIncome"
-                                        style="margin-left: 26px">立即保存
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 账目清单-->
-        <div id="account-total-list" style="margin-left: 60px; margin-right: 60px">
-            <hr style="color: lightgrey" class="line">
-            <h3 style="float:left;">
-                <b>账目清单</b>
-                <b><span th:text="${dateRange}" style="font-size: 15px" id="dateRange"></span></b>
-            </h3>
-            <div id="in-ex-surplus" style="float: right;">
-                总支出
-                <span class="amount" style="color: #14ba89">- <span id="monthly-expense"></span>
+                <!-- 账目清单-->
+                <div id="account-total-list" style=" width: 1000px; display: inline-block">
+                    <hr style="color: lightgrey" class="line">
+                    <h3 style="float:left;">
+                        <b>账目清单</b>
+                        <b><span th:text="${dateRange}" style="font-size: 15px" id="dateRange"></span></b>
+                    </h3>
+                    <div id="in-ex-surplus" style="float: right;">
+                        总支出
+                        <span class="amount" style="color: #14ba89">- <span id="monthly-expense"></span>
                     </span>
-                <span class="separator">|</span>
-                总收入
-                <span class="amount" style="color: #f1523a">+ <span id="monthly-income"></span></span>
-                <span class="separator">|</span>
-                结余
-                <span class="amount" style="color:#808080;" id="monthly-balance"></span>
-                <span style="color: grey; margin-left: 7px">（单位：元）</span>
-            </div>
-            <hr style="color: lightgrey; height: 10px" class="line">
-
-            <!-- 条件搜索 -->
-            <div id="form-search">
-                <div class="layui-form">
-                    <div class="layui-form-item">
-                        <!-- 月份概览 -->
-                        <label class="layui-form-label" for="lay-date">月份概览：</label>
-                        <div class="layui-input-inline" style="width: 120px">
-                            <input type="text" class="layui-input" autocomplete="off" placeholder="yyyy - mm"
-                                   id="lay-date" width="75px">
-                        </div>
-
-                        <label class="layui-form-label" for="search-first-category">
-                            一级分类：
-                        </label>
-                        <div class="layui-input-inline">
-                            <select name="first_category_name" class="first-category"
-                                    id="search-first-category" lay-filter="search-first-category">
-                                <option>一级分类</option>
-                            </select>
-                        </div>
-
-                        <label class="layui-form-label" for="search-second-category">
-                            二级分类：
-                        </label>
-                        <div class="layui-input-inline">
-                            <select name="second_category_name" class="second-category"
-                                    id="search-second-category">
-                                <option>二级分类</option>
-                            </select>
-                        </div>
-                        <label class="layui-form-label" for="search-account-type">金融账户：</label>
-                        <div class="layui-input-inline">
-                            <select name="account_type_name" class="account-type" id="search-account-type">
-                                <option>金融账户</option>
-                            </select>
-                        </div>
+                        <span class="separator">|</span>
+                        总收入
+                        <span class="amount" style="color: #f1523a">+ <span id="monthly-income"></span></span>
+                        <span class="separator">|</span>
+                        结余
+                        <span class="amount" style="color:#808080;" id="monthly-balance"></span>
+                        <span style="color: grey; margin-left: 7px">（单位：元）</span>
                     </div>
-                    <div class="layui-form-item">
-                        <label class="layui-form-label" for="search-date">
-                            日期时间：
-                        </label>
-                        <div class="layui-input-inline">
-                            <input type="text" class="layui-input date" id="search-date" name="date"
-                                   style="width: 120px" autocomplete="off" placeholder="选择日期时间">
-                        </div>
+                    <hr style="color: lightgrey; height: 10px" class="line">
 
-                        <label class="layui-form-label" for="search-remarks">备注：
-                            <a><i class="layui-icon"
-                                  style="font-size: 15px; margin-left: 15px"></i></a></label>
-                        <div class="layui-input-inline" style="width: 360px">
-                            <input type="text" name="remarks" id="search-remarks" placeholder="备注"
-                                   autocomplete="off"
-                                   class="layui-input remarks" width="380px" lay-verify="remarks">
-                        </div>
+                    <!-- 条件搜索 -->
+                    <div id="form-search">
+                        <form class="layui-form">
+                            <div class="layui-form-item">
+                                <!-- 月份概览 -->
+                                <label class="layui-form-label" for="lay-date">月份概览：</label>
+                                <div class="layui-input-inline" style="width: 120px">
+                                    <input type="text" class="layui-input" autocomplete="off"
+                                           placeholder="yyyy    -    mm "
+                                           id="lay-date" width="75px">
+                                </div>
+                                <label class="layui-form-label" for="search-first-category">
+                                    一级分类：
+                                </label>
+                                <div class="layui-input-inline">
+                                    <select name="first_category_name" class="first-category"
+                                            id="search-first-category" lay-filter="search-first-category">
+                                    </select>
+                                </div>
 
-                        <button class="layui-btn" lay-submit lay-filter="addAccountCurrent"
-                                style="margin-left: 26px">
-                            <i class="layui-icon layui-icon-search"></i>
-                            确定
-                        </button>
+                                <label class="layui-form-label" for="search-second-category">
+                                    二级分类：
+                                </label>
+                                <div class="layui-input-inline">
+                                    <select name="second_category_name" class="second-category"
+                                            id="search-second-category">
+                                    </select>
+                                </div>
+                                <label class="layui-form-label" for="search-account-type">金融账户：</label>
+                                <div class="layui-input-inline">
+                                    <select name="account_type_name" class="account-type" id="search-account-type">
+                                        <option>金融账户</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" for="search-date">
+                                    日期时间：
+                                </label>
+                                <div class="layui-input-inline">
+                                    <input type="text" class="layui-input date" id="search-date" name="dateRange"
+                                           style="width: 120px" autocomplete="off" placeholder="选择日期时间">
+                                </div>
+
+                                <label class="layui-form-label" for="search-remarks">备注：
+                                    <a><i class="layui-icon"
+                                          style="font-size: 15px; margin-left: 15px"></i></a></label>
+                                <div class="layui-input-inline" style="width: 370px; margin-right: 0">
+                                    <input type="text" name="remarks" id="search-remarks" placeholder="备注"
+                                           autocomplete="off"
+                                           class="layui-input remarks" width="380px" lay-verify="remarks">
+                                </div>
+
+                                <button class="layui-btn" lay-submit lay-filter="search"
+                                        style="margin-left: -140px">
+                                    <i class="layui-icon layui-icon-search"></i>
+                                    确定
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- 流水数据表格-->
-        <div style="margin-top: -10px;margin-left: 60px; margin-right: 60px">
-            <table class="layui-table" id="accountCurrent" lay-filter="accountCurrent"></table>
+                <!-- 流水数据表格-->
+                <div style="margin-left: 60px; margin-right: 60px; margin-top: -20px; min-height: 530px">
+                    <table class="layui-table" id="accountCurrent" lay-filter="accountCurrent"></table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- 设置收支属性，默认支出 -->
 <input type="hidden" id="in-ex-status" value="支">
-<!-- 父窗口和子窗口传递值 -->
-<input type="hidden" id="isTableReload" value="0"/>
-
 <script th:src="@{/layui.js}" charset="utf-8"></script>
-<script type="text/html" id="barAccountCurrent">
-    <a class="layui-btn layui-btn-sm" lay-event="edit">
-        <i class="layui-icon layui-icon-edit"
-           style="font-size: 5px"></i>
-        编辑
-    </a>
-    <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete">
-        <i class="layui-icon layui-icon-delete"
-           style="font-size: 5px"></i>
-        删除
-    </a>
-</script>
-<script type="text/javascript">
-    //添加账本
-    function addAccountBook() {
-        layer.open({
-            type: 2,
-            title: '添加账本',
-            skin: 'layui-layer-demo', //加上边框
-            area: ['400px', '220px'], //宽高
-            content: '/keepAccounts/addAccountBook'
-        });
-    }
-
+<script>
     //layui
     layui.use(['laypage', 'dropdown', 'layer', 'element', 'jquery', 'util', 'upload', 'form', 'table', 'laydate'], function () {
         var element = layui.element;
         var layer = layui.layer;
         var $ = layui.jquery;
         var upload = layui.upload;
+        var util = layui.util;
         var form = layui.form;
         var table = layui.table;
         var laydate = layui.laydate;
         var laypage = layui.laypage;
         var dropdown = layui.dropdown;
+        var menuOff = true;
 
-        //渲染账本
-        $.ajax({
-                url: '/accountBook/accountBookList',
-                dataType: 'json',
-                type: 'post',
-                success: function (data) {
-                    var layThisName = layThis("");//获取当前账本索引
-                    var accountBook = $("#accountBook");//获取账本id
-                    var inExStatus = $("#in-ex-status").val();//获取支出属性
-                    for (var i = 0; i < data.data.length; i++) {
-                        //判断 lay-this 账本索引的位置
-                        if (layThisName === data.data[i]) {
-                            accountBook.before(
-                                '<dd class="layui-this">' +
-                                '<a href="javascript:" lay-filter="accountBook">' + data.data[i] +
-                                '<i style="margin-right: 35px"></i>' +
-                                '</a>' +
-                                '</dd>'
-                            );
-                        } else {
-                            accountBook.before(
-                                '<dd>' +
-                                '<a href="javascript:" lay-filter="accountBook">' + data.data[i] +
-                                '<i style="margin-right: 35px"></i>' +
-                                '</a>' +
-                                '</dd>'
-                            );
-                        }
+        //头部事件
+        util.event('lay-header-event', {
+            //左侧菜单事件
+            menuLeft: function (othis) {
+                layer.open({
+                    type: 1
+                    , title: false
+                    , content: '<div class="layui-side layui-bg-black">\n' +
+                        '        <div class="layui-side-scroll" id="menu-left-account-book"></div>\n' +
+                        '    </div>'
+                    , area: ['', '100%']
+                    , offset: 'lt' //右上角
+                    , anim: 5
+                    , shadeClose: true
+                    , scrollbar: false
+                    , success: function () {
+                        renderAccountBookMenuLeft();//渲染账本列表
                     }
-                    element.render(); //刷新渲染
-                    renderFormEx(layThisName, inExStatus);//渲染表单数据
-                    renderTotalAmount(getDateSubstring()); //渲染账目清单
-                    renderTableData(getDateSubstring());//渲染表格数据
-                    renderAccountBookHeader();//渲染账本头像
-                    renderSearchForm(layThisName, inExStatus);//渲染搜索表单
-                }
+                });
             }
-        );
+        });
+
+        //判断账本是否初始化
+        if (isAccountBookInit() !== 1) {
+            layer.open({
+                type: 2,
+                title: '创建账本',
+                skin: 'layui-layer-demo', //加上边框
+                area: ['600px', '350px'], //宽高
+                closeBtn: 0,
+                content: '/initAccountBook'
+            });
+        }
+
+        //执行渲染账本
+        renderAccountBook();
+
+        //渲染账本组件
+        function renderAccountBook() {
+            $.ajax({
+                    url: '/accountBook/accountBookList',
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        var accountBookIndexValue = accountBookIndex("");//获取当前账本索引
+                        var accountBook = $("#account-book");//获取账本id
+                        var inExStatus = $("#in-ex-status").val();//获取支出属性
+                        accountBook.empty();
+                        //渲染侧边导航栏
+                        accountBook.append(
+                            '<ul class="layui-nav layui-nav-tree" lay-filter="all">\n' +
+                            '<li class="layui-nav-item layui-nav-itemed" id="menu">\n' +
+                            '<a href="javascript:">\n' +
+                            '<i class="layui-icon layui-icon-read" style="font-size: 15px; margin-right: 15px">' +
+                            '</i>\n' +
+                            '所有账本\n' +
+                            '<i class="layui-icon layui-icon-down layui-nav-more"></i>\n' +
+                            ' </a>' +
+                            '<dl class="layui-nav-child" id="account-book-item">\n' +
+                            '</dl>\n' +
+                            '</li>\n' +
+                            '</ul>');
+
+                        //渲染导航账本子条目
+                        var accountBookItem = $("#account-book-item");
+                        for (var i = 0; i < data.data.length; i++) {
+                            if (accountBookIndexValue === data.data[i]) {
+                                accountBookItem.append('<dd class="layui-this">' +
+                                    '<a href="javascript:">' + data.data[i] + '</a></dd>');
+                            } else {
+                                accountBookItem.append('<dd>' +
+                                    '<a href="javascript:">' + data.data[i] + '</a></dd>');
+                            }
+                        }
+                        //渲染添加账本条目
+                        accountBookItem.append(
+                            '<dd class="layui-anim layui-anim-downbit">\n' +
+                            '<a href="javascript:" id="add-account-book">\n' +
+                            '<i class="layui-icon layui-icon-addition" style="font-size: 15px"></i>\n' +
+                            '添加账本\n' +
+                            '<i style="margin-right: 35px"></i>\n' +
+                            '</a>\n' +
+                            '</dd>'
+                        );
+                        element.render();
+                        renderFormEx(accountBookIndexValue, inExStatus);//渲染表单数据
+                        renderTotalAmount(getDateSubstring()); //渲染账目清单
+                        renderTableData(getDateSubstring());//渲染表格数据
+                        renderAccountBookHeader();//渲染账本头像
+                        renderSearchForm(accountBookIndexValue, inExStatus);//渲染搜索表单
+                    }
+                }
+            );
+        }
+
+        //渲染移动端菜单账本组件
+        function renderAccountBookMenuLeft() {
+            $.ajax({
+                    url: '/accountBook/accountBookList',
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        var accountBookIndexValue = accountBookIndex("");//获取当前账本索引
+                        var accountBook = $("#menu-left-account-book");//获取账本id
+                        var inExStatus = $("#in-ex-status").val();//获取支出属性
+                        accountBook.empty();
+                        //渲染侧边导航栏
+                        accountBook.append(
+                            '<ul class="layui-nav layui-nav-tree" lay-filter="all">\n' +
+                            '<li class="layui-nav-item layui-nav-itemed" id="menu">\n' +
+                            '<a href="javascript:">\n' +
+                            '<i class="layui-icon layui-icon-read" style="font-size: 15px; margin-right: 15px">' +
+                            '</i>\n' +
+                            '所有账本\n' +
+                            '<i class="layui-icon layui-icon-down layui-nav-more"></i>\n' +
+                            ' </a>' +
+                            '<dl class="layui-nav-child" id="menu-left-account-book-item">\n' +
+                            '</dl>\n' +
+                            '</li>\n' +
+                            '</ul>');
+
+                        //渲染导航账本子条目
+                        var accountBookItem = $("#menu-left-account-book-item");
+                        for (var i = 0; i < data.data.length; i++) {
+                            if (accountBookIndexValue === data.data[i]) {
+                                accountBookItem.append('<dd class="layui-this">' +
+                                    '<a href="javascript:">' + data.data[i] + '</a></dd>');
+                            } else {
+                                accountBookItem.append('<dd>' +
+                                    '<a href="javascript:">' + data.data[i] + '</a></dd>');
+                            }
+                        }
+                        //渲染添加账本条目
+                        accountBookItem.append(
+                            '<dd class="layui-anim layui-anim-downbit">\n' +
+                            '<a href="javascript:" id="add-account-book">\n' +
+                            '<i class="layui-icon layui-icon-addition" style="font-size: 15px"></i>\n' +
+                            '添加账本\n' +
+                            '<i style="margin-right: 35px"></i>\n' +
+                            '</a>\n' +
+                            '</dd>'
+                        );
+                        element.render();
+                    }
+                }
+            );
+        }
+
+        //添加账本
+        function addAccountBook() {
+            layer.open({
+                type: 2,
+                title: '添加账本',
+                skin: 'layui-layer-demo', //加上边框
+                area: ['400px', '220px'], //宽高
+                content: '/addAccountBook',
+                end: function () {
+                    if (window.localStorage.getItem('isReload') === '1') {
+                        renderAccountBook();//重载账本
+                        window.localStorage.removeItem('isReload');
+                    }
+                }
+            });
+        }
 
         //添加模块
         $(document).ready(function () {
             //添加分类
             $(".add-category").click(function () {
-                var layThisName = layThis("");//获取账本索引
+                var accountBookVal = accountBookIndex("");//获取账本索引
                 var inExStatus = $("#in-ex-status").val();// 获取收支属性
                 layer.open({
                     type: 2,
                     title: '添加分类',
                     skin: 'layui-layer-demo', //加上边框
-                    area: ['400px', '310px'], //宽高
-                    content: '/keepAccounts/addCategory?inExStatus=' + inExStatus,
+                    area: ['520px', '350px'], //宽高
+                    content: '/addCategory?inExStatus=' + inExStatus,
                     end: function () {
-                        //如果子窗口提交成功，那么就执行表单异步更新
-                        if (window.localStorage.getItem("isRenderSelect") === "1") {
+                        if (window.localStorage.getItem('isReload') === '1') {
                             if (inExStatus === "支") {
-                                renderFormEx(layThisName, inExStatus);
+                                renderFormEx(accountBookVal, inExStatus);
                             } else {
-                                renderFormIn(layThisName, inExStatus);
+                                renderFormIn(accountBookVal, inExStatus);
                             }
-                            window.localStorage.setItem("isRenderSelect", "0");
+                            window.localStorage.removeItem('isReload');
                         }
                     }
                 });
             });
             //添加金融账户
-            $(".account-type").click(function () {
-                var layThisName = layThis("");//获取账本索引
+            $(".add-account-type").click(function () {
+                var accountBookVal = accountBookIndex("");//获取账本索引
                 var inExStatus = $("#in-ex-status").val();// 获取收支属性
                 layer.open({
                     type: 2,
                     title: '添加金融账户',
                     skin: 'layui-layer-demo', //加上边框
-                    area: ['420px', '210px'], //宽高
-                    content: '/keepAccounts/addAccountType',
+                    area: ['600px', '320px'], //宽高
+                    content: '/addAccountFinancial',
                     end: function () {
-                        if (window.localStorage.getItem("isRenderSelect") === "1") {
+                        if (window.localStorage.getItem('isReload') === '1') {
                             if (inExStatus === "支") {
-                                renderFormEx(layThisName, inExStatus);
+                                renderFormEx(accountBookVal, inExStatus);
                             } else {
-                                renderFormIn(layThisName, inExStatus);
+                                renderFormIn(accountBookVal, inExStatus);
                             }
-                            window.localStorage.setItem("isRenderSelect", "0");
+                            window.localStorage.removeItem('isReload');
                         }
                     }
                 });
             });
             //添加模板
             $(".add-category-template").click(function () {
-                var layThisName = layThis("");//获取账本索引
+                var accountBookVal = accountBookIndex("");//获取账本索引
                 var inExStatus = $("#in-ex-status").val();// 获取收支属性
                 layer.open({
                     type: 2,
                     title: '添加分类模板',
                     skin: 'layui-layer-demo', //加上边框
                     area: ['580px', '280px'], //宽高
-                    content: '/keepAccounts/addCategoryTemplate?inExStatus=' + inExStatus,
+                    content: '/addCategoryTemplate?inExStatus=' + inExStatus,
                     end: function () {
-                        if (window.localStorage.getItem("isRenderSelect") === "1") {
+                        if (window.localStorage.getItem("isReload") === "1") {
                             if (inExStatus === "支") {
-                                renderFormEx(layThisName, inExStatus);
+                                renderFormEx(accountBookVal, inExStatus);
                             } else {
-                                renderFormIn(layThisName, inExStatus);
+                                renderFormIn(accountBookVal, inExStatus);
                             }
-                            window.localStorage.setItem("isRenderSelect", "0");
+                            window.localStorage.removeItem("isReload");
                         }
                     }
                 });
@@ -533,33 +665,501 @@
             }
         });
 
-        //表单验证
-        form.verify({
-            remarks: function (value) {
-                if (value.length > 50) {
-                    return "备注格式太长，受限于50个字符";
-                }
-            },
-            amount: function (value) {
-                if (value.trim() === '') {
-                    return "请输入金额明细";
+        //用户头像渲染
+        $.ajax({
+            url: '/setting/getUserHeaderPath',
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                if (data.success) {
+                    $("#user-header-img").attr("src", data.data);
+                } else {
+                    $("#user-header-img").attr("src", "/images/user-header.png");
                 }
             }
         });
 
-        // 设置 lay-this 账本索引
-        function layThis(layThisName) {
-            var lay_this_name = "";
+        //表单验证
+        form.verify({
+            remarksEx: function (value) {
+                if (value.length > 50) {
+                    layer.tips("备注格式太长，受限于50个字符", "#remarks");
+                    return true;
+                }
+            },
+            amountEx: function (value) {
+                if (value.trim() === '') {
+                    layer.tips("请输入金额明细", "#amount");
+                    return true;
+                }
+                if (!(/^[0-9]+(\.[0-9]{0,2})?$/).test(value)) {
+                    layer.tips("输入的金额格式不正确", "#amount");
+                    return true;
+                }
+                if (value.length > 10) {
+                    layer.tips("输入的金额过大", "#amount");
+                    return true;
+                }
+            },
+            remarksIn: function (value) {
+                if (value.length > 50) {
+                    layer.tips("备注格式太长，受限于50个字符", "#remarks-income");
+                    return true;
+                }
+            },
+            amountIn: function (value) {
+                if (value.trim() === '') {
+                    layer.tips("请输入金额明细", "#amount-income");
+                    return true;
+                }
+                if (!(/^[0-9]+(\.[0-9]{0,2})?$/).test(value)) {
+                    layer.tips("输入的金额格式不正确", "#amount-income");
+                    return true;
+                }
+                if (value.length > 10) {
+                    layer.tips("输入的金额过大", "#amount-income");
+                    return true;
+                }
+            }
+        });
+
+        //账本事件
+        element.on('nav(all)', function (elem) {
+            //切换选项卡为支出面板
+            element.tabChange('keepAccounts', '支出');
+            // var accountBookName = $(this).text().replace(/[ ]/g, ""); //去掉空格
+            var accountBookName = elem.text().trim(); //获取当前账本
+            var inExStatus = $("#in-ex-status").val("支").val();//获取收支属性
+            if (accountBookName !== "所有账本" && accountBookName !== "添加账本") {
+                accountBookIndex(accountBookName);//设置当前账本索引
+                renderFormEx(accountBookName, inExStatus); //渲染表单数据
+                renderTableData(getDateSubstring());  //渲染表格流水
+                renderAccountBookHeader();//渲染账本头像
+                renderTotalAmount(getDateSubstring()); //渲染账目清单
+                renderSearchForm(accountBookName, inExStatus);//渲染表单搜索
+            } else if (accountBookName === "添加账本") {
+                addAccountBook();
+            }
+        });
+
+        //选项卡 切换到收入面板
+        element.on('tab(keepAccounts)', function (elem) {
+            var accountBookVal = accountBookIndex("");//获取账本索引
+            var inExStatus = $("#in-ex-status");//获取收支元素
+            if (elem.index === 0) {//当面板切换到支出选项卡时
+                inExStatus.val("支");//收支属性设置为：支
+            }
+            if (elem.index === 1) {//当面板切换到收入选项卡时
+                var inExStatusValue = inExStatus.val("收").val();//收支属性设置为：收
+                renderFormIn(accountBookVal, inExStatusValue);//渲染收入表单数据
+            }
+        });
+
+        //一级支出事件（记账面板选择）
+        form.on('select(first_expense_category)', function (data) {
+            var inExStatus = $("#in-ex-status").val();//获取支出属性
+            var firstCategoryName = data.value;//获取一级分类
             $.ajax({
-                url: '/layThis/select?layThisName=' + layThisName,
+                url: '/category/secondCategoryList',
+                data: {
+                    firstCategoryName: firstCategoryName,
+                    inExStatus: inExStatus
+                },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    var s_e_c = $("#second-expense-category");
+                    if (data.msg === "操作成功") {
+                        s_e_c.empty(); //防止重复渲染
+                        for (var i = 0; i < data.data.length; i++) {
+                            s_e_c.append("<option>" + data.data[i] + "</option>");
+                        }
+                        form.render('select'); //刷新渲染列表
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }
+            });
+        });
+
+        //一级收入事件（记账面板选择）
+        form.on('select(first-income-category)', function (data) {
+            var inExStatus = $("#in-ex-status").val();//获取支出属性
+            var firstCategoryName = data.value;//获取一级分类
+            $.ajax({
+                url: '/category/secondCategoryList',
+                data: {
+                    firstCategoryName: firstCategoryName,
+                    inExStatus: inExStatus
+                },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    var s_e_c = $("#second-income-category");
+                    if (data.msg === "操作成功") {
+                        s_e_c.empty(); //防止重复渲染
+                        for (var i = 0; i < data.data.length; i++) {
+                            s_e_c.append("<option>" + data.data[i] + "</option>");
+                        }
+                        form.render('select'); //刷新渲染列表
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }
+            });
+        });
+
+        //搜索表单事件
+        form.on('select(search-first-category)', function (data) {
+            //提交数据 返回后台 查询对应的二级分类
+            var firstCategoryName = data.value;
+            var s_e_c = $("#search-second-category");
+            if (firstCategoryName !== '所有分类') {
+                $.ajax({
+                    url: '/category/secondCategoryAllList?firstCategoryName=' + firstCategoryName,
+                    data: firstCategoryName,
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.msg === "操作成功") {
+                            s_e_c.empty(); //防止重复渲染
+                            s_e_c.append('<option>所有分类</option>');
+                            for (var i = 0; i < data.data.length; i++) {
+                                s_e_c.append("<option>" + data.data[i] + "</option>");
+                            }
+                            form.render('select'); //刷新渲染列表
+                        } else {
+                            layer.msg(data.msg);
+                        }
+                    }
+                });
+            } else {
+                s_e_c.empty();
+                s_e_c.append('<option>所有分类</option>');
+                form.render('select');
+            }
+        });
+
+        //分类模板事件（支出）
+        form.on('select(categoryTemplate)', function (data) {
+            var categoryTemplateName = data.value; //获取模板名称
+            var inExStatus = $("#in-ex-status").val(); //获取收支属性
+            //获取模板绑定的数据
+            $.ajax({
+                url: '/categoryTemplate/categoryTemplateSingle',
+                data: {categoryTemplateName: categoryTemplateName, inExStatus: inExStatus},
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    if (data.success) {
+                        //渲染一级分类选项
+                        $("#first-expense-category").val(data.data[0]);
+                        //渲染二级分类选项
+                        renderSecondCategory(data.data[0], data.data[1], inExStatus);
+                        //渲染金融账户分类选项
+                        $("#account-type").val(data.data[2]);
+                        form.render('select');
+                    } else {
+
+                    }
+                }
+            });
+
+            //渲染二级分类且渲染选项值
+            function renderSecondCategory(firstCategoryName, secondCategoryName, inExStatus) {
+                var s_e_c = $("#second-expense-category");
+                $.ajax({
+                    url: '/category/secondCategoryList',
+                    data: {
+                        firstCategoryName: firstCategoryName,
+                        inExStatus: inExStatus
+                    },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.msg === "操作成功") {
+                            s_e_c.empty(); //防止重复渲染
+                            for (var i = 0; i < data.data.length; i++) {
+                                s_e_c.append("<option>" + data.data[i] + "</option>");
+                            }
+                            //设置 value 值
+                            s_e_c.val(secondCategoryName);
+                            form.render('select'); //刷新渲染列表
+                        } else {
+
+                        }
+                    }
+                });
+            }
+        });
+
+        //分类模板事件（收入）
+        form.on('select(category-template-income)', function (data) {
+            var categoryTemplateName = data.value; //获取模板名称
+            var inExStatus = $("#in-ex-status").val(); //获取收支属性
+            //获取模板绑定的数据
+            $.ajax({
+                url: '/categoryTemplate/categoryTemplateSingle',
+                data: {categoryTemplateName: categoryTemplateName, inExStatus: inExStatus},
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    if (data.success) {
+                        //渲染一级分类选项
+                        $("#first-income-category").val(data.data[0]);
+                        //渲染二级分类选项
+                        renderSecondCategory(data.data[0], data.data[1], inExStatus);
+                        //渲染金融账户分类选项
+                        $("#account-type-income").val(data.data[2]);
+                        form.render('select');
+                    } else {
+
+                    }
+                }
+            });
+
+            //渲染二级分类且渲染选项值
+            function renderSecondCategory(firstCategoryName, secondCategoryName, inExStatus) {
+                var s_e_c = $("#second-income-category");
+                $.ajax({
+                    url: '/category/secondCategoryList',
+                    data: {
+                        firstCategoryName: firstCategoryName,
+                        inExStatus: inExStatus
+                    },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.msg === "操作成功") {
+                            s_e_c.empty(); //防止重复渲染
+                            for (var i = 0; i < data.data.length; i++) {
+                                s_e_c.append("<option>" + data.data[i] + "</option>");
+                            }
+                            //设置 value 值
+                            s_e_c.val(secondCategoryName);
+                            form.render('select'); //刷新渲染列表
+                        } else {
+
+                        }
+                    }
+                });
+            }
+        });
+
+        //表单提交（添加支出流水账单）
+        form.on('submit(addAccountCurrent)', function (data) {
+            if (data.field.first_category_name !== '' && data.field.second_category_name !== '' && data.field.account_type_name !== '') {
+                $.ajax({
+                    url: '/accountCurrent/addAccountCurrent',
+                    data: data.field,
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.success) {
+                            $("#amount").val("");//清空金额明细
+                            $("#remarks").val("");//清空备注
+                            renderTotalAmount(getDateSubstring());//渲染账目清单
+                            tableReload(); //执行表格数据重载异步更新
+                        } else {
+                            layer.msg(data.message);
+                        }
+                    }
+                });
+            } else {
+                layer.msg("请添加一二级分类、以及金融账户后再进行流水操作");
+            }
+            return false;
+        });
+
+        //表单提交（添加收入流水账单）
+        form.on('submit(addAccountCurrentIncome)', function (data) {
+            if (data.field.first_category_name !== '' && data.field.second_category_name !== '' && data.field.account_type_name !== '') {
+                $.ajax({
+                    url: '/accountCurrent/addAccountCurrent',
+                    data: data.field,
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.success) {
+                            $("#amount-income").val("");//清空金额明细
+                            $("#remarks-income").val("");//清空备注
+                            //渲染账目清单
+                            renderTotalAmount(getDateSubstring());
+                            //执行表格数据重载异步更新
+                            tableReload();
+                        } else {
+                            layer.msg(data.message);
+                        }
+                    }
+                });
+            } else {
+                layer.msg("请添加一二级分类、以及金融账户后再进行流水操作");
+            }
+            return false;
+        });
+
+        //表单提交 条件搜索
+        form.on('submit(search)', function (data) {
+            table.reload('accountCurrentData', {
+                //重载后以日期排序
+                url: '/accountCurrent/selectByConditions',
+                where: {
+                    first_category_name: data.field.first_category_name,
+                    second_category_name: data.field.second_category_name,
+                    account_type_name: data.field.account_type_name,
+                    dateRange: data.field.dateRange,
+                    remarks: data.field.remarks
+                },
+                initSort: {field: 'date', type: 'desc'},
+                method: 'post',
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                },
+                deep: true
+            });
+            return false;
+        });
+
+        //日期选择（查询面板）
+        laydate.render({
+            elem: '#lay-date',//指定元素
+            type: 'month',
+            theme: '#393D49',
+            done: function (value) {
+                //渲染账目清单
+                renderTotalAmount(value);
+                //查询指定年月的流水数据
+                renderTableData(value);
+            }
+        });
+
+        //日期选择（查询面板）
+        laydate.render({
+            elem: '#search-date',//指定元素
+            type: 'date',
+            theme: '#393D49',
+            range: true
+        });
+
+        //流水表格头部监听事件
+        table.on('toolbar(accountCurrent)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            var data = checkStatus.data;
+            if (obj.event === 'delete') {
+                if (data.length !== 0) {
+                    //构建数组
+                    var idList = [];
+                    for (var i = 0; i < data.length; i++) {
+                        idList[i] = data[i].id;
+                    }
+                    deleteDialog(idList, null);
+                } else {
+                    layer.msg("请至少选择一条记录");
+                }
+            }
+        });
+
+        //表格监听事件
+        table.on('tool(accountCurrent)', function (obj) {
+            var data = obj.data; //获取本行流水数据
+            var event = obj.event; //获取事件
+            if (event === 'edit') {
+                editAccountCurrent(data);
+            } else if (event === 'delete') {
+                var idList = [data.id];
+                deleteDialog(idList, obj);
+            }
+        });
+
+        //账本初始化
+        function isAccountBookInit() {
+            var isAccountBookIntVal = "";
+            $.ajax({
+                url: '/accountIndex/accountBookInt',
                 async: false, //同步
                 dataType: 'json',
                 type: 'post',
                 success: function (data) {
-                    lay_this_name = data.layThisName;
+                    if (data.success) {
+                        isAccountBookIntVal = data.isAccountBookInt;
+                    } else {
+                        console.log(data.msg);
+                    }
                 }
             });
-            return lay_this_name;
+            return isAccountBookIntVal;
+        }
+
+        //编辑本行流水数据
+        function editAccountCurrent(data) {
+            //编辑流水窗口
+            layer.open({
+                type: 2,
+                title: '编辑流水',
+                skin: 'layui-layer-demo', //加上边框
+                area: ['800px', '450px'], //宽高
+                method: 'post',
+                content: '/editAccountCurrent?accountCurrentId=' + data.id,
+                end: function () {
+                    if (window.localStorage.getItem('isRender') === '1') {
+                        renderTotalAmount($("#lay-date").val());
+                        tableReload();//执行表格重载
+                        window.localStorage.removeItem('isRender');
+                    }
+                }
+            });
+        }
+
+        //删除对话框
+        function deleteDialog(idList, obj) {
+            layer.confirm('确定要删除选中的流水记录吗？', function (index) {
+                deleteAccountCurrent(idList, obj, index);
+            });
+        }
+
+        //删除本行流水数据
+        function deleteAccountCurrent(idList, obj, index) {
+            var loadIndex = layer.load(2);
+            $.ajax({
+                url: '/accountCurrent/delete?idList=' + idList,
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    if (data.success) {
+                        layer.close(loadIndex);
+                        layer.close(index);
+                        layer.msg(
+                            data.message,
+                            {time: 1500},
+                            function () {
+                                renderTotalAmount($("#lay-date").val());
+                                tableReload();
+                            }
+                        );
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }
+            });
+        }
+
+        //账本索引
+        function accountBookIndex(accountBookName) {
+            var indexValue = "";
+            $.ajax({
+                url: '/accountIndex/accountBookIndex?accountBookName=' + accountBookName,
+                async: false, //同步
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    if (data.success) {
+                        indexValue = data.accountBookIndex;
+                    } else {
+                        console.log(data.msg);
+                    }
+                }
+            });
+            return indexValue;
         }
 
         //渲染账本头像
@@ -572,7 +1172,7 @@
                     if (data.success) {
                         $(".accountBookHeaderImg").attr("src", data.data);
                     } else {
-                        $(".accountBookHeaderImg").attr("src", null);
+                        $(".accountBookHeaderImg").attr("src", "http://42.193.17.123:8080/images/default.png");
                     }
                 }
             });
@@ -608,26 +1208,31 @@
             //渲染二级分类
             function renderSecondExpenseCategory(firstCategoryName, inExStatus) {
                 var s_e_c = $("#second-expense-category");
-                $.ajax({
-                    url: '/category/secondCategoryList',
-                    data: {
-                        firstCategoryName: firstCategoryName,
-                        inExStatus: inExStatus
-                    },
-                    dataType: 'json',
-                    type: 'post',
-                    success: function (data) {
-                        if (data.msg === "操作成功") {
-                            s_e_c.empty(); //防止重复渲染
-                            for (var i = 0; i < data.data.length; i++) {
-                                s_e_c.append("<option>" + data.data[i] + "</option>");
-                            }
-                            form.render('select'); //刷新渲染列表
-                        } else {
+                if (firstCategoryName != null) {
+                    $.ajax({
+                        url: '/category/secondCategoryList',
+                        data: {
+                            firstCategoryName: firstCategoryName,
+                            inExStatus: inExStatus
+                        },
+                        dataType: 'json',
+                        type: 'post',
+                        success: function (data) {
+                            if (data.msg === "操作成功") {
+                                s_e_c.empty(); //防止重复渲染
+                                for (var i = 0; i < data.data.length; i++) {
+                                    s_e_c.append("<option>" + data.data[i] + "</option>");
+                                }
+                                form.render('select'); //刷新渲染列表
+                            } else {
 
+                            }
                         }
-                    }
-                });
+                    });
+                } else {
+                    s_e_c.empty();
+                    form.render('select');
+                }
             }
 
             //渲染金融账户
@@ -848,20 +1453,30 @@
         function renderTableData(dateSubstring) {
             table.render({
                 elem: '#accountCurrent',
+                toolbar: '#toolbarAccountCurrent',
                 url: '/accountCurrent/accountCurrentList.json?dateSubstring=' + dateSubstring, //数据接口
                 title: '用户列表',
-                height: 472,
                 page: true,
                 limit: 10,
                 limits: [10, 20, 30, 40],
                 skin: 'line',
                 cols: [
                     [   //表头
+                        {type: 'checkbox', fixed: 'left'},
                         {field: 'id', hide: true},
                         {field: 'date', hide: true},
                         {field: 'dateConverted', title: '日期', sort: true},
                         {field: 'second_category_name', title: '分类', sort: true},
-                        {field: 'in_ex_status', title: '收支', sort: true},
+                        {
+                            field: 'in_ex_status', title: '收支', sort: true,
+                            templet: function (d) {
+                                if (d.in_ex_status === "收") {
+                                    return "<span style='color: #f1523a'>" + d.in_ex_status + "</span>";
+                                } else {
+                                    return "<span style='color: #14ba89'>" + d.in_ex_status + "</span>";
+                                }
+                            }
+                        },
                         {field: 'amountString', title: '金额', sort: true},
                         {field: 'account_type_name', title: '账户', sort: true},
                         {field: 'remarks', title: '备注'},
@@ -895,37 +1510,15 @@
         function renderTotalAmount(dateSubstring) {
             //月收入总额
             $.ajax({
-                url: '/totalAmountCalculate/getMonthlyIncome?dateSubstring=' + dateSubstring,
+                url: '/assetsOverview/getMonthlyInEx?dateSubstring=' + dateSubstring,
                 data: dateSubstring,
                 dataType: 'json',
                 type: 'post',
                 success: function (data) {
                     if (data.success) {
-                        $("#monthly-income").text(data.data);
-                    }
-                }
-            });
-            //月支出总额
-            $.ajax({
-                url: '/totalAmountCalculate/getMonthlyExpense?dateSubstring=' + dateSubstring,
-                data: dateSubstring,
-                dataType: 'json',
-                type: 'post',
-                success: function (data) {
-                    if (data.success) {
-                        $("#monthly-expense").text(data.data);
-                    }
-                }
-            });
-            //月结余总额
-            $.ajax({
-                url: '/totalAmountCalculate/getMonthlyBalance?dateSubstring=' + dateSubstring,
-                data: dateSubstring,
-                dataType: 'json',
-                type: 'post',
-                success: function (data) {
-                    if (data.success) {
-                        $("#monthly-balance").text(data.data);
+                        $("#monthly-income").text(data.monthlyIn);
+                        $("#monthly-expense").text(data.monthlyEx);
+                        $("#monthly-balance").text(data.monthlyBa);
                     }
                 }
             });
@@ -947,6 +1540,9 @@
 
         //渲染条件搜索表单
         function renderSearchForm(accountBookName, inExStatus) {
+            //渲染当前月份概览
+            $("#lay-date").val(getDateSubstring());
+
             //渲染一级分类
             $.ajax({
                 url: '/category/firstCategoryAllList?accountBookName=' + accountBookName,
@@ -957,6 +1553,7 @@
                     var f_c = $("#search-first-category");
                     if (data.msg === "操作成功") {
                         f_c.empty(); //清空列表 避免重复提交渲染
+                        f_c.append('<option>所有分类</option>');
                         for (var i = 0; i < data.data.length; i++) {
                             f_c.append("<option>" + data.data[i] + "</option>");
                         }
@@ -972,23 +1569,30 @@
             //渲染二级分类
             function renderSecondCategory(firstCategoryName, inExStatus) {
                 var s_e_c = $("#search-second-category");
-                $.ajax({
-                    url: '/category/secondCategoryList',
-                    data: {firstCategoryName: firstCategoryName, inExStatus: inExStatus},
-                    dataType: 'json',
-                    type: 'post',
-                    success: function (data) {
-                        if (data.msg === "操作成功") {
-                            s_e_c.empty(); //防止重复渲染
-                            for (var i = 0; i < data.data.length; i++) {
-                                s_e_c.append("<option>" + data.data[i] + "</option>");
-                            }
-                            form.render('select'); //刷新渲染列表
-                        } else {
+                if (firstCategoryName !== '所有分类') {
+                    $.ajax({
+                        url: '/category/secondCategoryList',
+                        data: {firstCategoryName: firstCategoryName, inExStatus: inExStatus},
+                        dataType: 'json',
+                        type: 'post',
+                        success: function (data) {
+                            if (data.msg === "操作成功") {
+                                s_e_c.empty(); //防止重复渲染
+                                s_e_c.append('<option>所有分类</option>');
+                                for (var i = 0; i < data.data.length; i++) {
+                                    s_e_c.append("<option>" + data.data[i] + "</option>");
+                                }
+                                form.render('select'); //刷新渲染列表
+                            } else {
 
+                            }
                         }
-                    }
-                });
+                    });
+                } else {
+                    s_e_c.empty();
+                    s_e_c.append('<option>所有分类</option>');
+                    form.render('select');
+                }
             }
 
             //渲染金融账户
@@ -1001,6 +1605,7 @@
                     var a_t = $("#search-account-type");
                     if (data.success) {
                         a_t.empty();//防止重复渲染
+                        a_t.append('<option>所有账户</option>');
                         for (var i = 0; i < data.data.length; i++) {
                             a_t.append("<option>" + data.data[i] + "</option>");
                         }
@@ -1011,400 +1616,30 @@
                 }
             });
         }
-
-        //账本事件
-        element.on('nav(all)', function (elem) {
-            //切换选项卡为支出面板
-            element.tabChange('keepAccounts', '支出');
-            // var accountBookName = $(this).text().replace(/[ ]/g, ""); //去掉空格
-            var accountBookName = elem.text().trim(); //获取当前账本
-            var inExStatus = $("#in-ex-status").val("支").val();//获取收支属性
-            if (accountBookName !== "所有账本" && accountBookName !== "添加账本") {
-                layThis(elem.text().trim());//设置当前 lay-this 账本索引
-                renderFormEx(accountBookName, inExStatus); //渲染表单数据
-                renderTableData(getDateSubstring());  //渲染流水表格
-                renderAccountBookHeader();//渲染账本头像
-                renderTotalAmount(getDateSubstring()); //渲染账目清单
-                renderSearchForm(accountBookName, inExStatus);//渲染表单搜索
-            } else if (accountBookName === "添加账本") {
-                addAccountBook();
-            } else if (accountBookName === "所有账本") {
-                var f_c = $(".first-category").empty().append("<option>一级分类</option>");
-                var s_c = $(".second-category").empty().append("<option>二级分类</option>");
-                var a_t = $(".account-type").empty().append("<option>金融账户</option>");
-                var c_t = $(".category-template").empty().append("<option>分类模板</option>");
-                var render = form.render('select');
-            }
-        });
-
-        //选项卡 切换到收入面板
-        element.on('tab(keepAccounts)', function (elem) {
-            var accountBookName = layThis("");//获取当前账本索引
-            var inExStatus = $("#in-ex-status");//获取收支元素
-            if (elem.index === 0) {//当面板切换到支出选项卡时
-                inExStatus.val("支");//收支属性设置为：支
-            }
-            if (elem.index === 1) {//当面板切换到收入选项卡时
-                var inExStatusValue = inExStatus.val("收").val();//收支属性设置为：收
-                //渲染收入表单数据
-                renderFormIn(accountBookName, inExStatusValue);
-            }
-        });
-
-        //一级支出事件（记账面板选择）
-        form.on('select(first_expense_category)', function (data) {
-            var inExStatus = $("#in-ex-status").val();//获取支出属性
-            var firstCategoryName = data.value;//获取一级分类
-            $.ajax({
-                url: '/category/secondCategoryList',
-                data: {
-                    firstCategoryName: firstCategoryName,
-                    inExStatus: inExStatus
-                },
-                dataType: 'json',
-                type: 'post',
-                success: function (data) {
-                    var s_e_c = $("#second-expense-category");
-                    if (data.msg === "操作成功") {
-                        s_e_c.empty(); //防止重复渲染
-                        for (var i = 0; i < data.data.length; i++) {
-                            s_e_c.append("<option>" + data.data[i] + "</option>");
-                        }
-                        form.render('select'); //刷新渲染列表
-                    } else {
-                        layer.msg(data.msg);
-                    }
-                }
-            });
-        });
-
-        //一级收入事件（记账面板选择）
-        form.on('select(first-income-category)', function (data) {
-            var inExStatus = $("#in-ex-status").val();//获取支出属性
-            var firstCategoryName = data.value;//获取一级分类
-            $.ajax({
-                url: '/category/secondCategoryList',
-                data: {
-                    firstCategoryName: firstCategoryName,
-                    inExStatus: inExStatus
-                },
-                dataType: 'json',
-                type: 'post',
-                success: function (data) {
-                    var s_e_c = $("#second-income-category");
-                    if (data.msg === "操作成功") {
-                        s_e_c.empty(); //防止重复渲染
-                        for (var i = 0; i < data.data.length; i++) {
-                            s_e_c.append("<option>" + data.data[i] + "</option>");
-                        }
-                        form.render('select'); //刷新渲染列表
-                    } else {
-                        layer.msg(data.msg);
-                    }
-                }
-            });
-        });
-
-        //一级支出事件（条件搜索表单）
-        form.on('select(search-first-category)', function (data) {
-            //提交数据 返回后台 查询对应的二级分类
-            var firstCategoryName = data.value;
-            $.ajax({
-                url: '/category/secondCategoryAllList?firstCategoryName=' + firstCategoryName,
-                data: firstCategoryName,
-                dataType: 'json',
-                type: 'post',
-                success: function (data) {
-                    var s_e_c = $("#search-second-category");
-                    if (data.msg === "操作成功") {
-                        s_e_c.empty(); //防止重复渲染
-                        for (var i = 0; i < data.data.length; i++) {
-                            s_e_c.append("<option>" + data.data[i] + "</option>");
-                        }
-                        form.render('select'); //刷新渲染列表
-                    } else {
-                        layer.msg(data.msg);
-                    }
-                }
-            });
-        });
-
-        //分类模板事件（支出）
-        form.on('select(categoryTemplate)', function (data) {
-            var categoryTemplateName = data.value; //获取模板名称
-            var inExStatus = $("#in-ex-status").val(); //获取收支属性
-            //获取模板绑定的数据
-            $.ajax({
-                url: '/categoryTemplate/categoryTemplateSingle',
-                data: {categoryTemplateName: categoryTemplateName, inExStatus: inExStatus},
-                dataType: 'json',
-                type: 'post',
-                success: function (data) {
-                    if (data.success) {
-                        //渲染一级分类选项
-                        $("#first-expense-category").val(data.data[0]);
-                        //渲染二级分类选项
-                        renderSecondCategory(data.data[0], data.data[1], inExStatus);
-                        //渲染金融账户分类选项
-                        $("#account-type").val(data.data[2]);
-                        form.render('select');
-                    } else {
-
-                    }
-                }
-            });
-
-            //渲染二级分类且渲染选项值
-            function renderSecondCategory(firstCategoryName, secondCategoryName, inExStatus) {
-                var s_e_c = $("#second-expense-category");
-                $.ajax({
-                    url: '/category/secondCategoryList',
-                    data: {
-                        firstCategoryName: firstCategoryName,
-                        inExStatus: inExStatus
-                    },
-                    dataType: 'json',
-                    type: 'post',
-                    success: function (data) {
-                        if (data.msg === "操作成功") {
-                            s_e_c.empty(); //防止重复渲染
-                            for (var i = 0; i < data.data.length; i++) {
-                                s_e_c.append("<option>" + data.data[i] + "</option>");
-                            }
-                            //设置 value 值
-                            s_e_c.val(secondCategoryName);
-                            form.render('select'); //刷新渲染列表
-                        } else {
-
-                        }
-                    }
-                });
-            }
-        });
-
-        //分类模板事件（收入）
-        form.on('select(category-template-income)', function (data) {
-            var categoryTemplateName = data.value; //获取模板名称
-            var inExStatus = $("#in-ex-status").val(); //获取收支属性
-            //获取模板绑定的数据
-            $.ajax({
-                url: '/categoryTemplate/categoryTemplateSingle',
-                data: {categoryTemplateName: categoryTemplateName, inExStatus: inExStatus},
-                dataType: 'json',
-                type: 'post',
-                success: function (data) {
-                    if (data.success) {
-                        //渲染一级分类选项
-                        $("#first-income-category").val(data.data[0]);
-                        //渲染二级分类选项
-                        renderSecondCategory(data.data[0], data.data[1], inExStatus);
-                        //渲染金融账户分类选项
-                        $("#account-type-income").val(data.data[2]);
-                        form.render('select');
-                    } else {
-
-                    }
-                }
-            });
-
-            //渲染二级分类且渲染选项值
-            function renderSecondCategory(firstCategoryName, secondCategoryName, inExStatus) {
-                var s_e_c = $("#second-income-category");
-                $.ajax({
-                    url: '/category/secondCategoryList',
-                    data: {
-                        firstCategoryName: firstCategoryName,
-                        inExStatus: inExStatus
-                    },
-                    dataType: 'json',
-                    type: 'post',
-                    success: function (data) {
-                        if (data.msg === "操作成功") {
-                            s_e_c.empty(); //防止重复渲染
-                            for (var i = 0; i < data.data.length; i++) {
-                                s_e_c.append("<option>" + data.data[i] + "</option>");
-                            }
-                            //设置 value 值
-                            s_e_c.val(secondCategoryName);
-                            form.render('select'); //刷新渲染列表
-                        } else {
-
-                        }
-                    }
-                });
-            }
-        });
-
-        //表单提交（添加支出流水账单）
-        form.on('submit(addAccountCurrent)', function (data) {
-            $.ajax({
-                url: '/accountCurrent/addAccountCurrent',
-                data: data.field,
-                dataType: 'json',
-                type: 'post',
-                success: function (data) {
-                    if (data.success) {
-                        $("#amount").val("");//清空金额明细
-                        $("#remarks").val("");//清空备注
-                        //渲染账目清单
-                        renderTotalAmount(getDateSubstring());
-                        //执行表格数据重载异步更新
-                        tableReload();
-                    } else {
-                        layer.msg(data.message);
-                    }
-                }
-            });
-            return false;
-        });
-
-        //表单提交（添加收入流水账单）
-
-        form.on('submit(addAccountCurrentIncome)', function (data) {
-            $.ajax({
-                url: '/accountCurrent/addAccountCurrent',
-                data: data.field,
-                dataType: 'json',
-                type: 'post',
-                success: function (data) {
-                    if (data.success) {
-                        $("#amount").val("");//清空金额明细
-                        $("#remarks").val("");//清空备注
-                        //渲染账目清单
-                        renderTotalAmount(getDateSubstring());
-                        //执行表格数据重载异步更新
-                        tableReload();
-                    } else {
-                        layer.msg(data.message);
-                    }
-                }
-            });
-            return false;
-        });
-
-        //日期选择（查询面板）
-        laydate.render({
-            elem: '#lay-date',//指定元素
-            type: 'month',
-            theme: '#393D49',
-            done: function (value) {
-                //渲染账目清单
-                renderTotalAmount(value);
-                //查询指定年月的流水数据
-                renderTableData(value);
-            }
-        });
-
-        //日期选择（查询面板）
-        laydate.render({
-            elem: '#search-date',//指定元素
-            type: 'date',
-            theme: '#393D49',
-            range: true
-        });
-
-        //表格监听事件
-        table.on('tool(accountCurrent)', function (obj) {
-            var data = obj.data; //获取本行流水数据
-            var event = obj.event; //获取事件
-            if (event === 'edit') {
-                editAccountCurrent(data);
-            } else if (event === 'delete') {
-                layer.confirm('确定要删除该行数据吗？', function (index) {
-                    deleteAccountCurrent(data, obj, index);
-                });
-
-            }
-
-            //编辑本行流水数据
-            function editAccountCurrent(data) {
-                /**
-                 * 只有当修改数据提交成功后，子页面会设置会通过 ajax 传递 isTableReload 到后台设置为 true，则在关闭子窗口的时候重载表格
-                 * 单纯关闭窗口右上角的按钮不会重载表格
-                 */
-                //编辑模块窗口关闭后表格重载索引
-                function getTableReload() {
-                    var isTableReload = false;
-                    $.ajax({
-                        url: '/tableReload/getTableReload',
-                        dataType: 'json',
-                        async: false, //同步
-                        type: 'post',
-                        success: function (data) {
-                            if (data.success) {
-                                isTableReload = data.data;
-                            } else {
-                                layer.msg(data.msg);
-                            }
-                        }
-                    });
-                    return isTableReload;
-                }
-
-                //编辑模块窗口关闭后设置表格重载
-                function setTableReload(isTableReload) {
-                    $.ajax({
-                        url: '/tableReload/setTableReload?isTableReload=' + isTableReload,
-                        data: isTableReload,
-                        dataType: 'json',
-                        type: 'post',
-                        success: function (data) {
-                            if (data.success) {
-                                // 获取当前窗口索引
-                                var index = parent.layer.getFrameIndex(window.name);
-                                // 关闭当前窗口
-                                window.parent.layer.close(index);//关闭当前窗口
-                            } else {
-                                layer.msg(data.msg);
-                            }
-                        }
-                    });
-                }
-
-                //编辑流水窗口
-                layer.open({
-                    type: 2,
-                    title: '编辑流水',
-                    skin: 'layui-layer-demo', //加上边框
-                    area: ['800px', '450px'], //宽高
-                    method: 'post',
-                    content: '/keepAccounts/editAccountCurrent?accountCurrentId=' + data.id,
-                    end: function () {
-                        if (getTableReload()) {
-                            renderTotalAmount(getDateSubstring());
-                            tableReload();//执行表格重载
-                            setTableReload(false);
-                        }
-                    }
-                });
-            }
-
-            //删除本行流水数据
-            function deleteAccountCurrent(data, obj, index) {
-                $.ajax({
-                    url: '/accountCurrent/delete?accountCurrentId=' + data.id,
-                    dataType: 'json',
-                    type: 'post',
-                    success: function (data) {
-                        if (data.success) {
-                            obj.del(); //删除对应的行数据
-                            layer.close(index);
-                            layer.msg(
-                                data.message,
-                                {time: 1000},
-                                function () {
-                                    renderTotalAmount(getDateSubstring());
-                                    tableReload();
-                                }
-                            );
-                        } else {
-                            layer.msg(data.msg);
-                        }
-                    }
-                });
-            }
-        });
     });
+</script>
+<!--账本管理头部操作工具板-->
+<script type="text/html" id="toolbarAccountCurrent">
+    <div class="layui-btn-container" style="text-align: right;">
+        <button class="layui-btn layui-btn-sm layui-btn-primary" id="batch-delete" lay-event="delete"
+                style="margin-top: 1px;margin-bottom: 0; margin-right: -9px; height: 28px; line-height: 28px">
+            <i class="layui-icon layui-icon-delete"></i>
+            批量删除
+        </button>
+    </div>
+</script>
+<script type="text/html" id="barAccountCurrent">
+    <a class="layui-btn layui-btn-sm" lay-event="edit">
+        <i class="layui-icon layui-icon-edit"
+           style="font-size: 5px"></i>
+        编辑
+    </a>
+    <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete">
+        <i class="layui-icon layui-icon-delete"
+           style="font-size: 5px"></i>
+        删除
+    </a>
 </script>
 </body>
 </html>
+

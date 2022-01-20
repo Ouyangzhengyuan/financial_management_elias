@@ -1,0 +1,101 @@
+/*面板设置*/
+.layui-panel {
+    color: rgba(0, 0, 0, .85);
+    min-width: 730px;
+    text-align: center;
+    overflow: hidden;
+}
+
+/*左面板设置*/
+#left-panel {
+    padding: 15px;
+    float: left;
+}
+
+.layui-elem-quote {
+    margin-bottom: 0;
+}
+
+/*副标题面板设置*/
+#left-panel .sub-header-div {
+    height: 200px;
+}
+
+/*资产概况设置*/
+#left-panel .amount-div {
+    float: left;
+    width: 231px;
+    text-align: center;
+    margin-top: 30px;
+}
+
+#left-panel #padding-div {
+    height: 38px;
+    margin: 0;
+    background-color: #FAFAFA;
+}
+
+#left-panel .amount-title {
+    color: #aaa
+}
+
+/*收支表设置*/
+#in-ex-table .layui-table {
+    margin-top: 0;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+
+#in-ex-table .layui-table tr {
+    border-left: none;
+    border-right: none;
+}
+
+#in-ex-table #t-head th {
+    text-align: right;
+    color: #808080;
+}
+
+#in-ex-table #tr-income td {
+    text-align: right;
+    color: #FF5722;
+}
+
+#in-ex-table #tr-expense td {
+    text-align: right;
+    color: #5FB878;
+}
+
+#in-ex-table .layui-icon {
+    font-size: 14px;
+}
+
+#in-ex-table #tr-income .layui-icon {
+    color: #FF5722;
+}
+
+#in-ex-table #tr-expense .layui-icon {
+    color: #5FB878;
+}
+
+
+/*财务简报设置*/
+#report {
+    float: left;
+    background-color: #FAFAFA;
+    width: 730px;
+    height: 38px;
+}
+
+#report p {
+    margin-top: 15px;
+    margin-left: 21px;
+    float: right;
+}
+
+#report strong {
+    font-size: 18px;
+}
+
+

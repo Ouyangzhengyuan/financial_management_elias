@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pers.elias.financial_management.mapper.TotalAmountMapper">
+    <select id="selectDailyInEx" parameterType="pers.elias.financial_management.model.AccountCurrent"
+            resultType="Double">
+        SELECT
+            ac.amount
+        FROM
+            account_current ac
+        WHERE
+            ac.user_name = #{userName}
+            and
+            ac.account_book_id = #{accountBookId}
+            and
+            ac.in_ex_status = #{inExStatus}
+            and
+            date_format(date, '%Y-%m-%d') = #{dateConverted}
+    </select>
+
+    <resultMap id="dailyInExByConditionsResultMap" type="pers.elias.financial_management.model.AccountCurrentResult">
+        <result property="date" column="date"/>
+        <collection property="amount" column="amount" ofType="Double"/>
+    </resultMap>
+
+    <select id="selectDailyInExByReconciliation" resultMap="dailyInExByConditionsResultMap">
+        SELECT
+        SUM(ac.amount),
+        ac.date
+        FROM
+        account_current ac,
+        account_type at
+        WHERE
+        ac.account_type_id = at.id
+        AND ac.user_name = #{userName}
+        AND ac.account_book_id = #{accountBookId}
+        AND ac.in_ex_status = #{inExStatus}
+        <if test="accountTypeId != null">
+            AND account_type_id = #{accountTypeId}
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND DATE_FORMAT(ac.date,"%Y-%m-%d") BETWEEN #{startDate} and #{endDate}
+        </if>
+        GROUP BY DATE(ac.date)
+    </select>
+
+    <select id="selectMonthlyInEx" parameterType="pers.elias.financial_management.model.AccountCurrent"
+            resultType="Double">
+        SELECT
+            ac.amount
+        FROM
+            account_current ac
+        WHERE
+            ac.user_name = #{userName}
+            and
+            ac.account_book_id = #{accountBookId}
+            and
+            ac.in_ex_status = #{inExStatus}
+            and
+            date_format(date, '%Y-%m') = #{dateConverted}
+    </select>
+
+    <select id="selectYearlyInEx" parameterType="pers.elias.financial_management.model.AccountCurrent"
+            resultType="Double">
+        SELECT
+            ac.amount
+        FROM
+            account_current ac
+        WHERE
+            ac.user_name = #{userName}
+            and
+            ac.account_book_id = #{accountBookId}
+            and
+            ac.in_ex_status = #{inExStatus}
+            and
+            date_format(date, '%Y') = #{dateConverted}
+    </select>
+
+    <select id="selectAllInEx" resultType="Double">
+        SELECT
+        ac.amount
+        FROM
+        account_current ac,
+        account_type at
+        WHERE
+        ac.account_type_id = at.id
+        AND ac.user_name = #{userName}
+        AND ac.account_book_id = #{accountBookId}
+        AND ac.in_ex_status = #{inExStatus}
+        AND at.financial_account_id not in
+        <foreach collection="accountFinancialId" item="accountFinancialId" index="index" open="(" close=")"
+                 separator=",">
+            #{accountFinancialId}
+        </foreach>
+    </select>
+
+    <select id="selectAllInExByReconciliation" resultType="Double">
+        SELECT
+        SUM(ac.amount)
+        FROM
+        account_current ac,
+        account_type at
+        WHERE
+        ac.account_type_id = at.id
+        AND ac.user_name = #{userName}
+        AND ac.account_book_id = #{accountBookId}
+        AND ac.in_ex_status = #{inExStatus}
+        <if test="accountTypeId != null">
+            AND account_type_id = #{accountTypeId}
+        </if>
+        <if test="registerDate != null and endDate != null">
+            AND DATE_FORMAT(ac.date,"%Y-%m-%d") BETWEEN #{registerDate} and #{endDate}
+        </if>
+        <if test="date != null">
+            AND DATE_FORMAT(ac.date,"%Y-%m-%d") = #{date}
+        </if>
+        <if test="accountFinancialId != null">
+            AND at.financial_account_id not in
+            <foreach collection="accountFinancialId" item="accountFinancialId" index="index" open="(" close=")"
+                     separator=",">
+                #{accountFinancialId}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectAccountAllInEx" parameterType="pers.elias.financial_management.model.AccountCurrent"
+            resultType="Double">
+        SELECT
+            ac.amount
+            FROM
+            account_current ac,
+            category_second cs,
+            account_type at,
+            account_financial af
+        WHERE
+            ac.user_name = cs.user_name
+            AND ac.account_book_id = cs.account_book_id
+            AND ac.second_category_id = cs.id
+            AND ac.account_type_id = at.id
+            AND af.id = at.financial_account_id
+            AND ac.user_name = #{userName}
+            AND ac.in_ex_status = #{inExStatus}
+            AND ac.account_book_id = #{accountBookId}
+            AND af.id = #{accountFinancialId}
+    </select>
+
+    <select id="selectSubAccountAllInEx" parameterType="pers.elias.financial_management.model.AccountCurrent"
+            resultType="Double">
+        SELECT
+            ac.amount
+            FROM
+            account_current ac,
+            category_second cs,
+            account_type at
+        WHERE
+            ac.user_name = cs.user_name
+            AND ac.account_book_id = cs.account_book_id
+            AND ac.second_category_id = cs.id
+            AND ac.account_type_id = at.id
+            AND ac.user_name = #{userName}
+            AND ac.in_ex_status = #{inExStatus}
+            AND ac.account_book_id = #{accountBookId}
+            AND ac.account_type_id = #{accountTypeId}
+    </select>
+
+    <select id="selectSecondCategoryAllInEx" resultType="Double">
+        SELECT
+            ac.amount
+            FROM
+            account_current ac,
+            category_second cs
+        WHERE
+            ac.user_name = cs.user_name
+            AND ac.account_book_id = cs.account_book_id
+            AND ac.second_category_id = cs.id
+            AND ac.user_name = #{userName}
+            AND ac.account_book_id = #{accountBookId}
+            AND ac.in_ex_status = #{inExStatus}
+			AND ac.second_category_id = #{secondCategoryId}
+    </select>
+
+    <select id="selectFirstCategoryAllInEx" resultType="Double">
+        SELECT
+            ac.amount
+        FROM
+            account_current ac,
+            category_first cf
+        WHERE
+            ac.user_name = cf.user_name
+            AND ac.account_book_id = cf.account_book_id
+            AND ac.first_category_id = cf.id
+            AND ac.user_name = #{userName}
+            AND ac.account_book_id = #{accountBookId}
+            AND ac.in_ex_status = #{inExStatus}
+            AND ac.first_category_id = #{firstCategoryId}
+    </select>
+
+    <select id="selectByConditions" resultType="pers.elias.financial_management.model.AccountCurrentResult">
+        SELECT
+            ac.id,
+            cf.first_category_name,
+            cs.second_category_name,
+            ac.in_ex_status,
+            ac.amount
+        FROM
+            account_current ac,
+            category_first cf,
+            category_second cs,
+            account_type AT
+        WHERE
+            ac.user_name = cs.user_name
+            AND ac.account_book_id = cs.account_book_id
+            AND ac.first_category_id = cf.id
+            AND ac.second_category_id = cs.id
+            AND ac.account_type_id = AT.id
+            AND ac.user_name = #{userName}
+            AND ac.account_book_id = #{accountBookId}
+            AND ac.in_ex_status = #{inExStatus}
+        <if test="firstCategoryId != null">
+            AND ac.first_category_id = #{firstCategoryId}
+        </if>
+        <if test="secondCategoryId != null">
+            AND ac.second_category_id = #{secondCategoryId}
+        </if>
+        <if test="accountTypeId != null">
+            AND ac.account_type_id = #{accountTypeId}
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND date_format(ac.date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+        </if>
+        <if test="remarks != null and remarks != ''">
+            AND ac.remarks LIKE concat('%', #{remarks}, '%')
+        </if>
+            ORDER BY cf.id ASC
+    </select>
+
+    <select id="selectYearInExByConditions" resultType="Double">
+        SELECT
+        sum(ac.amount)
+        FROM
+        account_current ac,
+        category_first cf,
+        category_second cs,
+        account_type AT
+        WHERE
+        ac.user_name = cs.user_name
+        AND ac.account_book_id = cs.account_book_id
+        AND ac.first_category_id = cf.id
+        AND ac.second_category_id = cs.id
+        AND ac.account_type_id = AT.id
+        AND ac.user_name = #{userName}
+        AND ac.account_book_id = #{accountBookId}
+        AND ac.in_ex_status = #{inExStatus}
+        <if test="firstCategoryId != null">
+            AND ac.first_category_id = #{firstCategoryId}
+        </if>
+        <if test="secondCategoryId != null">
+            AND ac.second_category_id = #{secondCategoryId}
+        </if>
+        <if test="accountTypeId != null">
+            AND ac.account_type_id = #{accountTypeId}
+        </if>
+        <if test="remarks != null and remarks != ''">
+            AND ac.remarks LIKE concat('%', #{remarks}, '%')
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND date_format(ac.date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+        </if>
+        AND date_format(ac.date, '%Y') = #{year}
+    </select>
+
+    <select id="selectAllInExByConditions" resultType="Double">
+        SELECT
+        sum(ac.amount)
+        FROM
+        account_current ac,
+        category_first cf,
+        category_second cs,
+        account_type AT
+        WHERE
+        ac.user_name = cs.user_name
+        AND ac.account_book_id = cs.account_book_id
+        AND ac.first_category_id = cf.id
+        AND ac.second_category_id = cs.id
+        AND ac.account_type_id = AT.id
+        AND ac.user_name = #{userName}
+        AND ac.account_book_id = #{accountBookId}
+        AND ac.in_ex_status = #{inExStatus}
+        <if test="firstCategoryId != null">
+            AND ac.first_category_id = #{firstCategoryId}
+        </if>
+        <if test="secondCategoryId != null">
+            AND ac.second_category_id = #{secondCategoryId}
+        </if>
+        <if test="accountTypeId != null">
+            AND ac.account_type_id = #{accountTypeId}
+        </if>
+        <if test="remarks != null and remarks != ''">
+            AND ac.remarks LIKE concat('%', #{remarks}, '%')
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND date_format(ac.date, '%Y-%m-%d') BETWEEN #{startDate} AND #{endDate}
+        </if>
+    </select>
+
+    <resultMap id="monthInExByConditionsResultMap" type="pers.elias.financial_management.model.MonthDayInEx">
+        <result property="date" column="date"/>
+        <collection property="amount" column="amount" ofType="Double"/>
+    </resultMap>
+
+    <select id="selectMonthInExByConditions" resultMap="monthInExByConditionsResultMap">
+        SELECT
+        SUM(ac.amount),
+        ac.date
+        FROM
+        account_current ac,
+        category_first cf,
+        category_second cs,
+        account_type AT
+        WHERE
+        ac.user_name = cs.user_name
+        AND ac.account_book_id = cs.account_book_id
+        AND ac.first_category_id = cf.id
+        AND ac.second_category_id = cs.id
+        AND ac.account_type_id = AT.id
+        AND ac.user_name = #{userName}
+        AND ac.account_book_id = #{accountBookId}
+        AND ac.in_ex_status = #{inExStatus}
+        <if test="firstCategoryId != null">
+            AND ac.first_category_id = #{firstCategoryId}
+        </if>
+        <if test="secondCategoryId != null">
+            AND ac.second_category_id = #{secondCategoryId}
+        </if>
+        <if test="year != null">
+            AND date_format(ac.date, '%Y') = #{year}
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND date_format(ac.date, '%Y-%m-%d') BETWEEN #{startDate} and #{endDate}
+        </if>
+        <if test="startYear != null and endYear != null and startMonth != null and endMonth != null">
+            GROUP BY DAY(ac.date)
+        </if>
+        <if test="startYear == null and endYear == null and startMonth == null and endMonth == null">
+            GROUP BY MONTH(ac.date)
+        </if>
+    </select>
+</mapper>

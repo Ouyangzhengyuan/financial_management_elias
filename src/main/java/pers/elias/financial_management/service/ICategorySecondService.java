@@ -59,6 +59,11 @@ public interface ICategorySecondService {
     List<String> selectAllByCategorySecond(CategorySecond categorySecond);
 
     /**
+     * 通过一级分类id查询二级分类id
+     */
+    List<Integer> selectIdByFirstCategoryId(Integer firstCategoryId);
+
+    /**
      * 删除指定用户账本
      */
     int deleteByCategorySecond(CategorySecond categorySecond);
@@ -66,10 +71,25 @@ public interface ICategorySecondService {
     /**
      * 是否存在二级分类
      */
-    boolean isExists(CategorySecond categorySecond);
+    boolean isExists(String categorySecondName, CategorySecond categorySecond);
 
     /**
      *  查询二级分类id
      */
     Integer selectIdByCategorySecond(CategorySecond categorySecond);
+
+    /**
+     * 通过用户名删除
+     */
+    int deleteByUserName(String userName);
+
+    /**
+     * 通过账本id删除
+     */
+    int deleteByAccountBookId(Integer accountBookId);
+
+    /**
+     * 通过一级分类id删除
+     */
+    int deleteByFirstCategoryId(Integer firstCategoryId);
 }

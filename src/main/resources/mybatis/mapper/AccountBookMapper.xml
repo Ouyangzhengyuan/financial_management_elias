@@ -120,7 +120,7 @@
     ab.user_name = #{userName}
   </select>
 
-  <select id="selectIdByUserNameAndBook" parameterType="pers.elias.financial_management.component.GlobalAccountInfo" resultType="Integer">
+  <select id="selectIdByUserNameAndBook" parameterType="pers.elias.financial_management.bean.GlobalAccountInfo" resultType="Integer">
     select ab.id
     from account_book ab
     where
@@ -128,4 +128,8 @@
     and
     ab.name = #{accountBookName}
   </select>
+
+  <delete id="deleteByUserName" parameterType="String">
+        delete from account_book where user_name = #{userName}
+    </delete>
 </mapper>

@@ -66,7 +66,37 @@ public interface CategoryTemplateMapper {
     CategoryTemplate selectByCategoryTemplate(CategoryTemplate categoryTemplate);
 
     /**
+     * 查询当前账本下所有收支模板
+     */
+    List<CategoryTemplate> selectAllTemplate(CategoryTemplate categoryTemplate);
+
+    /**
      * 删除模板
      */
     int deleteByCategoryTemplate(CategoryTemplate categoryTemplate);
+
+    /**
+     * 通过用户名删除
+     */
+    int deleteByUserName(String userName);
+
+    /**
+     * 通过账本id删除
+     */
+    int deleteByAccountBookId(Integer accountBookId);
+
+    /**
+     * 通过二级分类id删除
+     */
+    int deleteByCategorySecondId(Integer categorySecondId);
+
+    /**
+     * 通过一级分类id删除
+     */
+    int deleteByFirstCategoryId(Integer firstCategoryId);
+
+    /**
+     * 通过二级金融id删除
+     */
+    int deleteByAccountTypeId(Integer accountTypeId);
 }

@@ -65,7 +65,12 @@
         form.verify({
             templateName: function (value, item) {
                 if (value.trim() === '') {
-                    return "请输入模板名称！";
+                    layer.tips('请输入模板名称', "#templateName");
+                    return true;
+                }
+                if (value.length > 10) {
+                    layer.tips('模板名称过长', "#templateName");
+                    return true;
                 }
             }
         });
@@ -157,13 +162,15 @@
                     if (data.success) {
                         layer.msg(
                             data.message,
-                            {time: 1000},
+                            {time: 1500},
                             function () {
-                                window.localStorage.setItem("isRenderSelect", "1");
-                                // 获取当前窗口索引
-                                var index = parent.layer.getFrameIndex(window.name);
-                                // 关闭当前窗口
-                                window.parent.layer.close(index);//关闭当前窗口
+                                $("#templateName").val("");
+                                //是否更新账本列表
+                                window.localStorage.setItem("isReload", "1");
+                                // // 获取当前窗口索引
+                                // var pIndex = parent.layer.getFrameIndex(window.name);
+                                // // 关闭当前窗口
+                                // window.parent.layer.close(pIndex);//关闭当前窗口
                             });
                     } else {
                         layer.msg(data.message);

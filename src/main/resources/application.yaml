@@ -3,6 +3,11 @@ spring:
     username: root
     password: 123456
     url: jdbc:mysql://localhost:3306/financial_management?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai
+    #远程服务器数据库用户账号
+#    username: elias
+#    password: elias
+#    远程服务器数据库url
+#    url: jdbc:mysql://localhost:3306/financial_manage?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -42,7 +47,19 @@ mybatis:
 server:
   port: 8080
 
+#本地图片路径
+user-img-absolute-path: "D:/work-space/financial_management_elias/src/main/resources/static/images"
+user-img-relative-path: "/images/"
 
+#远程服务器图片路径
+#user-img-absolute-path: "/www/wwwroot/financial_management/images"
+#user-img-relative-path: "/images/"
+
+jwt:
+  tokenHeader: Authorization #JWT存储的请求头
+  secret: mySecret #JWT加解密使用的密钥
+  expiration: 604800 #JWT的超期限时间(60*60*24)
+  tokenHead: Bearer  #JWT负载中拿到开头
 
 
 

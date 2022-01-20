@@ -1,0 +1,226 @@
+/*面板设置*/
+.layui-panel {
+    color: rgba(0, 0, 0, .85);
+    overflow: hidden;
+}
+
+/*菜单设置*/
+#setting-menu {
+    width: 180px;
+    float: left;
+}
+
+#setting-menu li {
+    line-height: 50px;
+}
+
+/*菜单内容*/
+#setting-content {
+    float: left;
+    width: 873px;
+    height: 600px;
+    margin-left: 20px;
+    text-align: left;
+}
+
+/*引用区域*/
+.layui-elem-quote {
+    padding: 20px
+}
+
+/*个人中心面板*/
+#personal-details-panel {
+    display: inline;
+}
+
+#personal-details-panel #user-details {
+    float: left;
+    width: 424px;
+    height: 311px;
+    border: 1px solid #E9E9E9;
+}
+
+#user-details .layui-table th {
+    text-align: center;
+}
+
+#user-details .layui-table[lay-skin="line"] th, .layui-table[lay-skin="line"] td {
+    text-align: center;
+}
+
+#user-details .layui-table tr {
+    height: 48px;
+}
+
+#personal-details-panel .details-content {
+    color: #029789;
+    padding: 0;
+}
+
+#personal-details-panel .layui-table {
+    margin: 0;
+}
+
+#personal-details-panel .hover a:hover {
+    color: #01AAED;
+}
+
+#personal-details-panel .details-edit-color {
+    color: #FF5722
+}
+
+/*安全设置面板*/
+#security-setting-panel {
+    display: none;
+}
+
+#security-setting-panel .layui-form {
+    width: 380px;
+}
+
+#security-setting-panel .layui-tab-title {
+    width: 873px;
+}
+
+#security-setting-panel .layui-input {
+    width: 190px;
+}
+
+#security-setting-panel .layui-form-item {
+    margin-bottom: 30px;
+}
+
+#security-setting-panel .layui-form-item .layui-input-inline {
+    width: 300px;
+}
+
+#security-setting-panel .layui-form-label {
+    text-align: center;
+}
+
+#security-setting-panel .layui-form-label span {
+    margin-left: 3px;
+}
+
+#security-setting-panel .layui-tab-content {
+    margin-left: 6px;
+}
+
+/*账本管理面板*/
+#account-book-manage-panel {
+    width: 873px;
+    height: 438px;
+    background-color: #FAFAFA;
+    display: none;
+}
+
+#account-book-manage-panel #add-account-book-btn {
+    float: right;
+    margin-top: -32px;
+}
+
+#account-book-manage-panel .layui-table-cell {
+    text-align: center;
+}
+
+#account-book-manage-panel .layui-table-view {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    margin-top: -10px;
+}
+
+#account-book-manage-panel .layui-table-view .layui-table[lay-skin="line"] {
+    /*border-top: 1px solid #eee;*/
+    border-right: none;
+}
+
+/*分类管理面板*/
+#category-manage-panel {
+    width: 873px;
+    height: 438px;
+    background-color: #FAFAFA;
+    display: none
+}
+
+#category-manage-panel .layui-elem-quote {
+    margin-bottom: 0;
+}
+
+#category-manage-panel #add-category-btn {
+    float: right;
+    margin-top: -32px
+}
+
+#category-manage-panel .layui-table-view {
+    margin-top: -15px;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+
+#category-manage-panel .layui-table-cell {
+    text-align: center;
+}
+
+#category-manage-panel .layui-tab-title {
+    background-color: #FAFAFA;
+    padding-top: 10px;
+    text-align: center;
+}
+
+#category-manage-panel .layui-tab {
+    margin: 0;
+}
+
+#category-manage-panel .layui-table-view .layui-table[lay-skin="line"] {
+    /*border-top: 1px solid #eee;*/
+    border-right: none;
+}
+
+/*模板管理面板设置*/
+#template-manage-panel {
+    width: 873px;
+    height: 438px;
+    background-color: #FAFAFA;
+    display: none
+}
+
+#template-manage-panel .layui-elem-quote {
+    margin-bottom: 0;
+}
+
+#template-manage-panel .layui-tab {
+    margin: 0;
+}
+
+#template-manage-panel #add-template-btn {
+    float: right;
+    margin-top: -32px
+}
+
+#template-manage-panel .layui-table-view {
+    margin-top: -15px;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+
+#template-manage-panel .layui-table-cell {
+    text-align: center;
+}
+
+#template-manage-panel .layui-tab-title {
+    background-color: #FAFAFA;
+    padding-top: 10px;
+    text-align: center;
+}
+
+#template-manage-panel .layui-tab {
+    margin: 0;
+}
+
+#template-manage-panel .layui-table-view .layui-table[lay-skin="line"] {
+    /*border-top: 1px solid #eee;*/
+    border-right: none;
+}

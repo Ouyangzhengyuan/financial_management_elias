@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/common.css}" media="all">
+    <title>添加金融账户</title>
+    <style>
+        .layui-tab-title {
+            text-align: center;
+        }
+
+        .layui-form {
+            margin: 15px;
+        }
+    </style>
+</head>
+<body>
+<form class="layui-form">
+    <div class="layui-tab layui-tab-brief" lay-filter="account-financial-tab">
+        <ul class="layui-tab-title" id="account-financial-title">
+            <li class="layui-this">现金账户</li>
+            <li>金融账户</li>
+            <li>虚拟账户</li>
+            <li>信用账户</li>
+            <li>负债账户</li>
+        </ul>
+        <div class="layui-tab-content" style="height: 100px;">
+            <div class="layui-tab-item layui-show">
+                <div class="layui-tab layui-tab-brief" id="inner" style="height: 41px; margin: -5px">
+                    <ul class="layui-tab-title" style="width: 315px; margin-left: 127px" id="cash-title">
+                        <li class="layui-this" id="li-1">现金钱包</li>
+                        <li id="li-2">现金口袋</li>
+                    </ul>
+                </div>
+                <div class="layui-form-item" style="margin-top: 25px">
+                    <label class="layui-form-label" style="margin-left: 115px" for="cash-input">账户名称：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="cash" required lay-verify="cash"
+                               placeholder="现金账户" value="现金钱包"
+                               autocomplete="off" class="layui-input" style="width: 180px" id="cash-input"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-tab-item">
+                <div class="layui-tab layui-tab-brief" id="inner"
+                     style="height: 41px; margin: -5px">
+                    <ul class="layui-tab-title" style="width: 315px; margin-left: 127px" id="bank-title">
+                        <li class="layui-this">储蓄卡/借记卡</li>
+                        <li>存 折</li>
+                        <li>理财产品</li>
+                    </ul>
+                </div>
+                <div class="layui-form-item" style="margin-top: 25px">
+                    <label class="layui-form-label" style="margin-left: 115px" for="bank-input">账户名称：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="bank" required lay-verify="bank"
+                               placeholder="银行账户" value="储蓄卡/借记卡"
+                               autocomplete="off" class="layui-input" style="width: 180px" id="bank-input"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-tab-item">
+                <div class="layui-tab layui-tab-brief" id="inner"
+                     style="height: 41px; margin: -5px">
+                    <ul class="layui-tab-title" style="width: 315px; margin-left: 127px" id="virtual-title">
+                        <li class="layui-this">支付宝</li>
+                        <li>余额宝</li>
+                        <li>微信钱包</li>
+                    </ul>
+                </div>
+                <div class="layui-form-item" style="margin-top: 25px">
+                    <label class="layui-form-label" style="margin-left: 115px" for="virtual-input">账户名称：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="virtual" required lay-verify="virtual"
+                               placeholder="虚拟账户" value="支付宝"
+                               autocomplete="off" class="layui-input" style="width: 180px" id="virtual-input"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-tab-item">
+                <div class="layui-tab layui-tab-brief" id="inner"
+                     style="height: 41px; margin: -5px">
+                    <ul class="layui-tab-title" style="width: 315px; margin-left: 127px" id="credit-title">
+                        <li class="layui-this">花 呗</li>
+                        <li>信用卡</li>
+                    </ul>
+                </div>
+                <div class="layui-form-item" style="margin-top: 25px">
+                    <label class="layui-form-label" style="margin-left: 115px" for="credit-input">账户名称：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="credit" required lay-verify="credit"
+                               placeholder="信用账户" value="花呗"
+                               autocomplete="off" class="layui-input" style="width: 180px" id="credit-input"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-tab-item">
+                <div class="layui-tab layui-tab-brief" id="inner"
+                     style="height: 41px; margin: -5px">
+                    <ul class="layui-tab-title" style="width: 315px; margin-left: 127px" id="debts-title">
+                        <li class="layui-this">应付款项</li>
+                        <li>小额贷款</li>
+                    </ul>
+                </div>
+                <div class="layui-form-item" style="margin-top: 25px">
+                    <label class="layui-form-label" style="margin-left: 115px" for="debts-input">账户名称：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="debts" required lay-verify="debts"
+                               placeholder="负债账户" value="应付款项"
+                               autocomplete="off" class="layui-input" style="width: 180px" id="debts-input"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item" style="text-align: center; margin-top: 8px;">
+        <div class="layui-input-block" style="text-align: center; margin: 0">
+            <button class="layui-btn" lay-submit lay-filter="accountTypeName">立即提交</button>
+        </div>
+    </div>
+</form>
+<script th:src="@{/layui.js}" charset="utf-8"></script>
+<script type="text/javascript">
+    //使用 layui 框架
+    layui.use(['layer', 'element', 'jquery', 'form'], function () {
+        var element = layui.element;
+        var layer = layui.layer;
+        var $ = layui.jquery;
+        var form = layui.form;
+
+        //现金账户点击事件
+        $("#cash-title").children("li").click(function (e) {
+            var a = $(this).text();
+            $("#cash-input").val(a);
+        });
+
+        //银行账户点击事件
+        $("#bank-title").children("li").click(function (e) {
+            var a = $(this).text();
+            $("#bank-input").val(a);
+        });
+
+        //信用账户点击事件
+        $("#credit-title").children("li").click(function (e) {
+            var a = $(this).text();
+            $("#credit-input").val(a);
+        });
+
+        //信用账户点击事件
+        $("#debts-title").children("li").click(function (e) {
+            var a = $(this).text();
+            $("#debts-input").val(a);
+        });
+
+        //信用账户点击事件
+        $("#virtual-title").children("li").click(function (e) {
+            var a = $(this).text();
+            $("#virtual-input").val(a);
+        });
+
+        //表单验证
+        //验证状态 防止多个表单提示弹出
+        var status1 = true;
+        var status2 = false;
+        var status3 = false;
+        var status4 = false;
+        var status5 = false;
+        form.verify({
+            cash: function (value) {
+                if (status1 && value.trim() === '') {
+                    layer.tips("请输入现金账户", "#cash-input");
+                    return true;
+                }
+                if (status1 && value.length > 10) {
+                    layer.tips("账户名称过长", "#cash-input");
+                    return true;
+                }
+            },
+            bank: function (value) {
+                if (status2 && value.trim() === '') {
+                    layer.tips("请输入银行账户", "#bank-input");
+                    return true;
+                }
+                if (status2 && value.length > 10) {
+                    layer.tips("账户名称过长", "#bank-input");
+                    return true;
+                }
+            },
+            virtual: function (value) {
+                if (status3 && value.trim() === '') {
+                    layer.tips("请输入虚拟账户", "#virtual-input");
+                    return true;
+                }
+                if (status3 && value.length > 10) {
+                    layer.tips("账户名称过长", "#virtual-input");
+                    return true;
+                }
+            },
+            credit: function (value) {
+                if (status4 && value.trim() === '') {
+                    layer.tips("请输入信用账户", "#credit-input");
+                    return true;
+                }
+                if (status4 && value.length > 10) {
+                    layer.tips("账户名称过长", "#credit-input");
+                    return true;
+                }
+            },
+            debts: function (value) {
+                if (status5 && value.trim() === '') {
+                    layer.tips("请输入负债账户", "#debts-input");
+                    return true;
+                }
+                if (status5 && value.length > 10) {
+                    layer.tips("账户名称过长", "#debts-input");
+                    return true;
+                }
+            }
+        });
+
+        //获取一级账户名
+        var accountFinancialName = '现金账户';//默认现金账户
+        element.on('tab(account-financial-tab)', function (data) {
+            switch (data.index) {
+                case 0:
+                    accountFinancialName = "现金账户";
+                    status1 = true;
+                    status2 = false;
+                    status3 = false;
+                    status4 = false;
+                    status5 = false;
+                    break;
+                case 1:
+                    accountFinancialName = "金融账户";
+                    status1 = false;
+                    status2 = true;
+                    status3 = false;
+                    status4 = false;
+                    status5 = false;
+                    break;
+                case 2:
+                    accountFinancialName = "虚拟账户";
+                    status1 = false;
+                    status2 = false;
+                    status3 = true;
+                    status4 = false;
+                    status5 = false;
+                    break;
+                case 3:
+                    accountFinancialName = "信用账户";
+                    status1 = false;
+                    status2 = false;
+                    status3 = false;
+                    status4 = true;
+                    status5 = false;
+                    break;
+                case 4:
+                    accountFinancialName = "负债账户";
+                    status1 = false;
+                    status2 = false;
+                    status3 = false;
+                    status4 = false;
+                    status5 = true;
+                    break;
+            }
+        });
+
+        //提交表单
+        form.on('submit(accountTypeName)', function (data) {
+            //匹配一级账户获得二级账户名
+            var accountTypeName = '';
+            switch (accountFinancialName) {
+                case "现金账户":
+                    accountTypeName = data.field.cash;
+                    break;
+                case "金融账户":
+                    accountTypeName = data.field.bank;
+                    break;
+                case "虚拟账户":
+                    accountTypeName = data.field.virtual;
+                    break;
+                case "信用账户":
+                    accountTypeName = data.field.credit;
+                    break;
+                case "负债账户":
+                    accountTypeName = data.field.debts;
+                    break;
+            }
+            //提交后台
+            $.ajax({
+                url: '/accountType/addAccountFinancial.do',
+                data: {accountFinancialName: accountFinancialName, accountTypeName: accountTypeName},
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    if (data.success) {
+                        layer.msg(
+                            data.message,
+                            {time: 1500},
+                            function () {
+                                inputEmpty();//清空表单值
+                                //是否更新账本列表
+                                window.localStorage.setItem("isReload", "1");
+                                // // 获取当前窗口索引
+                                // var pIndex = parent.layer.getFrameIndex(window.name);
+                                // // 关闭当前窗口
+                                // window.parent.layer.close(pIndex);//关闭当前窗口
+                            });
+                    } else {
+                        layer.msg(
+                            data.message,
+                            {time: 1500},
+                            function () {
+                                inputEmpty();
+                            });
+                    }
+                }
+            });
+
+            function inputEmpty(){
+                //清除input值
+                switch (accountFinancialName) {
+                    case "现金账户":
+                        $("#cash-input").val("");
+                        break;
+                    case "金融账户":
+                        $("#bank-input").val("");
+                        break;
+                    case "虚拟账户":
+                        $("#virtual-input").val("");
+                        break;
+                    case "信用账户":
+                        $("#credit-input").val("");
+                        break;
+                    case "负债账户":
+                        $("#debts-input").val("");
+                        break;
+                }
+            }
+
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

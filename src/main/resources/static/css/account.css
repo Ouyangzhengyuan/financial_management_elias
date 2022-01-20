@@ -1,0 +1,144 @@
+/*Ãæ°åÉèÖÃ*/
+.layui-panel {
+    color: rgba(0, 0, 0, .85);
+    min-width: 1119px;
+    min-height: 675px;
+    overflow: hidden;
+}
+
+#panel-box {
+    padding: 15px;
+}
+
+#panel-left {
+    width: 173px;
+    float: left;
+}
+
+#panel-right {
+    width: 916px;
+    height: 100%;
+    min-height: 645px;
+    float: left;
+}
+
+#over-view {
+    margin-bottom: 0;
+}
+
+#over-view ul {
+    padding-top: 21px;
+    padding-bottom: 21px;
+}
+
+#over-view li {
+    margin-bottom: 6px;
+}
+
+.li-title {
+    font-size: 12px;
+    line-height: 12px;
+    display: block;
+}
+
+#content {
+    padding: 34px 36px 4px 36px;
+}
+
+#account-list-div .layui-nav {
+    background-color: white;
+    width: 173px;
+}
+
+#account-list-div .layui-nav-itemed > .layui-nav-child {
+    background-color: white;
+}
+
+#account-list-div .layui-nav .layui-nav-item a {
+    color: black;
+}
+
+#account-list-div ul {
+    /*border-bottom: 1px solid lightgray;*/
+}
+
+#account-list-div .layui-nav-item {
+    padding-bottom: 15px;
+    padding-top: 15px;
+    text-align: center;
+    border-bottom: 1px solid lightgray;
+}
+
+#panel-right {
+    background-color: #FAFAFA;
+}
+
+#account-over-view {
+    text-align: center;
+    margin-top: 35px;
+}
+
+#account-over-view .account-over-view-box {
+    float: left;
+    border-right: 1px solid lightgrey;
+}
+
+#account-over-view p {
+    margin-top: 2px;
+}
+
+#add-button-div .layui-btn {
+    width: 150px;
+    height: 45px;
+}
+
+#header {
+    height: 80px;
+}
+
+.layui-card-header h3 {
+    float: left;
+}
+
+.layui-card-header p {
+    float: left;
+    margin-left: 30px;
+    color: #aaa;
+}
+
+.layui-colla-content {
+    padding: 0;
+}
+
+.layui-card-body .layui-card-body-a {
+    margin-right: 30px;
+}
+
+.layui-colla-content {
+    border: 0;
+}
+
+.layui-table {
+    margin: 0;
+}
+
+.layui-card-body .layui-table {
+    margin: 0;
+}
+
+.layui-table-header {
+    border-bottom-width: 0;
+}
+
+.layui-table-view {
+    margin: 0;
+    border: none;
+}
+
+.layui-table-page {
+    text-align: center;
+}
+
+.layui-nav-tree .layui-this, .layui-nav-tree .layui-this > a, .layui-nav-tree .layui-this > a:hover, .layui-nav-tree .layui-nav-child dd.layui-this, .layui-nav-tree .layui-nav-child dd.layui-this a {
+    /*background-color: lightgray;*/
+}

@@ -1,18 +1,22 @@
 package pers.elias.financial_management.controller;
 
 import cn.hutool.json.JSONObject;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import pers.elias.financial_management.component.AjaxResult;
-import pers.elias.financial_management.component.GlobalAccountInfo;
+import pers.elias.financial_management.bean.AjaxResult;
+import pers.elias.financial_management.bean.GlobalAccountInfo;
 import pers.elias.financial_management.model.CategoryFirst;
 import pers.elias.financial_management.model.CategorySecond;
 import pers.elias.financial_management.service.impl.AccountBookService;
+import pers.elias.financial_management.service.impl.AccountIndexService;
 import pers.elias.financial_management.service.impl.CategoryFirstService;
 import pers.elias.financial_management.service.impl.CategorySecondService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -33,6 +37,9 @@ public class CategorySecondController {
     @Autowired //二级分类服务
     private CategorySecondService categorySecondService;
 
+    @Autowired
+    private AccountIndexService accountIndexService;
+
     /**
      * 查询二级分类
      */
@@ -41,11 +48,12 @@ public class CategorySecondController {
     public String secondCategoryList(String firstCategoryName, String inExStatus) {
         JSONObject jsonObject = new JSONObject();
         try {
-            if(firstCategoryName == null){
-                jsonObject.put("code", 200);
-                jsonObject.put("msg", "查询二级分类失败");
-                return jsonObject.toString();
-            }
+            //获取当前登录的用户
+            String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+            //设置当前登录的用户
+            globalAccountInfo.setUserName(userName);
+            //设置当前用户账本
+            globalAccountInfo.setAccountBookName(accountIndexService.selectByPrimaryKey(userName).getAccountBookIndex());
             //反向查询账本 id
             Integer accountBookId = accountBookService.selectIdByUserNameAndBook(globalAccountInfo);
             //一级分类实体对象
@@ -80,11 +88,12 @@ public class CategorySecondController {
     public Object secondCategoryAllList(String firstCategoryName){
         JSONObject jsonObject = new JSONObject();
         try {
-            if(firstCategoryName == null){
-                jsonObject.put("code", 200);
-                jsonObject.put("msg", "查询二级分类失败");
-                return jsonObject.toString();
-            }
+            //获取当前登录的用户
+            String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+            //设置当前登录的用户
+            globalAccountInfo.setUserName(userName);
+            //设置当前用户账本
+            globalAccountInfo.setAccountBookName(accountIndexService.selectByPrimaryKey(userName).getAccountBookIndex());
             //反向查询账本 id
             Integer accountBookId = accountBookService.selectIdByUserNameAndBook(globalAccountInfo);
             //一级分类实体对象
@@ -115,12 +124,18 @@ public class CategorySecondController {
 
 
     /**
-     * 添加二级支出
+     * 添加二级收支分类
      */
     @RequestMapping("/addSecondCategory.do")
     @ResponseBody
     public AjaxResult addSecondExCategory(String firstCategoryName, String secondCategoryName, String inExStatus) {
             try {
+                //获取当前登录的用户
+                String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+                //设置当前登录的用户
+                globalAccountInfo.setUserName(userName);
+                //设置当前用户账本
+                globalAccountInfo.setAccountBookName(accountIndexService.selectByPrimaryKey(userName).getAccountBookIndex());
                 //反向查询当前账本id
                 Integer accountBookId = accountBookService.selectIdByUserNameAndBook(globalAccountInfo);
                 //反向查询一级支出id
@@ -133,17 +148,17 @@ public class CategorySecondController {
                 CategorySecond categorySecond = new CategorySecond();
                 categorySecond.setUserName(globalAccountInfo.getUserName());
                 categorySecond.setAccountBookId(accountBookId);
-                categorySecond.setFirstCategoryId(firstExCategoryId);
-                categorySecond.setSecondCategoryName(secondCategoryName.trim());
-                categorySecond.setInExStatus(inExStatus);
-                if (categorySecondService.isExists(categorySecond)) {
+                if (!categorySecondService.isExists(secondCategoryName, categorySecond)) {
+                    categorySecond.setSecondCategoryName(secondCategoryName.trim());
+                    categorySecond.setInExStatus(inExStatus);
+                    categorySecond.setFirstCategoryId(firstExCategoryId);
                     categorySecondService.insert(categorySecond);
                     ajaxResult.setSuccess(true);
                     ajaxResult.setMessage("添加成功");
                     return ajaxResult;
                 }
                 ajaxResult.setSuccess(false);
-                ajaxResult.setMessage("该类目已存在！");
+                ajaxResult.setMessage("支出或收入已存在同名分类");
                 return ajaxResult;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -151,5 +166,100 @@ public class CategorySecondController {
                 ajaxResult.setMessage("添加失败");
                 return ajaxResult;
             }
+    }
+
+    /**
+     * 编辑二级收支分类
+     */
+    @ResponseBody
+    @RequestMapping("/editSecondCategory.do")
+    public String editSecondCategory(String oldCategoryName, String newCategoryName, String inExStatus){
+        JSONObject jsonObject = new JSONObject();
+        try{
+            //获取当前登录的用户
+            String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+            //设置当前登录的用户
+            globalAccountInfo.setUserName(userName);
+            //设置当前用户账本
+            globalAccountInfo.setAccountBookName(accountIndexService.selectByPrimaryKey(userName).getAccountBookIndex());
+            //查询账本 id
+            Integer accountBookId = accountBookService.selectIdByUserNameAndBook(globalAccountInfo);
+            //一级分类实体
+            CategorySecond categorySecond = new CategorySecond();
+            categorySecond.setUserName(globalAccountInfo.getUserName());
+            categorySecond.setAccountBookId(accountBookId);
+            categorySecond.setInExStatus(inExStatus);
+            categorySecond.setSecondCategoryName(oldCategoryName);
+            //判断一级分类
+            if(oldCategoryName.equals(newCategoryName)){
+                //查询当前分类所在的id
+                Integer categoryId = categorySecondService.selectIdByCategorySecond(categorySecond);
+                categorySecond.setId(categoryId);
+                categorySecond.setSecondCategoryName(newCategoryName);
+                //执行修改
+                categorySecondService.updateByPrimaryKeySelective(categorySecond);
+                jsonObject.put("success", true);
+                jsonObject.put("msg", "修改成功");
+                return jsonObject.toString();
+            }else if (!categorySecondService.isExists(newCategoryName, categorySecond)) {
+                //查询当前分类所在的id
+                Integer categoryId = categorySecondService.selectIdByCategorySecond(categorySecond);
+                categorySecond.setId(categoryId);
+                categorySecond.setSecondCategoryName(newCategoryName);
+                //执行修改
+                categorySecondService.updateByPrimaryKeySelective(categorySecond);
+                jsonObject.put("success", true);
+                jsonObject.put("msg", "修改成功");
+                return jsonObject.toString();
+            }
+            jsonObject.put("success", false);
+            jsonObject.put("msg", "支出或收入分类已存在同名");
+            return jsonObject.toString();
+        }catch (Exception e){
+            e.printStackTrace();
+            jsonObject.put("success", false);
+            jsonObject.put("msg", "修改失败");
+            return jsonObject.toString();
+        }
+    }
+
+    /**
+     * 删除二级收支分类
+     */
+    @ResponseBody
+    @RequestMapping("/deleteSecondCategory.do")
+    public String deleteSecondCategory(HttpServletRequest request, String inExStatus){
+        JSONObject jsonObject = new JSONObject();
+        try{
+            //获取当前登录的用户
+            String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+            //设置当前登录的用户
+            globalAccountInfo.setUserName(userName);
+            //设置当前用户账本
+            globalAccountInfo.setAccountBookName(accountIndexService.selectByPrimaryKey(userName).getAccountBookIndex());
+            //查询账本id
+            Integer accountBookId = accountBookService.selectIdByUserNameAndBook(globalAccountInfo);
+            String[] categoryFirstList = request.getParameterValues("categoryFirstList[]");
+            for (String categoryName : categoryFirstList) {
+                //二级分类实体
+                CategorySecond categorySecond = new CategorySecond();
+                categorySecond.setUserName(globalAccountInfo.getUserName());
+                categorySecond.setAccountBookId(accountBookId);
+                categorySecond.setInExStatus(inExStatus);
+                categorySecond.setSecondCategoryName(categoryName);
+                //查询分类所在 id
+                Integer categoryId = categorySecondService.selectIdByCategorySecond(categorySecond);
+                //执行删除
+                categorySecondService.deleteByPrimaryKey(categoryId);
+            }
+            jsonObject.put("success", true);
+            jsonObject.put("msg", "删除成功");
+            return jsonObject.toString();
+        }catch (Exception e){
+            e.printStackTrace();
+            jsonObject.put("success", false);
+            jsonObject.put("msg", "删除异常");
+            return jsonObject.toString();
+        }
     }
 }

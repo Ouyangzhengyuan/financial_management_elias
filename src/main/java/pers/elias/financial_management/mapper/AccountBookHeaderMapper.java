@@ -3,6 +3,9 @@ package pers.elias.financial_management.mapper;
 import org.springframework.stereotype.Repository;
 import pers.elias.financial_management.model.AccountBookHeader;
 
+import java.util.List;
+import java.util.Map;
+
 @Repository
 public interface AccountBookHeaderMapper {
     /**
@@ -62,4 +65,19 @@ public interface AccountBookHeaderMapper {
      * 更新头像路径
      */
     int updateByAccountBookHeader(AccountBookHeader accountBookHeader);
+
+    /**
+     * 通过用户名删除
+     */
+    int deleteByUserName(String userName);
+
+    /**
+     * 通过账本id删除
+     */
+    int deleteByAccountBookId(Integer accountBookId);
+
+    /**
+     * 通过用户名查询
+     */
+    List<String> selectByUserName(String userName);
 }

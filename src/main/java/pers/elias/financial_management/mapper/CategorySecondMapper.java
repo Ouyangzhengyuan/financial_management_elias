@@ -61,6 +61,11 @@ public interface CategorySecondMapper {
     List<String> selectAllByCategorySecond(CategorySecond categorySecond);
 
     /**
+     * 通过一级分类id查询二级分类id
+     */
+    List<Integer> selectIdByFirstCategoryId(Integer firstCategoryId);
+
+    /**
      * 删除指定用户账本
      */
     int deleteByCategorySecond(CategorySecond categorySecond);
@@ -69,4 +74,20 @@ public interface CategorySecondMapper {
      *  查询二级分类id
      */
     Integer selectIdByCategorySecond(CategorySecond categorySecond);
+
+    /**
+     * 通过用户名删除
+     */
+    int deleteByUserName(String userName);
+
+    /**
+     * 通过账本id删除
+     */
+    int deleteByAccountBookId(Integer accountBookId);
+
+    /**
+     * 通过一级分类id删除
+     */
+    int deleteByFirstCategoryId(Integer firstCategoryId);
+
 }

@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Financial Management - 账户</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" th:href="@{/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/common.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/account.css}" media="all">
+    <style>
+        /* 移动端 */
+        @media screen and (max-width: 768px) {
+            .layui-layout-admin .layui-layout-left,
+            .layui-layout-admin .layui-body,
+            .layui-layout-admin .layui-footer {
+                left: 0;
+            }
+
+            .layui-layout-admin .layui-side {
+                left: -300px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <!--头部区域-->
+    <div class="layui-header">
+        <div class="layui-logo layui-hide-xs" style="width: 300px; font-size: 21px">Financial Management - 记账</div>
+        <!-- 头部区域（可配合layui 已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left" style="padding-left: 150px">
+            <!-- 移动端显示 -->
+            <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft"
+                style="margin-left: -150px">
+                <a href="javascript:">
+                    账本
+                    <i class="layui-icon layui-icon-spread-left"></i>
+                </a>
+            </li>
+
+            <li class="layui-nav-item  layui-hide-xs">
+                <a href="/overView">概览</a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs">
+                <a href="/keepAccounts">记账</a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs layui-this"><a href="/account">账户</a></li>
+            <li class="layui-nav-item layui-hide-xs"><a href="/statement">报表</a></li>
+            <li class="layui-nav-item layui-hide-xs"><a href="/setting">设置</a></li>
+        </ul>
+
+        <!--    账户设置    -->
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="">
+                    <div style="color: #009688">
+                        <i class="layui-icon layui-icon-username" style="font-size: 30px;"></i>
+                        <span th:text="${userName}"></span>
+                    </div>
+                    <!-- 个人中心 -->
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="/setting">
+                        <i class="layui-icon layui-icon-user" style="font-size: 20px; color: #5FB878"></i>
+                        基本资料</a></dd>
+                    <dd><a href="">
+                        <i class="layui-icon layui-icon-set" style="font-size: 20px; color: #2F4056"></i>
+                        安全设置</a></dd>
+                    <dd>
+                        <a th:href="@{/logout}">
+                            <i class="layui-icon layui-icon-logout" style="font-size: 20px; color: #FF5722"></i>
+                            安全退出
+                        </a>
+                    </dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll" id="account-book"></div>
+    </div>
+
+    <!--  内容主体 body  -->
+    <div class="layui-body layui-anim layui-anim-downbit">
+        <div style="padding: 15px;">
+            <div class="layui-card layui-panel">
+                <div id="panel-box">
+                    <!-- 左面板 -->
+                    <div id="panel-left">
+                        <!-- 资产概览 -->
+                        <div class="layui-elem-quote" id="over-view">
+                            <ul>
+                                <li>
+                                    <p class="amount-title-color">总资产</p>
+                                    <p class="amount-font-m amount-color-red" id="all-assets"></p>
+                                </li>
+                                <li>
+                                    <p class="amount-title-color">总负债</p>
+                                    <p class="amount-font-m amount-color-green" id="all-debts"></p>
+                                </li>
+                                <li>
+                                    <p class="amount-title-color">净资产</p>
+                                    <p class="amount-font-m" id="net-assets"></p>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- 账户列表 -->
+                        <div id="account-list-div">
+                            <ul class="layui-nav layui-nav-tree" lay-filter="account-financial" id="account-financial"
+                                style="height: 325px"></ul>
+                        </div>
+                    </div>
+
+                    <!-- 右面板 -->
+                    <div id="panel-right">
+                        <div id="content">
+                            <!-- 账户概览 -->
+                            <h2 id="account-financial-name" style="height: 27px"></h2>
+                            <div id="header">
+                                <div id="account-over-view">
+                                    <div>
+                                        <div class="account-over-view-box"
+                                             style="padding-right: 55px; width: 130px; height: 46px">
+                                            <p class="amount-title-color">余额</p>
+                                            <p class="amount-font-l" id="account-balance" style="height: 31px"></p>
+                                        </div>
+                                        <div class="account-over-view-box"
+                                             style="padding-left: 55px; padding-right: 55px;  width: 130px;height: 46px">
+                                            <p class="amount-title-color">流入</p>
+                                            <p class="amount-color-red amount-font-l" id="account-all-in"
+                                               style="height: 31px"></p>
+                                        </div>
+                                        <div class="account-over-view-box"
+                                             style="padding-left: 55px; width: 130px; padding-right: 55px; height: 46px; border-right: none">
+                                            <p class="amount-title-color">流出</p>
+                                            <p class="amount-color-green amount-font-l" id="account-all-ex"
+                                               style="height: 31px"></p>
+                                        </div>
+                                    </div>
+                                    <div id="add-button-div">
+                                        <button class="layui-btn layui-btn-warm" id="add-account-type">
+                                            <i class="layui-icon layui-icon-addition" style="font-size: 18px"></i>
+                                            添加账户
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--金融账户概况-->
+                            <h2 style="text-align: center; margin-top: 50px; display: none;" id="no-data-msg">
+                                暂无二级账户</h2>
+                            <div id="layui-card"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="add-account-type-title">
+<script th:src="@{/layui.js}" charset="utf-8"></script>
+<script type="text/javascript">
+    //layui
+    layui.use(['laypage', 'dropdown', 'layer', 'element', 'jquery', 'util', 'upload', 'form', 'table', 'laydate', 'slider'], function () {
+            var element = layui.element;
+            var layer = layui.layer;
+            var $ = layui.jquery;
+            var upload = layui.upload;
+            var form = layui.form;
+            var table = layui.table;
+            var laydate = layui.laydate;
+            var laypage = layui.laypage;
+            var dropdown = layui.dropdown;
+            var util = layui.util;
+
+            //执行账本渲染
+            renderAccountBook();
+
+            //头部事件 移动端显示账本菜单
+            util.event('lay-header-event', {
+                //移动端左侧菜单事件
+                menuLeft: function (othis) {
+                    layer.open({
+                        type: 1
+                        , title: false
+                        , content: '<div class="layui-side layui-bg-black">\n' +
+                            '        <div class="layui-side-scroll" id="menu-left-account-book"></div>\n' +
+                            '    </div>'
+                        , area: ['', '100%']
+                        , offset: 'lt' //右上角
+                        , anim: 5
+                        , shadeClose: true
+                        , scrollbar: false
+                        , success: function () {
+                            renderAccountBookMenuLeft();//渲染账本列表
+                        }
+                    });
+                }
+            });
+
+            //账本事件监听
+            element.on('nav(all)', function (elem) {
+                var accountBookName = elem.text().trim(); //获取当前账本
+                var accountFinancialIndexVal = accountFinancialIndex("");//获取一级金融账户索引值
+                if (accountBookName !== "所有账本" && accountBookName !== "添加账本") {
+                    accountBookIndex(accountBookName);//设置当前账本索引
+                    renderOverView(accountBookName);//渲染资产概况
+                    renderAccountFinancialList(accountBookName);//渲染一级金融账户列表
+                    renderAccountFinancialAmount(accountBookName, accountFinancialIndexVal);//渲染一级金融账户数据
+                } else if (accountBookName === "添加账本") {
+                    addAccountBook();
+                }
+            });
+
+            //一级金融事件监听
+            element.on('nav(account-financial)', function (elem) {
+                $("#account-financial-name").text(elem.text());//设置当前右面板一级金融账户标题名称
+                var accountFinancialName = elem.text();//获取当前一级金融账户名称
+                var accountBookIndexVal = accountBookIndex("");//获取账本索引
+                var accountFinancialIndexVal = accountFinancialIndex(accountFinancialName);
+                renderAccountFinancialAmount(accountBookIndexVal, accountFinancialName);
+            });
+
+            //账本索引组件
+            function accountBookIndex(accountBookName) {
+                var indexValue = "";
+                $.ajax({
+                    url: '/accountIndex/accountBookIndex?accountBookName=' + accountBookName,
+                    async: false, //同步
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.success) {
+                            indexValue = data.accountBookIndex;
+                        } else {
+                            layer.msg(data.msg);
+                        }
+                    }
+                });
+                return indexValue;
+            }
+
+            //一级金融索引组件
+            function accountFinancialIndex(accountFinancialName) {
+                var accountFinancialIndex = "";
+                $.ajax({
+                    url: '/accountIndex/accountFinancialIndex?accountFinancialName=' + accountFinancialName,
+                    async: false, //同步
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        accountFinancialIndex = data.accountFinancialIndex;
+                    }
+                });
+                return accountFinancialIndex;
+            }
+
+            //获取当前日期格式：2021-01-01
+            function getDate() {
+                var date = new Date();
+                var dateSimple;
+                this.year = date.getFullYear();
+                this.month = date.getMonth() + 1;
+                this.date = date.getDate();
+                if (this.month < 10) {
+                    if (this.date < 10) {
+                        return this.year + "-0" + this.month + "-0" + this.date;
+                    }
+                    dateSimple = this.year + "-0" + this.month + "-" + this.date;
+                } else {
+                    if (this.date < 10) {
+                        dateSimple = this.year + "-" + this.month + "-0" + this.date;
+                    }
+                    dateSimple = this.year + "-" + this.month + "-" + this.date;
+                }
+                return dateSimple;
+            }
+
+            //获取当前年月格式2021-01
+            function getYearMonth() {
+                var date = new Date;
+                var year = date.getFullYear();
+                var month = date.getMonth() + 1;
+                var dateSubstring;
+                if (month < 10) {
+                    dateSubstring = year + '-' + '0' + month;
+                } else {
+                    dateSubstring = year + '-' + month;
+                }
+                return dateSubstring;
+            }
+
+            //获取当前年份格式：2021
+            function getYear() {
+                return new Date().getFullYear();
+            }
+
+            //资产概况数据组件
+            function renderOverView(accountBookName) {
+                //获取资产概况数据
+                $.ajax({
+                    url: '/assetsOverview/financialOverview?accountBookName=' + accountBookName,
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        var allAssets = $("#all-assets");
+                        var allDebts = $("#all-debts");
+                        var netAssets = $("#net-assets");
+                        if (data.success) {
+                            //总收入
+                            allAssets.empty();
+                            allAssets.append("<span class='layui-anim layui-anim-downbit'>" + data.allAssets + "</span>");
+                            //总负债
+                            allDebts.empty();
+                            allDebts.append("<span class='layui-anim layui-anim-downbit'>" + data.allDebts + "</span>");
+                            //净资产
+                            netAssets.empty();
+                            netAssets.append("<span class='layui-anim layui-anim-downbit'>" + data.netAssets + "</span>");
+                        }
+                    }
+                });
+            }
+
+            //一级金融账户列表组件
+            function renderAccountFinancialList(accountBookName) {
+                $.ajax({
+                    url: '/accountFinancial/accountFinancialList?accountBookName=' + accountBookName,
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        var accountFinancialIndexVal = accountFinancialIndex("");//获取一级金融账户列表索引
+                        var accountFinancial = $("#account-financial");
+                        if (data.success) {
+                            accountFinancial.empty();
+                            for (var i = 0; i < data.data.length; i++) {
+                                if (data.data[i] === accountFinancialIndexVal) {
+                                    accountFinancial.append(
+                                        '<li class="layui-nav-item layui-this"><a href="javascript:">' + data.data[i] + '</a></li>');
+                                } else {
+                                    accountFinancial.append(
+                                        '<li class="layui-nav-item"><a href="javascript:">' + data.data[i] + '</a></li>');
+                                }
+
+                            }
+                            element.render();
+                        } else {
+                            layer.msg(data.msg);
+                        }
+                    }
+                });
+            }
+
+            //一级金融账户数据组件、二级金融账户数据组件
+            function renderAccountFinancialAmount(accountBookName, accountFinancialName) {
+                //渲染一级账户资产概况
+                renderFinancialOverview();
+
+                //一级金融数据概况
+                function renderFinancialOverview() {
+                    $.ajax({
+                        url: '/assetsOverview/getAccountOverview',
+                        data: {
+                            accountBookName: accountBookName, accountFinancialName: accountFinancialName
+                        },
+                        dataType: 'json',
+                        type: 'post',
+                        success: function (data) {
+                            var accountFinancialId = $("#account-financial-name");
+                            var accountAllIn = $("#account-all-in");
+                            var accountAllEx = $("#account-all-ex");
+                            var accountBalance = $("#account-balance");
+                            if (data.success) {
+                                //账户标题名称
+                                accountFinancialId.empty();
+                                accountFinancialId.append('<strong class="layui-anim layui-anim-downbi">' +
+                                    accountFinancialIndex(accountFinancialName) + '</strong>');
+                                //账户总收入
+                                accountAllIn.empty();
+                                accountAllIn.append('<span class="layui-anim layui-anim-downbit">' + data.accountIn + '</span>');
+                                //账户总支出
+                                accountAllEx.empty();
+                                accountAllEx.append('<span class="layui-anim layui-anim-downbit">' + data.accountEx + '</span>');
+                                //账户结余
+                                accountBalance.empty();
+                                accountBalance.append('<span class="layui-anim layui-anim-downbit">' + data.accountBa + '</span>');
+                            } else {
+                                layer.msg(data.msg);
+                            }
+                        }
+                    });
+                }
+
+                //渲染子账户流水面板
+                $.ajax({
+                    url: '/accountFinancial/subAccountList',
+                    data: {
+                        accountBookName: accountBookName, accountFinancialName: accountFinancialName
+                    },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.success) {
+                            var layuiCard = $("#layui-card");
+                            var no_data_msg = $("#no-data-msg");
+                            layuiCard.empty();//清空重复的渲染
+                            if(data.subAccountList.length > 0){
+                                //隐藏信息提示
+                                no_data_msg.hide();
+                                //渲染二级账户面板
+                                for (var i = 0; i < data.subAccountList.length; i++) {
+                                    //子账户标题和工具栏
+                                    layuiCard.append('<div class="layui-card">\n' +
+                                        '<div class="layui-card-header">\n' +
+                                        '<h3><strong class="account-type-name" ' +
+                                        'id="account-type-name' + i + '">' + data.subAccountList[i] + '</strong></h3>\n' +
+                                        '<p class="account-type-name">' + data.subAccountList[i] + '</p>\n' +
+                                        '<p>人民币</p>\n' +
+                                        '</div>\n' +
+                                        '<div class="layui-card-body">\n' +
+                                        '<div style="height: 35px">\n' +
+                                        '<a class="layui-card-body-a" href="javascript:" id="del' + i + '">\n' +
+                                        '<i class="layui-icon layui-icon-delete"></i>\n' +
+                                        '删除\n' +
+                                        '</a>\n' +
+                                        '<a class="layui-card-body-a" href="javascript:" id="edit' + i + '">\n' +
+                                        '<i class="layui-icon layui-icon-edit"></i>\n' +
+                                        '编辑\n' +
+                                        '</a>\n' +
+                                        '<a class="layui-card-body-a" href="javascript:">\n' +
+                                        '<i class="layui-icon layui-icon-date"></i>\n' +
+                                        '对账\n' +
+                                        '</a>\n' +
+                                        '</div>\n' +
+                                        '<div class="layui-collapse"  lay-filter="accountCurrent' + i + '">\n' +
+                                        '<div class="layui-colla-item">\n' +
+                                        '<h2 class="layui-colla-title">' +
+                                        '<span style="float:left;">展开流水记录（<span id="subCount' + i + '"></span>）</span>' +
+                                        '<div style="float:right; color: darkgray;">' +
+                                        '<div style="display: inline">' +
+                                        '流入<span id="income' + i + '" style="color: #f1523a; margin-right: 10px;margin-left: 10px"></span>' +
+                                        '<span style="margin-right: 10px;">|</span>' +
+                                        '</div>' +
+                                        '<div style="display: inline">流出<span id="expense' + i + '" style="color: #14ba89; margin-right: 10px; margin-left: 10px"></span>' +
+                                        '<span style="margin-right: 10px;">|</span>' +
+                                        '</div>' +
+                                        '<div style="display: inline">余额<span id="balance' + i + '" style="color: grey; margin-left: 10px"></span>' +
+                                        '<span style="color: darkgray; margin-left: 7px">（单位：元）</span>' +
+                                        '</div></div></h2>\n' +
+                                        '<div class="layui-colla-content" id="layui-colla-content' + i + '">\n' +
+                                        '<table class="layui-table" id="accountCurrent' + i + '" lay-filter="a' + i + '"></table>\n' +
+                                        '</div>\n' +
+                                        '</div>\n' +
+                                        '</div>\n' +
+                                        '</div>\n' +
+                                        '</div>');
+                                    //加载子账户操作
+                                    subAccountTool(accountBookName, accountFinancialName, data.subAccountList[i], i);
+                                }
+                                //加载子账户清单
+                                setAccountAmount();
+                                //加载流水表格
+                                tableObjectInt(accountFinancialName, data);
+                                //刷新元素
+                                element.render();
+                            }else{
+                                no_data_msg.css('display', 'block');
+                            }
+                        } else {
+                            console.log(data.msg);
+                        }
+                    }
+                });
+
+                //子账户操作
+                function subAccountTool(accountBookName, accountFinancialName, accountTypeName, i) {
+                    //编辑子账户
+                    $("#edit" + i).click(function () {
+                        //文档替换
+                        $("#account-type-name" + i).replaceWith(
+                            '<div id="edit-div" class="layui-anim layui-anim-downbit">' +
+                            '<input class="layui-input" id="edit-input" style="margin-top: 2px; width: 150px; ' +
+                            'display: inline"\n' +
+                            'value="' + accountTypeName + '">' +
+                            '<button class="layui-btn layui-btn-sm" id="edit-btn" ' +
+                            'style="margin-bottom: 5px; margin-left: 5px">确定</button></div>'
+                        );
+                        // 编辑子账户
+                        $("#edit-btn").click(function () {
+                            var accountTypeNameNew = $("#edit-input").val();
+                            $.ajax({
+                                url: '/accountType/editAccountType',
+                                data: {
+                                    accountBookName: accountBookName,
+                                    accountTypeNameOld: accountTypeName,
+                                    accountTypeNameNew: accountTypeNameNew
+                                },
+                                dataType: 'json',
+                                type: 'post',
+                                success: function (data) {
+                                    if (data.success) {
+                                        renderAccountFinancialAmount(accountBookName, accountFinancialName);
+                                    } else {
+                                        layer.msg(data.msg);
+                                    }
+                                }
+                            });
+                        });
+                    });
+
+                    //删除子账户
+                    $("#del" + i).click(function () {
+                        layer.confirm("删除该账户也会将该账户下的所有流水记录都删除，确定要删除该账户吗？",
+                            {
+                                //确定按钮回调函数
+                                yes: function (index) {
+                                    layer.close(index);
+                                    //验证二级密码
+                                    layer.open({
+                                        type: 1,
+                                        title: '二级密码',
+                                        skin: 'layui-layer-demo', //加上边框
+                                        area: ['502px', '162px'], //宽高
+                                        content: '<input class="layui-input" type="password" id="second-pass" placeholder="请输入二级密码" style="width: 200px; margin-left: 151px; margin-top: 8px" required lay-verify="secondPass">\n',
+                                        btn: ["确定", "取消"],
+                                        yes: function (index) {
+                                            //验证二级密码
+                                            $.ajax({
+                                                url: '/verifySecondPass?secondPass=' + $("#second-pass").val(),
+                                                dataType: 'json',
+                                                type: 'post',
+                                                success: function (data) {
+                                                    if (data.success) {
+                                                        //执行删除
+                                                        del(accountBookName, accountTypeName);
+                                                        layer.close(index);
+                                                    } else {
+                                                        layer.msg(data.msg);
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+
+                        function del(accountBookName, accountTypeName) {
+                            $.ajax({
+                                url: '/accountType/deleteAccountType',
+                                data: {
+                                    accountBookName: accountBookName, accountTypeName: accountTypeName
+                                },
+                                dataType: 'json',
+                                type: 'post',
+                                success: function (data) {
+                                    if (data.success) {
+                                        layer.msg(data.msg, {time: 1000}, function () {
+                                            //刷新当前子账户数据
+                                            renderAccountFinancialAmount(accountBookName, accountFinancialName);
+                                        });
+                                    } else {
+                                        layer.msg(data.msg);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+
+                //账目清单
+                function setAccountAmount() {
+                    $.ajax({
+                        url: '/accountFinancial/subAccountList',
+                        data: {
+                            accountBookName: accountBookName, accountFinancialName: accountFinancialName
+                        },
+                        dataType: 'json',
+                        type: 'post',
+                        success: function (data) {
+                            if (data.success) {
+                                for (var i = 0; i < data.subAccountList.length; i++) {
+                                    var income = $("#income" + i);
+                                    var expense = $("#expense" + i);
+                                    var balance = $("#balance" + i);
+                                    income.empty();
+                                    income.append('<span class="layui-anim layui-anim-downbit">' + data.subAccountInEx[data.subAccountList[i]][0] + '</span>');
+                                    expense.empty();
+                                    expense.append('<span class="layui-anim layui-anim-downbit">' + data.subAccountInEx[data.subAccountList[i]][1] + '</span>');
+                                    balance.empty();
+                                    balance.append('<span class="layui-anim layui-anim-downbit">' + data.subAccountInEx[data.subAccountList[i]][2] + '</span>');
+                                    $("#subCount" + i).text(data.subAccountInEx[data.subAccountList[i]][3]);
+                                }
+                                //刷新元素
+                                element.render();
+                            } else {
+                                console.log(data.msg);
+                            }
+                        }
+                    });
+                }
+
+                //渲染表格对象及其操作
+                function tableObjectInt(accountFinancialName, data) {
+                    //表格重载id集合
+                    var tableReloadIdList = [];
+
+                    //渲染子账户流水表格
+                    for (var x = 0; x < data.subAccountList.length; x++) {
+                        table.render({
+                            elem: '#accountCurrent' + x,
+                            toolbar: '#toolbarAccountCurrent',
+                            url: '/accountFinancial/selectSubAccountCurrentList', //数据接口
+                            where: {
+                                accountFinancialName: accountFinancialName,
+                                accountTypeName: data.subAccountList[x]
+                            },
+                            title: '用户列表',
+                            page: true,
+                            limit: 10,
+                            limits: [10, 20, 30, 40],
+                            skin: 'line',
+                            cols: [
+                                [   //表头
+                                    {type: 'checkbox', fixed: 'left'},
+                                    {field: 'id', hide: true},
+                                    {field: 'date', hide: true},
+                                    {field: 'dateConverted', title: '日期', sort: true, width: 105},
+                                    {field: 'second_category_name', title: '分类'},
+                                    {
+                                        field: 'in_ex_status', title: '收支', width: 80,
+                                        templet: function (d) {
+                                            if (d.in_ex_status === "收") {
+                                                return "<span style='color: #f1523a'>" + d.in_ex_status + "</span>";
+                                            } else {
+                                                return "<span style='color: #14ba89'>" + d.in_ex_status + "</span>";
+                                            }
+                                        }
+                                    },
+                                    {field: 'amountString', title: '金额'},
+                                    {field: 'account_type_name', title: '账户', width: 120},
+                                    {field: 'remarks', title: '备注', width: 120},
+                                    {title: '操作', align: 'center', toolbar: '#toolBar'}
+                                ]
+                            ],
+                            initSort: {field: 'date', type: 'desc'}
+                        });
+
+                        //表格头部监听
+                        table.on('toolbar(a' + x + ')', function (obj) {
+                            var checkStatus = table.checkStatus(obj.config.id);
+                            var data = checkStatus.data;
+                            if (obj.event === 'delete') {
+                                if (data.length !== 0) {
+                                    //构建数组
+                                    var idList = [];
+                                    for (var i = 0; i < data.length; i++) {
+                                        idList[i] = data[i].id;
+                                    }
+                                    deleteDialog(idList, null);
+                                } else {
+                                    layer.msg("请至少选择一条流水记录");
+                                }
+                            }
+                        });
+
+                        //表格事件监听
+                        table.on('tool(a' + x + ')', function (obj) {
+                            if (obj.event === 'delete') {
+                                var idList = [obj.data.id];
+                                deleteDialog(idList, obj);
+                            }
+                        });
+
+                        //表格重载集合
+                        tableReloadIdList[x] = 'accountCurrent' + x;
+                    }
+
+                    //删除对话框
+                    function deleteDialog(idList, obj) {
+                        layer.confirm('确定要删除选中的流水记录吗？', function (index) {
+                            deleteAccountCurrent(idList, obj, index);
+                        });
+                    }
+
+                    //删除本行流水数据
+                    function deleteAccountCurrent(idList, obj, index) {
+                        var loadIndex = layer.load(2);
+                        $.ajax({
+                            url: '/accountCurrent/delete?idList=' + idList,
+                            dataType: 'json',
+                            type: 'post',
+                            success: function (data) {
+                                if (data.success) {
+                                    layer.close(loadIndex);
+                                    layer.close(index);
+                                    layer.msg(
+                                        data.message,
+                                        {time: 1500},
+                                        function () {
+                                            //更新账本总资产概况
+                                            renderOverView(accountBookName);
+                                            //更新一级账户总资产概况
+                                            renderFinancialOverview();
+                                            //更新二级账户账目清单
+                                            setAccountAmount();
+                                            //更新流水表格
+                                            renderTables(tableReloadIdList);
+                                        }
+                                    );
+                                } else {
+                                    console.log(data.msg);
+                                }
+                            }
+                        });
+
+                        //更新流水表格
+                        function renderTables(tableReloadIdList) {
+                            for (var i = 0; i < tableReloadIdList.length; i++) {
+                                table.reload(tableReloadIdList[i], {
+                                    method: 'post'
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            //账本组件
+            function renderAccountBook() {
+                $.ajax({
+                        url: '/accountBook/accountBookList',
+                        dataType: 'json',
+                        type: 'post',
+                        success: function (data) {
+                            var accountBookIndexValue = accountBookIndex("");//获取当前账本索引
+                            var accountBook = $("#account-book");//获取账本id
+                            var inExStatus = $("#in-ex-status").val();//获取支出属性
+                            accountBook.empty();
+                            //渲染侧边导航栏
+                            accountBook.append(
+                                '<ul class="layui-nav layui-nav-tree" lay-filter="all">\n' +
+                                '<li class="layui-nav-item layui-nav-itemed" id="menu">\n' +
+                                '<a href="javascript:">\n' +
+                                '<i class="layui-icon layui-icon-read" style="font-size: 15px; margin-right: 15px">' +
+                                '</i>\n' +
+                                '所有账本\n' +
+                                '<i class="layui-icon layui-icon-down layui-nav-more"></i>\n' +
+                                ' </a>' +
+                                '<dl class="layui-nav-child" id="account-book-item">\n' +
+                                '</dl>\n' +
+                                '</li>\n' +
+                                '</ul>');
+
+                            //渲染导航账本子条目
+                            var accountBookItem = $("#account-book-item");
+                            for (var i = 0; i < data.data.length; i++) {
+                                if (accountBookIndexValue === data.data[i]) {
+                                    accountBookItem.append('<dd class="layui-this">' +
+                                        '<a href="javascript:">' + data.data[i] + '</a></dd>');
+                                } else {
+                                    accountBookItem.append('<dd>' +
+                                        '<a href="javascript:">' + data.data[i] + '</a></dd>');
+                                }
+                            }
+                            //渲染添加账本条目
+                            accountBookItem.append(
+                                '<dd class="layui-anim layui-anim-downbit">\n' +
+                                '<a href="javascript:" id="add-account-book">\n' +
+                                '<i class="layui-icon layui-icon-addition" style="font-size: 15px"></i>\n' +
+                                '添加账本\n' +
+                                '<i style="margin-right: 35px"></i>\n' +
+                                '</a>\n' +
+                                '</dd>'
+                            );
+                            element.render();
+                            renderOverView(accountBookIndexValue);
+                            renderAccountFinancialList(accountBookIndexValue);
+                            renderAccountFinancialAmount(accountBookIndexValue, accountFinancialIndex(""));
+                        }
+                    }
+                );
+            }
+
+            //账本组件
+            function addAccountBook() {
+                layer.open({
+                    type: 2,
+                    title: '添加账本',
+                    skin: 'layui-layer-demo', //加上边框
+                    area: ['400px', '220px'], //宽高
+                    content: '/addAccountBook',
+                    end: function () {
+                        var isReload = window.localStorage.getItem('isReload');
+                        if (isReload === '1') {
+                            renderAccountBook();//重载账本
+                        }
+                    }
+                });
+            }
+
+            //移动端菜单账本组件
+            function renderAccountBookMenuLeft() {
+                $.ajax({
+                        url: '/accountBook/accountBookList',
+                        dataType: 'json',
+                        type: 'post',
+                        success: function (data) {
+                            var accountBookIndexValue = accountBookIndex("");//获取当前账本索引
+                            var accountBook = $("#menu-left-account-book");//获取账本id
+                            var inExStatus = $("#in-ex-status").val();//获取支出属性
+                            accountBook.empty();
+                            //渲染侧边导航栏
+                            accountBook.append(
+                                '<ul class="layui-nav layui-nav-tree" lay-filter="all">\n' +
+                                '<li class="layui-nav-item layui-nav-itemed" id="menu">\n' +
+                                '<a href="javascript:">\n' +
+                                '<i class="layui-icon layui-icon-read" style="font-size: 15px; margin-right: 15px">' +
+                                '</i>\n' +
+                                '所有账本\n' +
+                                '<i class="layui-icon layui-icon-down layui-nav-more"></i>\n' +
+                                ' </a>' +
+                                '<dl class="layui-nav-child" id="menu-left-account-book-item">\n' +
+                                '</dl>\n' +
+                                '</li>\n' +
+                                '</ul>');
+
+                            //渲染导航账本子条目
+                            var accountBookItem = $("#menu-left-account-book-item");
+                            for (var i = 0; i < data.data.length; i++) {
+                                if (accountBookIndexValue === data.data[i]) {
+                                    accountBookItem.append('<dd class="layui-this">' +
+                                        '<a href="javascript:">' + data.data[i] + '</a></dd>');
+                                } else {
+                                    accountBookItem.append('<dd>' +
+                                        '<a href="javascript:">' + data.data[i] + '</a></dd>');
+                                }
+                            }
+                            //渲染添加账本条目
+                            accountBookItem.append(
+                                '<dd class="layui-anim layui-anim-downbit">\n' +
+                                '<a href="javascript:" id="add-account-book">\n' +
+                                '<i class="layui-icon layui-icon-addition" style="font-size: 15px"></i>\n' +
+                                '添加账本\n' +
+                                '<i style="margin-right: 35px"></i>\n' +
+                                '</a>\n' +
+                                '</dd>'
+                            );
+                            element.render();
+                        }
+                    }
+                );
+            }
+
+            //添加组件
+            $(document).ready(function () {
+                //添加子账户
+                $("#add-account-type").click(function () {
+                    var accountBookIndexVal = accountBookIndex("");//获取账本索引
+                    var accountFinancialName = $("#account-financial-name").text();//获取一级金融账户名称
+                    layer.open({
+                        type: 2,
+                        title: '添加' + accountFinancialName,
+                        skin: 'layui-layer-demo', //加上边框
+                        area: ['421px', '212px'], //宽高
+                        content: '/addAccountType',
+                        end: function () {
+                            if (window.localStorage.getItem("isRenderSubAccount") === "1") {
+                                //移除刷新属性
+                                window.localStorage.removeItem('isRenderSubAccount');
+                                //刷新当前子账户
+                                renderAccountFinancialAmount(accountBookIndexVal, accountFinancialName);
+                            }
+                        }
+                    });
+                });
+            });
+        }
+    );
+</script>
+<script type="text/html" id="toolbarAccountCurrent">
+    <div class="layui-btn-container" style="text-align: right;">
+        <button class="layui-btn layui-btn-sm layui-btn-primary" id="batch-delete" lay-event="delete"
+                style="margin-top: 1px;margin-bottom: 0; margin-right: -9px; height: 28px; line-height: 28px">
+            <i class="layui-icon layui-icon-delete"></i>
+            批量删除
+        </button>
+    </div>
+</script>
+<script type="text/html" id="toolBar">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">
+        <i class="layui-icon layui-icon-delete"
+           style="font-size: 17px"></i>
+        删除
+    </a>
+</script>
+<script type="text/html" id="barAccountCurrent">
+    <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete" style="width: 100px">
+        <i class="layui-icon layui-icon-delete"
+           style="font-size: 5px"></i>
+        删除
+    </a>
+</script>
+</body>
+</html>

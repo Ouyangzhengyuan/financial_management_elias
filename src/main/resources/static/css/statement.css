@@ -1,0 +1,116 @@
+.layui-panel {
+    overflow: hidden;
+    min-width: 1119px;
+}
+
+/*外元素填充*/
+#div-out {
+    padding: 15px;
+}
+
+/*内面板填充*/
+#inner-panel {
+    padding: 15px;
+}
+
+/*财务报表菜单面板设置*/
+#financial-statement-menu .layui-panel {
+    float: left;
+    width: 180px;
+    min-width: 180px;
+    text-align: left;
+    box-shadow: none;
+    display: inline-block;
+}
+
+/*菜单项目设置*/
+#financial-statement-menu .layui-menu li {
+    line-height: 60px;
+}
+
+/*报表内容主体设置*/
+#financial-statement-content {
+    float: left;
+    margin-left: 15px;
+    min-height: 600px;
+    width: 890px;
+    display: inline-block;
+}
+
+/*日常收支报表面板设置*/
+#daily-in-ex-panel {
+    text-align: center;
+}
+
+/*选项卡面板设置*/
+.layui-tab {
+    margin: 0;
+}
+.layui-tab-title {
+    text-align: center;
+}
+.layui-tab-content {
+    text-align: center;
+}
+
+/*表单设置*/
+#form-search .layui-form {
+    text-align: left;
+    display: inline-block;
+}
+#form-search .layui-form-item .layui-input-inline {
+    width: 120px;
+}
+#form-search .layui-form-item button {
+    margin-left: 35px;
+}
+
+/*图表设置*/
+.chartContainer {
+    display: inline-block;
+    height: 300px;
+    width: 700px;
+}
+.canvasjs-chart-credit {
+    display: none;
+}
+.chart-title h2 {
+    display: inline;
+}
+.chart-title .now-date {
+    font-size: 15px;
+}
+
+/*年收支趋势面板设置*/
+#trend-in-ex-panel{
+    text-align: center;
+}
+#trend-in-ex-panel .layui-form-item .layui-input-inline {
+    width: 120px;
+}
+
+/*对账报表面板设置*/
+#reconciliation{
+    text-align: center;
+}
+#reconciliation form{
+    width: 760px;
+    display: inline-block;
+}
+#reconciliation .layui-colla-content{
+    border-top: none;
+    padding: 0;
+}
+#reconciliation .layui-table-view{
+    margin: 0;
+}
+#reconciliation .layui-table{
+    margin: 0;
+}
+#reconciliation .layui-table-header{
+    border: none;
+}
+#reconciliation .layui-table-view{
+    border: none;
+    margin: 0;
+}

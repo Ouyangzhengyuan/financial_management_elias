@@ -56,7 +56,7 @@ public interface IAccountTypeService {
     /**
      * 查询金融账户
      */
-    List<String> selectAccountTypeName(Integer accountBookId);
+    List<String> selectAccountTypeName(AccountType accountType);
 
     /**
      * 判断金融账户名称是否存在
@@ -67,4 +67,14 @@ public interface IAccountTypeService {
      * 查询指定金融账户
      */
     Integer selectIdByAccountType(AccountType accountType);
+
+    /**
+     * 通过用户名删除
+     */
+    int deleteByUserName(String userName);
+
+    /**
+     * 通过账本id删除
+     */
+    int deleteByAccountBookId(Integer accountBookId);
 }

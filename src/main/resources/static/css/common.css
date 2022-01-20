@@ -1,0 +1,26 @@
+.amount-title-color{
+    color: #aaa;
+}
+
+.amount-color-red{
+    color: #FF5722
+}
+
+.amount-color-green{
+    color: #5FB878
+}
+
+.amount-font-m{
+    font-size: 18px;
+    height: 28px;
+    width: 138px;
+}
+
+.amount-font-l{
+    font-size: 26px;
+}
+
+.layui-table-page{
+    text-align: center;
+}
+

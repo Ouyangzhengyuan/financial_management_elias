@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title>Financial Management - 个人财务管理系统 - 登录</title>
+    <meta charset="UTF-8">
+    <title>Financial Management - 财务管理系统 - 登录</title>
     <link rel="stylesheet" th:href="@{/css/layui.css}" media="all">
     <link rel="stylesheet" th:href="@{/css/common.css}" media="all">
+    <script type="text/javascript" th:src="@{/layui.js}"></script>
     <style>
         .login-box {
             width: 400px;
@@ -19,12 +21,14 @@
         .login-box header {
             color: #393D49;
             font-size: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             text-align: center;
+            margin-left: 5px;
         }
 
         .layui-form-item {
             text-align: center;
+            margin-bottom: 25px;
         }
 
         .layui-form-item .layui-input-inline {
@@ -42,29 +46,33 @@
             width: 250px;
         }
 
-        #checkbox-autoLogin{
-            float: left;
-            margin-left: 85px;
+        #checkbox-autoLogin {
+            display: inline;
+            margin-left: 80px;
         }
 
-        #forgetPass{
-            float: right;
-            margin-right: 57px;
-            line-height: 35px;
+        #forgetPass {
+            display: inline;
         }
 
-        .layui-icon{
+        #register {
+            display: inline;
+        }
+
+        .layui-icon {
             font-size: 20px;
-            color:darkgray;
+            color: darkgray;
         }
+
 
     </style>
 </head>
 <body>
-
 <div class="login-box">
-    <header><h1>个人财务管理系统</h1></header>
-    <form class="layui-form" action=""  method="post">
+    <header><h1>Financial Management - 登录</h1></header>
+<!--    <form class="layui-form" method="post" th:action="@{/login.do}">-->
+        <form class="layui-form" method="post">
+        <span th:if="${param.error}" th:text="用户名或密码不正确" hidden="hidden" id="error-msg"></span>
         <div class="layui-form-item">
             <div class="layui-input-inline">
                 <label for="userName"><i class="layui-icon layui-icon-username"></i></label>
@@ -82,67 +90,60 @@
             </div>
         </div>
 
-        <div class="layui-form-item">
-            <div class="layui-input-block">
-                <div id="checkbox-autoLogin"><input type="checkbox" name="rememberMe" value="true" title="自动登录" id="autoLogin"></div>
-                <div id="forgetPass"><a href="javascript:forgetPass()">忘记密码？</a></div>
+        <div class="layui-form-item" style="height: 38px">
+                <div id="checkbox-autoLogin" class="layui-anim layui-anim-downbit">
+                    <input type="checkbox" class="layui-input" name="remember-me" title="记住我" id="autoLogin">
+                </div>
+            <div class="layui-form-mid layui-word-aux" style="float: right; margin-right: 65px">
+                <div style="margin-right: 10px;" id="forgetPass">
+                    <a href="javascript:forgetPass()" style="color: #029789">忘记密码？</a>
+                </div>
+                <div id="register">
+                    <a href="/register" style="color: #029789;">注册用户</a>
+                </div>
             </div>
-        </div>
-
-        <input type="hidden" th:value="${msg}" id="msg">
-
-        <div class="layui-form-item">
-            <div class="layui-input-block" style="margin-left: 20px">
-<!--                <input type="submit" value="登录">-->
-                <button class="layui-btn" lay-submit lay-filter="doLogin" style="width: 250px">登录</button>
-            </div>
-        </div>
-    </form>
 </div>
 
-<script th:src="@{/layui.js}" charset="utf-8"></script>
-<script type="text/javascript">
 
-    function forgetPass(){
-        layer.msg("请致电管理员！");
+<div class="layui-form-item">
+    <div class="layui-input-block" style="margin-left: 20px">
+        <button class="layui-btn" lay-submit lay-filter="doLogin" style="width: 250px">登 录</button>
+    </div>
+</div>
+</form>
+</div>
+<script th:src="@{/layui.js}" charset="utf-8" type="text/javascript"></script>
+<script type="text/javascript">
+    function forgetPass() {
+        layer.msg("请联系管理员");
     }
 
-    layui.use(['form', 'layer', 'jquery', 'element'], function () {
+    layui.use(['form', 'jquery', 'element'], function () {
         // 操作对象
         var form = layui.form;
         var $ = layui.jquery;
         var element = layui.element;
 
+        //登录错误信息提示
+        var msg = $("#error-msg").text();
+        if (msg !== '') {
+            layer.msg(msg, {time: 1500});
+        }
+
         form.verify({
             userName: function (value, item) {
-                if(value === ''){
-                    return "请输入用户名！"
+                if (value === '') {
+                    layer.tips("请输入用户名", "#userName");
+                    return true;
                 }
             },
             userPass: function (value, item) {
-                if(value === ''){
-                    return "请输入用户密码！"
+                if (value === '') {
+                    layer.tips("请输入用户密码", "#userPass");
+                    return true;
                 }
             }
         });
-
-        //表单提交
-        // form.on('submit(doLogin)', function (data) {
-        //     $.ajax({
-        //         url: '/doLogin',
-        //         data: data.field,
-        //         dataType: 'json',
-        //         type: 'post',
-        //         success: function (data) {
-        //             if (data.success) {
-        //                 layer.msg(data.message);
-        //         } else {
-        //                 layer.msg(data.message);
-        //             }
-        //         }
-        //     });
-        //     return false;
-        // });
     });
 </script>
 </body>

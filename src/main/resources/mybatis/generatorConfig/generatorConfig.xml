@@ -41,7 +41,7 @@
                              targetProject="src\main\java"/>
 
         <!--生成全部表tableName设为%-->
-        <table tableName="account_book_header" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+        <table tableName="account_current" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
 <!--            <generated Key column="id" sqlStatement="MySql" identity="true"/>-->
         </table>
     </context>

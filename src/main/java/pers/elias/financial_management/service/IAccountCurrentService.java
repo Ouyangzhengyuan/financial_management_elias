@@ -64,7 +64,7 @@ public interface IAccountCurrentService {
     /**
      * 条件查询
      */
-    List<AccountCurrentResult> selectByConditions(AccountCurrent accountCurrent);
+    PageBean<AccountCurrentResult> selectByConditions(Map<String, Object> paramMap);
 
     /**
      * id 查询
@@ -72,32 +72,32 @@ public interface IAccountCurrentService {
     AccountCurrentResult selectById(Integer id);
 
     /**
-     * 日支出总额
+     * 查询总数
      */
-    List<Double> selectDailyExpense(AccountCurrent accountCurrent);
+    Integer selectCount(Map<String, Object> paramMap);
 
     /**
-     * 月支出总额
+     * 查询子账户流水总记录数
      */
-    List<Double> selectMonthlyExpense(AccountCurrent accountCurrent);
+    Integer selectSubAccountCount(AccountCurrent accountCurrent);
 
     /**
-     * 年支出总额
+     * 通过用户名删除
      */
-    List<Double> selectYearlyExpense(AccountCurrent accountCurrent);
+    int deleteByUserName(String userName);
 
     /**
-     * 日收入总额
+     * 通过账本id删除
      */
-    List<Double> selectDailyIncome(AccountCurrent accountCurrent);
+    int deleteByAccountBookId(Integer accountBookId);
 
     /**
-     * 月收入总额
+     * 通过二级分类id删除
      */
-    List<Double> selectMonthlyIncome(AccountCurrent accountCurrent);
+    int deleteByCategorySecondId(Integer categorySecondId);
 
     /**
-     * 年收入总额
+     * 通过二级金融id删除
      */
-    List<Double> selectYearlyIncome(AccountCurrent accountCurrent);
+    int deleteByAccountTypeId(Integer accountTypeId);
 }

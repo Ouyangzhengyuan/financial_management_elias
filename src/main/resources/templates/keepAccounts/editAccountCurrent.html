@@ -64,10 +64,8 @@
         </div>
     </div>
 
-    <div class="layui-form-item" style="text-align: center; margin: 30px 0 0 0">
-        <div class="layui-input-block" style="text-align: center; margin: 0">
+    <div class="layui-form-item" style="text-align: center; margin: 50px 0 0 0">
             <button class="layui-btn" lay-submit lay-filter="submit">立即提交</button>
-        </div>
     </div>
 </form>
 
@@ -229,23 +227,12 @@
                             data.message,
                             {time: 1000},
                             function () {
-                                var isTableReload = true;
-                                $.ajax({
-                                    url: '/tableReload/setTableReload?isTableReload=' + isTableReload,
-                                    data: isTableReload,
-                                    dataType: 'json',
-                                    type: 'post',
-                                    success: function (data) {
-                                        if(data.success){
-                                            // 获取当前窗口索引
-                                            var index = parent.layer.getFrameIndex(window.name);
-                                            // 关闭当前窗口
-                                            window.parent.layer.close(index);//关闭当前窗口
-                                        }else{
-                                            layer.msg(data.msg);
-                                        }
-                                    }
-                                });
+                                //是否更新流水表格
+                                window.localStorage.setItem('isRender', '1');
+                                //获取当前窗口索引
+                                var index = parent.layer.getFrameIndex(window.name);
+                                // 关闭当前窗口
+                                window.parent.layer.close(index);//关闭当前窗口
                             }
                         );
                     } else {

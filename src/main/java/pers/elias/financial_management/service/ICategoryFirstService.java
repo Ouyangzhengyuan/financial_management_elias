@@ -72,10 +72,20 @@ public interface ICategoryFirstService {
     /**
      * 判断一级分类是否存在
      */
-    boolean firstCategoryExists(CategoryFirst categoryFirst);
+    boolean firstCategoryExists(String categoryFirstName, CategoryFirst categoryFirst);
 
     /**
      * 查询指定一级分类id
      */
     Integer selectIdByCategoryFirst(CategoryFirst categoryFirst);
+
+    /**
+     * 通过用户名删除
+     */
+    int deleteByUserName(String userName);
+
+    /**
+     * 通过账本id删除
+     */
+    int deleteByAccountBookId(Integer accountBookId);
 }

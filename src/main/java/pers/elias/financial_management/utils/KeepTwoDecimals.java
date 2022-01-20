@@ -1,6 +1,7 @@
 package pers.elias.financial_management.utils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 /**
@@ -8,10 +9,10 @@ import java.text.DecimalFormat;
  */
 public class KeepTwoDecimals {
     public static Double calculateKeepTwoDeci(Double doubleValue){
-        return new BigDecimal(doubleValue).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+        return new BigDecimal(doubleValue).setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
 
     public static String keepTwoDeci(Double doubleValue){
-       return new DecimalFormat("#.00").format(doubleValue);
+       return new DecimalFormat("0.00").format(doubleValue);
     }
 }

@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Financial Management - 设置</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" th:href="@{/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/common.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/setting.css}" media="all">
+    <style>
+        /* 移动端 */
+        @media screen and (max-width: 768px) {
+            .layui-layout-admin .layui-layout-left,
+            .layui-layout-admin .layui-body,
+            .layui-layout-admin .layui-footer {
+                left: 0;
+            }
+
+            .layui-layout-admin .layui-side {
+                left: -300px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <!--头部区域-->
+    <div class="layui-header">
+        <div class="layui-logo layui-hide-xs" style="width: 300px; font-size: 21px">Financial Management - 记账</div>
+        <!-- 头部区域（可配合layui 已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left" style="padding-left: 150px">
+            <!-- 移动端显示 -->
+            <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft"
+                style="margin-left: -150px">
+                <a href="javascript:">
+                    账本
+                    <i class="layui-icon layui-icon-spread-left"></i>
+                </a>
+            </li>
+
+            <li class="layui-nav-item layui-hide-xs">
+                <a href="/overView">概览</a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs">
+                <a href="/keepAccounts">记账</a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs"><a href="/account">账户</a></li>
+            <li class="layui-nav-item layui-hide-xs"><a href="/statement">报表</a></li>
+            <li class="layui-nav-item layui-hide-xs  layui-this"><a href="/setting">设置</a></li>
+        </ul>
+
+        <!--    账户设置    -->
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="">
+                    <div style="color: #009688">
+                        <i class="layui-icon layui-icon-username" style="font-size: 30px;"></i>
+                        <span th:text="${userName}"></span>
+                    </div>
+                    <!-- 个人中心 -->
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="/setting">
+                        <i class="layui-icon layui-icon-user" style="font-size: 20px; color: #5FB878"></i>
+                        基本资料</a></dd>
+                    <dd><a href="">
+                        <i class="layui-icon layui-icon-set" style="font-size: 20px; color: #2F4056"></i>
+                        安全设置</a></dd>
+                    <dd>
+                        <a th:href="@{/logout}">
+                            <i class="layui-icon layui-icon-logout" style="font-size: 20px; color: #FF5722"></i>
+                            安全退出
+                        </a>
+                    </dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 左侧导航区域（账本） -->
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll" id="account-book"></div>
+    </div>
+
+    <!--  内容主体 body  -->
+    <div class="layui-body layui-anim layui-anim-downbit">
+        <div style="padding: 15px;">
+<!--            <div class="layui-card layui-panel">-->
+            <div style="padding: 15px; display: inline-block; min-width: 1103px">
+                <!--用户菜单-->
+                <div id="setting-menu">
+                    <div class="layui-panel" style="width: 180px; min-width: 180px; text-align: left">
+                        <ul class="layui-menu" id="setting-menu-on">
+                            <li class="layui-menu-item-group layui-menu-item-down" lay-options="{type: 'group'}">
+                                <div class="layui-menu-body-title">
+                                    系统设置 <i class="layui-icon layui-icon-up"></i>
+                                </div>
+                                <ul>
+                                    <li class="layui-menu-item-checked" lay-options="{id: 1, title: '个人中心'}">个人中心
+                                    </li>
+                                    <li lay-options="{id: 2, title: '安全设置'}">安全设置</li>
+                                </ul>
+                            </li>
+                            <li class="layui-menu-item-group layui-menu-item-down" lay-options="{type: 'group'}">
+                                <div class="layui-menu-body-title">
+                                    账本设置 <i class="layui-icon layui-icon-up"></i>
+                                </div>
+                                <ul>
+                                    <li lay-options="{id: 3, title: '账本管理'}">账本管理</li>
+                                    <li lay-options="{id: 4, title: '分类管理'}">分类管理</li>
+                                    <li lay-options="{id: 5, title: '模板管理'}">模板管理</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!--菜单内容主体-->
+                <div id="setting-content">
+                    <!--个人中心面板-->
+                    <div id="personal-details-panel">
+                        <!--个人中心面板-->
+                        <blockquote class="layui-elem-quote">
+                            <h3>
+                        <span class="layui-breadcrumb">
+                          <a href="javascript:">系统设置</a>
+                          <a href="javascript:"><cite>个人中心</cite></a>
+                        </span>
+                            </h3>
+                        </blockquote>
+                        <!--用户信息-->
+                        <div id="user-details">
+                            <div style="border-bottom: 1px solid #E9E9E9; padding: 10px 15px; line-height: 50px;text-align: center">
+                                我的基本信息： <h4 class="user-name" style="color: #029789; display: inline"></h4></div>
+
+                            <!--基本信息-->
+                            <table class="layui-table" lay-skin="line"
+                                   style="width: 424px; height: 241px; border: none">
+                                <colgroup>
+                                    <col width="117">
+                                    <col width="186">
+                                    <col width="120">
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <td>用户名称：</td>
+                                    <td class="details-content user-name "></td>
+                                    <td><a class="details-edit-color hover" href="javascript:" id="close-account">
+                                        <i class="layui-icon layui-icon-username"></i>注销账户</a>
+                                </tr>
+                                <tr>
+                                    <td id="tel-title">手机号码：</td>
+                                    <td class="details-content tel-th">
+                                        <span id="tel-detail"></span>
+                                        <label for="tel-input"></label><input class="layui-input" id="tel-input"
+                                                                              style="width: 150px; display: none">
+                                    </td>
+                                    <td class="tel-th">
+                                <span id="tel-edit">
+                                      <a class="details-edit-color hover" href="javascript:">
+                                    <i class="layui-icon layui-icon-edit"></i>修改号码</a>
+                                </span>
+                                        <button class="layui-btn" id="tel-btn"
+                                                style="height: 30px; line-height: 20px; display: none">确定
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>电子邮箱：</td>
+                                    <td class="details-content e-th">
+                                        <span id="e-mail-detail"></span>
+                                        <label for="e-main-input"></label><input class="layui-input"
+                                                                                 id="e-main-input"
+                                                                                 style="width: 150px; display: none">
+                                    </td>
+                                    <td class="e-th">
+                                <span id="e-mail-edit">
+                                     <a class="details-edit-color hover" href="javascript:">
+                                     <i class="layui-icon layui-icon-edit"></i>修改邮箱</a>
+                                </span>
+                                        <button class="layui-btn" id="e-mail-btn"
+                                                style="height: 30px; line-height: 20px; display: none">确定
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>登陆时间：</td>
+                                    <td class="details-content" id="login-date-time"></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>注册时间：</td>
+                                    <td class="details-content" id="register-date"></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!--用户头像-->
+                        <div style="margin-left: 20px; float:left; width: 424px; height: 311px; border: 1px solid #E9E9E9; ">
+                            <div style="padding: 10px 15px; line-height: 50px; border-bottom: 1px solid #E9E9E9; text-align: center">
+                                我的头像信息：
+                                <a id="user-header" href="javascript:" style="color: #FF5722"> <i
+                                        class="layui-icon hover">&#xe67c;</i>上传头像</a>
+                            </div>
+                            <div id="user-header" style="width: 424px; height: 240px; text-align: center">
+                                <img id="user-header-img" src="http://42.193.17.123:8080/images/user-header.png" alt width="147" height="147"
+                                     style="margin-top: 46px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--安全设置面板-->
+                    <div id="security-setting-panel">
+                        <blockquote class="layui-elem-quote">
+                            <h3>
+                         <span class="layui-breadcrumb">
+                          <a href="javascript:">系统设置</a>
+                          <a href="javascript:"><cite>安全设置</cite></a>
+                        </span>
+                            </h3>
+                        </blockquote>
+                        <!--选项卡容器-->
+                        <div class="layui-tab layui-tab-brief" style="margin: 0">
+                            <!--选项卡-->
+                            <ul class="layui-tab-title">
+                                <li class="layui-this">账户密码修改</li>
+                                <li>二级密码修改</li>
+                            </ul>
+                            <!--选项卡面板-->
+                            <div class="layui-tab-content">
+                                <!--修改密码-->
+                                <div class="layui-tab-item layui-show">
+                                    <form class="layui-form">
+                                        <div class="layui-form-item" style="margin-top: 15px;">
+                                            <div class="layui-input-inline">
+                                                <label class="layui-form-label" for="now-pass">当前密码</label>
+                                                <input type="password" name="nowPass" required lay-verify="nowPass"
+                                                       placeholder="请输入当前密码" autocomplete="off" class="layui-input"
+                                                       id="now-pass">
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <div class="layui-input-inline">
+                                                <label class="layui-form-label"
+                                                       for="new-pass">
+                                                    新<span></span>
+                                                    密<span></span>
+                                                    码
+                                                </label>
+                                                <input type="password" name="newPass" required lay-verify="newPass"
+                                                       placeholder="请输入新的密码" autocomplete="off" class="layui-input"
+                                                       id="new-pass">
+                                            </div>
+                                            <div class="layui-form-mid layui-word-aux">6-18位</div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <div class="layui-input-inline">
+                                                <label class="layui-form-label" for="confirm-new-pass">确认密码</label>
+                                                <input type="password" name="confirmNewPass" required
+                                                       lay-verify="confirmNewPass" placeholder="请确认新的密码"
+                                                       autocomplete="off"
+                                                       class="layui-input"
+                                                       id="confirm-new-pass">
+                                            </div>
+                                            <div class="layui-form-mid layui-word-aux">6-18位</div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <div class="layui-input-inline" style="text-align: center">
+                                                <button class="layui-btn" lay-submit lay-filter="submitPass"
+                                                        style="margin-left: 111px; width: 190px">确认修改
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!--修改二级密码-->
+                                <div class="layui-tab-item">
+                                    <form class="layui-form">
+                                        <div class="layui-form-item" style="margin-top: 15px">
+                                            <div class="layui-input-inline">
+                                                <label class="layui-form-label" for="now-second-pass">当前密码</label>
+                                                <input type="password" name="nowSecondPass" required
+                                                       lay-verify="nowSecondPass"
+                                                       placeholder="请输入当前二级密码" autocomplete="off"
+                                                       class="layui-input"
+                                                       id="now-second-pass">
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <div class="layui-input-inline">
+                                                <label class="layui-form-label"
+                                                       for="new-second-pass">
+                                                    新<span></span>
+                                                    密<span></span>
+                                                    码
+                                                </label>
+                                                <input type="password" name="newSecondPass" required
+                                                       lay-verify="newSecondPass"
+                                                       placeholder="请输入新的二级密码" autocomplete="off"
+                                                       class="layui-input"
+                                                       id="new-second-pass">
+                                            </div>
+                                            <div class="layui-form-mid layui-word-aux">6-18位</div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <div class="layui-input-inline">
+                                                <label class="layui-form-label"
+                                                       for="confirm-new-second-pass">确认密码</label>
+                                                <input type="password" name="confirmNewSecondPass" required
+                                                       lay-verify="confirmNewSecondPass" placeholder="请确认新的二级密码"
+                                                       autocomplete="off"
+                                                       class="layui-input"
+                                                       id="confirm-new-second-pass">
+                                            </div>
+                                            <div class="layui-form-mid layui-word-aux">6-18位</div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <div class="layui-input-inline" style="text-align: center">
+                                                <button class="layui-btn" lay-submit lay-filter="submitSecondPass"
+                                                        style="margin-left: 111px; width: 190px">确认修改
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--账本管理面板-->
+                    <div id="account-book-manage-panel">
+                        <blockquote class="layui-elem-quote">
+                            <h3>
+                        <span class="layui-breadcrumb">
+                          <a href="javascript:">账本设置</a>
+                          <a href="javascript:"><cite>账本管理</cite></a>
+                        </span></h3>
+                            <button class="layui-btn layui-bg-orange" id="add-account-book-btn">
+                                <i class="layui-icon layui-icon-addition"></i>
+                                添加账本
+                            </button>
+                        </blockquote>
+                        <table class="layui-table" id="account-book-manage-table"
+                               lay-filter="account-book-manage-table" style="display: none"></table>
+                    </div>
+
+                    <!--分类管理面板-->
+                    <div id="category-manage-panel">
+                        <!--面包屑-->
+                        <blockquote class="layui-elem-quote">
+                            <h3> <span class="layui-breadcrumb">
+                          <a href="javascript:">账本设置</a>
+                          <a href="javascript:"><cite>分类管理</cite></a>
+                        </span></h3>
+                            <button class="layui-btn layui-bg-orange" id="add-category-btn">
+                                <i class="layui-icon layui-icon-addition"></i>
+                                添加分类
+                            </button>
+                        </blockquote>
+                        <!--分类管理内容-->
+                        <div class="layui-tab layui-tab-brief" lay-filter="category-manage">
+                            <ul class="layui-tab-title">
+                                <li class="layui-this">支出分类</li>
+                                <li>收入分类</li>
+                            </ul>
+                            <div class="layui-tab-content">
+                                <div class="layui-tab-item layui-show">
+                                    <table class="layui-table" id="category-manage-ex-table"
+                                           lay-filter="category-manage-ex-table" style="display: none"></table>
+                                </div>
+                                <div class="layui-tab-item">
+                                    <table class="layui-table" id="category-manage-in-table"
+                                           lay-filter="category-manage-in-table" style="display: none"></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--模板管理面板-->
+                    <div id="template-manage-panel">
+                        <!--面包屑-->
+                        <blockquote class="layui-elem-quote">
+                            <h3>
+                        <span class="layui-breadcrumb">
+                          <a href="javascript:">账本设置</a>
+                          <a href="javascript:"><cite>模板管理</cite></a>
+                        </span></h3>
+                            <!--添加按钮-->
+                            <button class="layui-btn layui-bg-orange" id="add-template-btn">
+                                <i class="layui-icon layui-icon-addition"></i>
+                                添加模板
+                            </button>
+                        </blockquote>
+                        <!--选项卡面板-->
+                        <div class="layui-tab layui-tab-brief" lay-filter="template-manage">
+                            <ul class="layui-tab-title">
+                                <li class="layui-this">支出模板</li>
+                                <li>收入模板</li>
+                            </ul>
+                            <div class="layui-tab-content">
+                                <div class="layui-tab-item layui-show">
+                                    <table class="layui-table" id="template-manage-ex-table"
+                                           lay-filter="template-manage-ex-table" style="display: none"></table>
+                                </div>
+                                <div class="layui-tab-item">
+                                    <table class="layui-table" id="template-manage-in-table"
+                                           lay-filter="template-manage-in-table" style="display: none"></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+<!--                </div>-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/layui.js}" charset="utf-8"></script>
+<script type="text/javascript" th:inline="javascript">
+    //layui
+    layui.use(['dropdown', 'layer', 'element', 'jquery', 'upload', 'form', 'table'], function () {
+        var element = layui.element;
+        var layer = layui.layer;
+        var $ = layui.jquery;
+        var upload = layui.upload;
+        var dropdown = layui.dropdown;
+        var form = layui.form;
+        var table = layui.table;
+
+        //执行渲染账本
+        renderAccountBook();
+
+        //渲染账本组件
+        function renderAccountBook() {
+            $.ajax({
+                    url: '/accountBook/accountBookList',
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        var accountBookIndexValue = accountBookIndex("");//获取当前账本索引
+                        var accountBook = $("#account-book");//获取账本id
+                        var inExStatus = $("#in-ex-status").val();//获取支出属性
+                        accountBook.empty();
+                        //渲染侧边导航栏
+                        accountBook.append(
+                            '<ul class="layui-nav layui-nav-tree" lay-filter="all">\n' +
+                            '<li class="layui-nav-item layui-nav-itemed" id="menu">\n' +
+                            '<a href="javascript:">\n' +
+                            '<i class="layui-icon layui-icon-read" style="font-size: 15px; margin-right: 15px">' +
+                            '</i>\n' +
+                            '所有账本\n' +
+                            '<i class="layui-icon layui-icon-down layui-nav-more"></i>\n' +
+                            ' </a>' +
+                            '<dl class="layui-nav-child" id="account-book-item">\n' +
+                            '</dl>\n' +
+                            '</li>\n' +
+                            '</ul>');
+
+                        //渲染导航账本子条目
+                        var accountBookItem = $("#account-book-item");
+                        for (var i = 0; i < data.data.length; i++) {
+                            if (accountBookIndexValue === data.data[i]) {
+                                accountBookItem.append('<dd class="layui-this">' +
+                                    '<a href="javascript:">' + data.data[i] + '</a></dd>');
+                            } else {
+                                accountBookItem.append('<dd>' +
+                                    '<a href="javascript:">' + data.data[i] + '</a></dd>');
+                            }
+                        }
+                        //渲染添加账本条目
+                        accountBookItem.append(
+                            '<dd class="layui-anim layui-anim-downbit">\n' +
+                            '<a href="javascript:" id="add-account-book">\n' +
+                            '<i class="layui-icon layui-icon-addition" style="font-size: 15px"></i>\n' +
+                            '添加账本\n' +
+                            '<i style="margin-right: 35px"></i>\n' +
+                            '</a>\n' +
+                            '</dd>'
+                        );
+                        element.render();
+                    }
+                }
+            );
+        }
+
+        //账本事件
+        element.on('nav(all)', function (elem) {
+            var accountBookName = elem.text().trim(); //获取当前账本
+            if (accountBookName !== "所有账本" && accountBookName !== "添加账本") {
+                accountBookIndex(accountBookName);//设置账本全局索引
+                reloadCategoryManageTable();//刷新分类管理
+                reloadTemplateManageTable();//刷新模板管理
+            } else if (accountBookName === "添加账本") {
+                addAccountBook();
+            }
+        });
+
+        //菜单点击事
+        dropdown.on('click(setting-menu-on)', function (options) {
+            var title = options.title;
+            if (title === '个人中心') {
+                //加载个人中心面板
+                $("#personal-details-panel").css('display', 'inline');
+                //隐藏其他面板
+                $("#security-setting-panel").hide();
+                $("#account-book-manage-panel").hide();
+                $("#category-manage-panel").hide();
+                $("#template-manage-panel").hide();
+            } else if (title === '安全设置') {
+                //加载安全设置面板
+                $("#security-setting-panel").css('display', 'inline');
+                //隐藏其他面板
+                $("#personal-details-panel").hide();
+                $("#account-book-manage-panel").hide();
+                $("#category-manage-panel").hide();
+                $("#template-manage-panel").hide();
+            } else if (title === '账本管理') {
+                //加载账本管理面板
+                $("#account-book-manage-panel").css('display', 'inline');
+                //隐藏其他面板
+                $("#security-setting-panel").hide();
+                $("#personal-details-panel").hide();
+                $("#category-manage-panel").hide();
+                $("#template-manage-panel").hide();
+            } else if (title === '分类管理') {
+                //加载分类管理面板
+                $("#category-manage-panel").css('display', 'inline');
+                //隐藏其他面板
+                $("#security-setting-panel").hide();
+                $("#personal-details-panel").hide();
+                $("#account-book-manage-panel").hide();
+                $("#template-manage-panel").hide();
+            } else if (title === '模板管理') {
+                //加载模板管理面板
+                $("#template-manage-panel").css('display', 'inline');
+                //隐藏其他面板
+                $("#personal-details-panel").hide();
+                $("#security-setting-panel").hide();
+                $("#account-book-manage-panel").hide();
+                $("#category-manage-panel").hide();
+            }
+        });
+
+        //加载个人中心组件
+        loadPersonalComponents();
+
+        //加载安全设置组件
+        loadSecuritySettingComponents();
+
+        //加载账本管理组件
+        loadAccountBookManageComponents();
+
+        //加载分类管理组件
+        loadCategoryManageComponents();
+
+        //加载模板管理组件
+        loadTemplateManageComponents();
+
+        //添加账本
+        function addAccountBook() {
+            layer.open({
+                type: 2,
+                title: '添加账本',
+                skin: 'layui-layer-demo', //加上边框
+                area: ['400px', '220px'], //宽高
+                content: '/addAccountBook',
+                end: function () {
+                    var isReload = window.localStorage.getItem('isReload');
+                    if (isReload === '1') {
+                        renderAccountBook();//重载账本
+                        reloadAccountBookManageTable();
+                        window.localStorage.setItem("isReloadRelevantData", "0");
+                    }
+                }
+            });
+        }
+
+        //账本索引
+        function accountBookIndex(accountBookName) {
+            var indexValue = "";
+            $.ajax({
+                url: '/accountIndex/accountBookIndex?accountBookName=' + accountBookName,
+                async: false, //同步
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    if (data.success) {
+                        indexValue = data.accountBookIndex;
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }
+            });
+            return indexValue;
+        }
+
+        //收支索引
+        function inExStatusIndex(inExStatus) {
+            return inExStatus;
+        }
+
+        //获取当前日期 格式比如：2021-01-01
+        function getDate() {
+            var date = new Date();
+            var dateSimple;
+            this.year = date.getFullYear();
+            this.month = date.getMonth() + 1;
+            this.date = date.getDate();
+            if (this.month < 10) {
+                if (this.date < 10) {
+                    return this.year + "-0" + this.month + "-0" + this.date;
+                }
+                dateSimple = this.year + "-0" + this.month + "-" + this.date;
+            } else {
+                if (this.date < 10) {
+                    dateSimple = this.year + "-" + this.month + "-0" + this.date;
+                }
+                dateSimple = this.year + "-" + this.month + "-" + this.date;
+            }
+            return dateSimple;
+        }
+
+        //获取当前年月：2021-01
+        function getYearMonth() {
+            var date = new Date;
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            var dateSubstring;
+            if (month < 10) {
+                dateSubstring = year + '-' + '0' + month;
+            } else {
+                dateSubstring = year + '-' + month;
+            }
+            return dateSubstring;
+        }
+
+        //获取当前年份：2021
+        function getYear() {
+            return new Date().getFullYear();
+        }
+
+        //操作完成后重载账本表格
+        function reloadAccountBookManageTable() {
+            table.reload('account-book-manage-table', {
+                method: 'post'
+            });
+        }
+
+        //操作完成后重载分类管理表格
+        function reloadCategoryManageTable() {
+            table.reload('category-manage-ex-table', {
+                method: 'post'
+            });
+            table.reload('category-manage-in-table', {
+                method: 'post'
+            });
+        }
+
+        //操作完成后重载模板管理表格
+        function reloadTemplateManageTable() {
+            table.reload('template-manage-ex-table', {
+                method: 'post'
+            });
+            table.reload('template-manage-in-table', {
+                method: 'post'
+            });
+        }
+
+        //个人中心组件
+        function loadPersonalComponents() {
+            //个人基本信息渲染
+            $.ajax({
+                url: '/setting/getPersonalDetails',
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    if (data.success) {
+                        $(".user-name").text(data.userName);
+                        $("#tel-detail").text(data.tel);
+                        $("#e-mail-detail").text(data.eMail);
+                        $("#login-date-time").text(data.loginDateTime);
+                        $("#register-date").text(data.registerDate);
+                    }
+                }
+            });
+
+            //用户头像渲染
+            $.ajax({
+                url: '/setting/getUserHeaderPath',
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    if (data.success) {
+                        $("#user-header-img").attr("src", data.data);
+                    } else {
+                        $("#user-header-img").attr("src", "http://42.193.17.123:8080/images/user-header.png");
+                    }
+                }
+            });
+
+            //头像上传组件
+            upload.render({
+                elem: '#user-header' //绑定元素
+                , url: '/setting/upload' //上传接口
+                , done: function (res) {
+                    $("#user-header-img").attr("src", res.data);
+                    layer.msg(res.msg);
+                    //上传完毕回调
+                }
+                , error: function (res) {
+                    layer.msg(res.msg);
+                    //请求异常回调
+                }
+            });
+
+            //个人信息事件监听
+            $(document).ready(function () {
+                //注销账户事件
+                $("#close-account").click(function () {
+                    //询问对话框
+                    layer.confirm("确定要注销该账户吗？",
+                        {
+                            yes: function (index) {
+                                layer.close(index);
+                                verifySecondPassDialog();
+                            }
+                        });
+
+                    //校验二级密码对话框
+                    function verifySecondPassDialog() {
+                        layer.prompt({
+                            formType: 1,
+                            value: '请输入二级密码',
+                            title: '二级密码验证'
+                        }, function (value, index, elem) {
+                            verifySecondPass(value, index);//调用验证二级密码
+                        });
+                    }
+
+                    //验证二级密码
+                    function verifySecondPass(password, index) {
+                        $.ajax({
+                            url: '/verifySecondPass?secondPass=' + password,
+                            dataType: 'json',
+                            type: 'post',
+                            success: function (data) {
+                                if (data.success) {
+                                    closeAccount(index);
+                                } else {
+                                    layer.msg(data.msg, {time: 1500});
+                                }
+                            }
+                        });
+                    }
+
+                    //执行注销账户
+                    function closeAccount() {
+                        var index = layer.load(2);//加载层
+                        $.ajax({
+                            url: '/closeAccount',
+                            dataType: 'json',
+                            type: 'post',
+                            success: function (data) {
+                                if (data.success) {
+                                    layer.close(index);//关闭加载层
+                                    layer.msg(data.msg, {time: 2000}, function () {
+                                        window.location.href = '/logout';//退出登录
+                                    });
+                                } else {
+                                    layer.msg(data.msg, {time: 1500});
+                                }
+                            }
+                        });
+                    }
+                });
+
+                //修改手机号码
+                $("#tel-edit").click(function () {
+                    var th = $(".tel-th");
+                    var detail = $("#tel-detail");//详细信息
+                    var input = $("#tel-input");//输入框
+                    var edit = $("#tel-edit");//编辑按钮
+                    var btn = $("#tel-btn");//按钮
+                    //设置输入框
+                    detail.css('display', 'none');
+                    input.css('display', 'inline').attr('value', detail.text());
+                    //设置按钮
+                    edit.css('display', 'none');
+                    btn.css('display', 'inline');
+                    th.css('padding', '0');
+                    //按钮监听事件
+                    btn.click(function () {
+                        var tel = input.val();
+                        $.ajax({
+                            url: '/setting/editPersonalDetails?tel=' + tel,
+                            dataType: 'json',
+                            type: 'post',
+                            success: function (data) {
+                                if (data.success) {
+                                    input.css('display', 'none');
+                                    detail.css('display', 'inline').text(tel);
+                                    btn.css('display', 'none');
+                                    edit.css('display', 'block');
+                                } else {
+                                    layer.msg(data.msg);
+                                }
+                            }
+                        });
+                    });
+                });
+
+                //修改电子邮箱
+                $("#e-mail-edit").click(function () {
+                    var th = $(".e-th");
+                    var detail = $("#e-mail-detail");//详细信息
+                    var input = $("#e-main-input");//输入框
+                    var edit = $("#e-mail-edit");//编辑按钮
+                    var btn = $("#e-mail-btn");//按钮
+                    //设置输入框
+                    detail.css('display', 'none');
+                    input.css('display', 'inline').attr('value', detail.text());
+                    //设置按钮
+                    edit.css('display', 'none');
+                    btn.css('display', 'inline');
+                    th.css('padding', '0');
+                    //按钮监听事件
+                    btn.click(function () {
+                        var eMail = input.val();
+                        $.ajax({
+                            url: '/setting/editPersonalDetails?eMail=' + eMail,
+                            dataType: 'json',
+                            type: 'post',
+                            success: function (data) {
+                                if (data.success) {
+                                    input.css('display', 'none');
+                                    detail.css('display', 'inline').text(eMail);
+                                    btn.css('display', 'none');
+                                    edit.css('display', 'block');
+                                } else {
+                                    layer.msg(data.msg);
+                                }
+                            }
+                        });
+                    });
+                });
+            });
+        }
+
+        //安全设置组件
+        function loadSecuritySettingComponents() {
+            //表单验证
+            form.verify({
+                nowPass: function (value, item) {
+                    if (value === '') {
+                        layer.tips('请输入当前密码', '#now-pass');
+                        return true;
+                    }
+                },
+                newPass: function (value, item) {
+                    if (value === '') {
+                        layer.tips('请输入新密码', '#new-pass');
+                        return true;
+                    } else if (!(/^\w{6,18}$/).test(value)) {
+                        layer.tips('新密码格式不正确', '#new-pass');
+                        return true;
+                    }
+                },
+                confirmNewPass: function (value, item) {
+                    if (value === '') {
+                        layer.tips('请确认新密码', '#confirm-new-pass');
+                        return true;
+                    } else if (value !== $("#new-pass").val()) {
+                        layer.tips('两次输入的新密码不一致', '#confirm-new-pass');
+                        return true;
+                    }
+                },
+                nowSecondPass: function (value, item) {
+                    if (value === '') {
+                        layer.tips('请输入当前二级密码', '#now-second-pass');
+                        return true;
+                    }
+                },
+                newSecondPass: function (value, item) {
+                    if (value === '') {
+                        layer.tips('请输入新的二级密码', '#new-second-pass');
+                        return true;
+                    } else if (!(/^\w{6,18}$/).test(value)) {
+                        layer.tips('输入的二级密码格式不正确', '#new-second-pass');
+                        return true;
+                    }
+                },
+                confirmNewSecondPass: function (value, item) {
+                    if (value === '') {
+                        layer.tips('请确认新的二级密码', '#confirm-new-second-pass');
+                        return true;
+                    }
+                    if (value !== $("#new-second-pass").val()) {
+                        layer.tips('两次输入的二级密码不一致', '#confirm-new-second-pass');
+                        return true;
+                    }
+                }
+            });
+
+            //表单提交（修改账户密码）
+            form.on('submit(submitPass)', function (data) {
+                //获取密码字段
+                var nowPass = data.field.nowPass;
+                var newPass = data.field.newPass;
+                //异步更新
+                $.ajax({
+                    url: '/setting/editAccountPass',
+                    data: {nowPass: nowPass, newPass: newPass},
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.success) {
+                            layer.msg(data.msg, {time: 1000}, function () {
+                                emptyInput();
+                            });
+                        } else {
+                            layer.tips(data.msg, $("#now-pass"), function () {
+                                $("#now-pass").val("").focus();
+                            });
+                        }
+                    }
+                });
+
+                //清空输入框
+                function emptyInput() {
+                    $("#now-pass").val("").focus();
+                    $("#new-pass").val("");
+                    $("#confirm-new-pass").val("");
+                }
+
+                //阻止表单跳转
+                return false;
+            });
+
+            //表单提交（修改二级密码）
+            form.on('submit(submitSecondPass)', function (data) {
+                //获取密码字段
+                var nowSecondPass = data.field.nowSecondPass;
+                var newSecondPass = data.field.newSecondPass;
+                console.log(nowSecondPass);
+                console.log(newSecondPass);
+                //异步更新
+                $.ajax({
+                    url: '/setting/editSecondPass',
+                    data: {nowSecondPass: nowSecondPass, newSecondPass: newSecondPass},
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.success) {
+                            layer.msg(data.msg, {time: 1000}, function () {
+                                emptyInput();
+                            });
+                        } else {
+                            layer.tips(data.msg, $("#now-second-pass"), function () {
+                                emptyInput();
+                            });
+                        }
+                    }
+                });
+
+                //清空输入框
+                function emptyInput() {
+                    $("#now-second-pass").val("").focus();
+                    $("#new-second-pass").val("");
+                    $("#confirm-new-second-pass").val("");
+                }
+
+                //阻止表单跳转
+                return false;
+            });
+        }
+
+        //账本管理组件
+        function loadAccountBookManageComponents() {
+            //添加账本
+            $("#add-account-book-btn").click(function () {
+                addAccountBook();
+            });
+
+            //渲染账本表格
+            table.render({
+                toolbar: '#toolbarAccountBookManage',
+                elem: '#account-book-manage-table',
+                url: '/setting/accountBookTable', //数据接口
+                title: '账本列表',
+                limit: 10,
+                limits: [10, 20, 30, 40],
+                skin: 'line',
+                cols: [
+                    [   //表头
+                        {type: 'checkbox', fixed: 'left'},
+                        {
+                            field: 'accountBookName', title: '账本名称', width: 100, templet: function (d) {
+                                return '<span style="color: #009688;">' + d.accountBookName + '</span>'
+                            }
+                        },
+                        {
+                            field: 'count', title: '流水计数', templet: function (d) {
+                                return '<span style="color: #009688">' + d.count + ' 条</span>'
+                            }
+                        },
+                        {
+                            field: 'allIn', title: '总收入', templet: function (d) {
+                                return '<span style="color: #FF5722">+ ' + d.allIn + '</span>'
+                            }
+                        },
+                        {
+                            field: 'allEx', title: '总支出', templet: function (d) {
+                                return '<span style="color: #5FB878">- ' + d.allEx + '</span>'
+                            }
+                        },
+                        {
+                            field: 'allDebts', title: '总负债', templet: function (d) {
+                                return '<span style="color: #5FB878">' + d.allDebts + '</span>'
+                            }
+                        },
+                        {field: 'netAssets', title: '净资产'},
+                        {title: '操作', toolbar: '#barAccountBookManage', align: 'center', width: 155}
+                    ]
+                ],
+                id: 'account-book-manage-table'
+            });
+
+            //表格行内监听事件
+            table.on('tool(account-book-manage-table)', function (obj) {
+                var accountBookName = obj.data.accountBookName;
+                var event = obj.event;
+                //表格事件判断
+                if (event === 'edit') {
+                    editAccountBook(accountBookName);
+                } else if (event === 'delete') {
+                    var accountBookArrays = [accountBookName];
+                    deleteAccountBookDialog(accountBookArrays);//调用删除询问对话框
+                }
+            });
+
+            //表格头部监听事件
+            table.on('toolbar(account-book-manage-table)', function (obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                if (obj.event === 'delete') {
+                    var data = checkStatus.data;
+                    //判断是否选中
+                    if (data.length !== 0) {
+                        var accountBookArrays = [];
+                        for (var i = 0; i < data.length; i++) {
+                            accountBookArrays[i] = data[i].accountBookName;
+                        }
+                        deleteAccountBookDialog(accountBookArrays);
+                    } else {
+                        layer.msg("请至少选择其中一个账本");
+                    }
+                }
+            });
+
+            //执行编辑账本
+            function editAccountBook(accountBookName) {
+                //修改账本对话框
+                layer.open({
+                    type: 2,
+                    title: '编辑账本',
+                    skin: 'layui-layer-demo', //加上边框
+                    area: ['400px', '220px'], //宽高
+                    content: '/editAccountBook?accountBookName=' + accountBookName,
+                    end: function () {
+                        var isReload = window.localStorage.getItem('isReloadAccountBookManageTable');
+                        if (isReload === '1') {
+                            renderAccountBook();//重载账本
+                            reloadAccountBookManageTable();//重载账本管理表格
+                            window.localStorage.setItem("isReloadAccountBookManageTable", "0");
+                        }
+                    }
+                });
+            }
+
+            //删除账本对话框
+            function deleteAccountBookDialog(accountBookArrays) {
+                //询问对话框
+                layer.confirm("删除已选中的账本会导致目标账本下的所有数据被清空，确定要删除吗？",
+                    {
+                        title: '删除账本',
+                        yes: function (index) {
+                            layer.close(index);
+                            verifySecondPassDialog(accountBookArrays);//调用二级密码对话框
+                        }
+                    });
+            }
+
+            //二级密码对话框
+            function verifySecondPassDialog(accountBookArrays) {
+                layer.prompt({
+                    formType: 1,
+                    value: '请输入二级密码',
+                    title: '二级密码验证'
+                }, function (value, index, elem) {
+                    verifySecondPass(value, index, accountBookArrays);//调用验证二级密码
+                });
+            }
+
+            //验证二级密码
+            function verifySecondPass(password, index, accountBookArrays) {
+                $.ajax({
+                    url: '/verifySecondPass?secondPass=' + password,
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.success) {
+                            deleteAccountBook(accountBookArrays, index);//调用执行删除
+                        } else {
+                            layer.msg(data.msg, {time: 1500});
+                        }
+                    }
+                });
+            }
+
+            //执行删除账本
+            function deleteAccountBook(accountBookArrays, verifyIndex) {
+                var index = layer.load(2, {time: 20 * 1000});
+                $.ajax({
+                    url: '/accountBook/deleteAccountBook.do?accountBookName=' + accountBookArrays,
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.success) {
+                            layer.close(index);
+                            layer.msg(data.msg, {time: 1500}, function () {
+                                renderAccountBook();//重载账本
+                                reloadAccountBookManageTable();//刷新账本管理表格
+                                layer.close(verifyIndex);//关闭二级密码窗口
+                            });
+                        } else {
+                            layer.msg(data.msg);
+                        }
+                    }
+                });
+            }
+        }
+
+        //分类管理组件
+        function loadCategoryManageComponents() {
+            var accountBookName = accountBookIndex("");//当前账本索引
+            var inExStatus = inExStatusIndex("支");//当前收支索引
+
+            //选项卡事件
+            element.on('tab(category-manage)', function (data) {
+                if (data.index === 0) {
+                    inExStatus = inExStatusIndex("支");//设置收支索引
+                } else if (data.index === 1) {
+                    inExStatus = inExStatusIndex("收");//设置收支索引
+                }
+            });
+
+            //添加分类按钮事件
+            $("#add-category-btn").click(function () {
+                layer.open({
+                    type: 2,
+                    title: '添加分类',
+                    skin: 'layui-layer-demo', //加上边框
+                    area: ['520px', '350px'], //宽高
+                    content: '/addCategory?inExStatus=' + inExStatus,
+                    end: function () {
+                        var isReload = window.localStorage.getItem('isReload');
+                        if (isReload === '1') {
+                            reloadCategoryManageTable();
+                            window.localStorage.setItem('isReload', '0');
+                        }
+                    }
+                });
+            });
+
+            //渲染支出分类表格
+            table.render({
+                elem: '#category-manage-ex-table',
+                toolbar: '#toolbarDemo',
+                url: '/setting/categoryList?accountBookName=' + accountBookName + '&inExStatus=' + '支',
+                title: '账本列表',
+                limit: 10,
+                limits: [10, 20, 30, 40],
+                skin: 'line',
+                cols: [
+                    [   //表头
+                        {type: 'checkbox', fixed: 'left'},
+                        {field: 'firstCategoryName', title: '一级分类'},
+                        {
+                            title: '操作', width: 100, align: 'left', templet: function (d) {
+                                if (d.firstCategoryName !== undefined) {
+                                    return '<a lay-event="editF" href="javascript:">\n' +
+                                        '<i class="layui-icon layui-icon-edit" style="font-size: 17px; color: #009688"></i>\n' +
+                                        '</a>\n' +
+                                        '<a lay-event="deleteF" href="javascript:">\n' +
+                                        '<i class="layui-icon layui-icon-delete" style="font-size: 17px; color: #FF5722"></i>\n' +
+                                        '</a>'
+                                }
+                                return "";
+                            }
+                        },
+                        {field: 'secondCategoryName', title: '二级分类'},
+                        {
+                            title: '操作', width: 100, align: 'left', templet: function (d) {
+                                if (d.secondCategoryName !== undefined && d.secondCategoryName !== null) {
+                                    return '<a lay-event="editS" href="javascript:">\n' +
+                                        '<i class="layui-icon layui-icon-edit" style="font-size: 17px; color: #009688"></i>\n' +
+                                        '</a>\n' +
+                                        '<a lay-event="deleteS" href="javascript:">\n' +
+                                        '<i class="layui-icon layui-icon-delete" style="font-size: 17px; color: #FF5722"></i>\n' +
+                                        '</a>';
+                                } else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {field: 'allAmount', title: '支出统计'}
+                    ]
+                ],
+                id: 'category-manage-ex-table'
+            });
+
+            //渲染收入分类表格
+            table.render({
+                elem: '#category-manage-in-table',
+                toolbar: '#toolbarDemo',
+                url: '/setting/categoryList?accountBookName=' + accountBookName + '&inExStatus=' + '收',
+                title: '账本列表',
+                limit: 10,
+                limits: [10, 20, 30, 40],
+                skin: 'line',
+                cols: [
+                    [   //表头
+                        {type: 'checkbox', fixed: 'left'},
+                        {field: 'firstCategoryName', title: '一级分类'},
+                        {
+                            title: '操作', width: 100, align: 'left', templet: function (d) {
+                                if (d.firstCategoryName !== undefined) {
+                                    return '<a lay-event="editF" href="javascript:">\n' +
+                                        '<i class="layui-icon layui-icon-edit" style="font-size: 17px; color: #009688"></i>\n' +
+                                        '</a>\n' +
+                                        '<a lay-event="deleteF" href="javascript:">\n' +
+                                        '<i class="layui-icon layui-icon-delete" style="font-size: 17px; color: #FF5722"></i>\n' +
+                                        '</a>'
+                                }
+                                return "";
+                            }
+                        },
+                        {field: 'secondCategoryName', title: '二级分类'},
+                        { title: '操作', width: 100, align: 'left', templet: function (d) {
+                                if (d.secondCategoryName !== undefined && d.secondCategoryName !== null) {
+                                    return '<a lay-event="editS" href="javascript:">\n' +
+                                        '<i class="layui-icon layui-icon-edit" style="font-size: 17px; color: #009688"></i>\n' +
+                                        '</a>\n' +
+                                        '<a lay-event="deleteS" href="javascript:">\n' +
+                                        '<i class="layui-icon layui-icon-delete" style="font-size: 17px; color: #FF5722"></i>\n' +
+                                        '</a>';
+                                } else {
+                                    return "";
+                                }
+                            }},
+                        {field: 'allAmount', title: '收入统计'}
+                    ]
+                ],
+                id: 'category-manage-in-table'
+            });
+
+            //支出表格头部监听事件
+            table.on('toolbar(category-manage-ex-table)', function (obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                var data = checkStatus.data;
+                switch (obj.event) {
+                    case 'deleteF':
+                        if (data.length !== 0) {
+                            layer.confirm('删除已选中的一级分类会导致该分类下所有关联数据被清空，确定要删除吗？',
+                                function () {
+                                    var firstCategoryList = [];
+                                    for (var i = 0; i < data.length; i++) {
+                                        firstCategoryList[i] = data[i].firstCategoryName;
+                                    }
+                                    deleteCategory(firstCategoryList, inExStatus, '一级分类');
+                                });
+                        } else {
+                            layer.msg('请至少选择其中一个分类');
+                        }
+                        break;
+                    case 'deleteS':
+                        if (data.length !== 0) {
+                            var isEmpty;
+                            for (var i = 0; i < data.length; i++) {
+                                var secondCategoryName = data[i].secondCategoryName;
+                                if (secondCategoryName === undefined || secondCategoryName === null) {
+                                    isEmpty = true;
+                                }
+                            }
+                            if(isEmpty){
+                                layer.msg("请先为选中的一级分类创建相应的二级分类再进行相关操作哟~", {time: 4000});
+                            }else{
+                                layer.confirm('删除已选中的二级分类会导致该分类下所有关联数据被清空，确定要删除吗？',
+                                    function () {
+                                        var secondCategoryList = [];
+                                        for (var i = 0; i < data.length; i++) {
+                                            secondCategoryList[i] = data[i].secondCategoryName;
+                                        }
+                                        deleteCategory(secondCategoryList, inExStatus, '二级分类');
+                                    });
+                            }
+                        } else {
+                            layer.msg('请至少选择其中一个分类');
+                        }
+                        break;
+                }
+            });
+
+            //收入表格头部监听事件
+            table.on('toolbar(category-manage-in-table)', function (obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                var data = checkStatus.data;
+                switch (obj.event) {
+                    case 'deleteF':
+                        if (data.length !== 0) {
+                            layer.confirm('删除已选中的一级分类会导致该分类下所有关联数据被清空，确定要删除吗？',
+                                function () {
+                                    var firstCategoryList = [];
+                                    for (var i = 0; i < data.length; i++) {
+                                        firstCategoryList[i] = data[i].firstCategoryName;
+                                    }
+                                    deleteCategory(firstCategoryList, inExStatus, '一级分类');
+                                });
+                        } else {
+                            layer.msg('请至少选择其中一个分类');
+                        }
+                        break;
+                    case 'deleteS':
+                        if (data.length !== 0) {
+                            layer.confirm('删除已选中的二级分类会导致该分类下所有关联数据被清空，确定要删除吗？',
+                                function () {
+                                    var secondCategoryList = [];
+                                    for (var i = 0; i < data.length; i++) {
+                                        secondCategoryList[i] = data[i].secondCategoryName;
+                                    }
+                                    deleteCategory(secondCategoryList, inExStatus, '二级分类');
+                                });
+                        } else {
+                            layer.msg('请至少选择其中一个分类');
+                        }
+                        break;
+                }
+            });
+
+            //支出表格行内监听
+            table.on('tool(category-manage-ex-table)', function (obj) {
+                var data = obj.data;
+                var event = obj.event;
+                tableEvent(data, event);
+            });
+
+            //收入表格行内监听
+            table.on('tool(category-manage-in-table)', function (obj) {
+                var data = obj.data;
+                var event = obj.event;
+                tableEvent(data, event);
+            });
+
+            //表格行内事件判断
+            function tableEvent(data, event) {
+                //表格事件判断
+                if (event === 'editF') {
+                    editCategory(data.firstCategoryName, inExStatus, '一级分类');
+                } else if (event === 'editS') {
+                    editCategory(data.secondCategoryName, inExStatus, '二级分类');
+                } else if (event === 'deleteF') {
+                    var categoryTypeF = '一级分类';
+                    var categoryFirstList = [data.firstCategoryName];//构建数组
+                    layer.confirm('删除该一级分类会导致该分类下所有关联数据被清空，确定要删除 "' + data.firstCategoryName + '" 分类吗？', {title: '删除分类'}, function () {
+                        deleteCategory(categoryFirstList, inExStatus, categoryTypeF);
+                    });
+                } else if (event === 'deleteS') {
+                    var categoryTypeS = '二级分类';
+                    var categorySecondList = [data.secondCategoryName];//构建数组
+                    layer.confirm('删除该二级分类会导致该分类下所有关联数据被清空，确定要删除 "' + data.secondCategoryName + '" 分类吗？', {title: '删除分类'}, function () {
+                        deleteCategory(categorySecondList, inExStatus, categoryTypeS);
+                    });
+                }
+            }
+
+            //编辑对话框
+            function editCategory(categoryName, inExStatus, categoryType) {
+                if (categoryName !== undefined && categoryName !== null) {
+                    layer.open({
+                        type: 2,
+                        title: '编辑分类：' + categoryType,
+                        skin: 'layui-layer-demo', //加上边框
+                        area: ['400px', '240px'], //宽高
+                        content: '/editCategory?categoryName=' + categoryName + '&inExStatus=' + inExStatus + '&categoryType=' + categoryType,
+                        end: function () {
+                            var isReload = window.localStorage.getItem('isReload');
+                            if (isReload === '1') {
+                                reloadCategoryManageTable();
+                                window.localStorage.removeItem('isReload');
+                            }
+                        }
+                    });
+                } else {
+                    layer.msg("请先为选中的一级分类创建相应的二级分类再进行相关操作哟~", {time: 4000});
+                }
+            }
+
+            //删除分类选择url
+            function deleteCategory(categoryList, inExStatus, categoryType) {
+                var url = '';
+                if (categoryType === '一级分类') {
+                    url = '/category/deleteFirstCategory.do';
+                    del(url, categoryList, inExStatus);
+                }
+                if (categoryType === '二级分类') {
+                    url = '/category/deleteSecondCategory.do';
+                    del(url, categoryList, inExStatus);
+                }
+            }
+
+            //执行删除
+            function del(url, categoryFirstList, inExStatus) {
+                //加载层
+                var index = layer.load(2);
+                //传递分类数组到后台需要修改 contentType: "application/x-www-form-urlencoded",
+                $.ajax({
+                    url: url,
+                    data: {"categoryFirstList": categoryFirstList, inExStatus: inExStatus},
+                    dataType: 'json',
+                    contentType: "application/x-www-form-urlencoded",
+                    type: 'post',
+                    success: function (data) {
+                        if (data.success) {
+                            layer.close(index);
+                            layer.msg(data.msg, {time: 1500}, function () {
+                                reloadCategoryManageTable();
+                            });
+                        }
+                    }
+                });
+            }
+        }
+
+        //模板管理组件
+        function loadTemplateManageComponents() {
+            var accountBookName = accountBookIndex("");//当前账本索引
+            var inExStatus = inExStatusIndex("支");//当前收支索引
+
+            //添加按钮事件
+            $("#add-template-btn").click(function () {
+                layer.open({
+                    type: 2,
+                    title: '添加模板',
+                    skin: 'layui-layer-demo', //加上边框
+                    area: ['580px', '280px'], //宽高
+                    content: '/addCategoryTemplate?inExStatus=' + inExStatus,
+                    end: function () {
+                        var isReload = window.localStorage.getItem('isReload');
+                        if (isReload === '1') {
+                            reloadTemplateManageTable();
+                        }
+                    }
+                });
+            });
+
+            //选项卡事件
+            element.on('tab(template-manage)', function (data) {
+                if (data.index === 0) {
+                    inExStatus = inExStatusIndex("支");//设置收支索引
+                } else if (data.index === 1) {
+                    inExStatus = inExStatusIndex("收");//设置收支索引
+                }
+            });
+
+            //支出模板表格
+            table.render({
+                elem: '#template-manage-ex-table',
+                toolbar: '#toolbarTemplateManage',
+                url: '/setting/templateManageList?inExStatus=' + '支',
+                limit: 10,
+                limits: [10, 20, 30, 40],
+                skin: 'line',
+                cols: [
+                    [   //表头
+                        {type: 'checkbox', fixed: 'left'},
+                        {field: 'id', hide: true},
+                        {field: 'templateName', title: '模板名称'},
+                        {field: 'firstCategoryName', title: '一级分类'},
+                        {field: 'secondCategoryName', title: '二级分类'},
+                        {field: 'accountTypeName', title: '金融账户'},
+                        {title: '操作', toolbar: '#barCategoryManage', width: 160, align: 'center'}
+                    ]
+                ],
+                id: 'template-manage-ex-table'
+            });
+
+            //收入模板表格
+            table.render({
+                elem: '#template-manage-in-table',
+                toolbar: '#toolbarTemplateManage',
+                url: '/setting/templateManageList?inExStatus=' + '收',
+                limit: 10,
+                limits: [10, 20, 30, 40],
+                skin: 'line',
+                cols: [
+                    [   //表头
+                        {type: 'checkbox', fixed: 'left'},
+                        {field: 'id', hide: true},
+                        {field: 'templateName', title: '模板名称'},
+                        {field: 'firstCategoryName', title: '一级分类'},
+                        {field: 'secondCategoryName', title: '二级分类'},
+                        {field: 'accountTypeName', title: '金融账户'},
+                        {title: '操作', toolbar: '#barCategoryManage', width: 160, align: 'center'}
+                    ]
+                ],
+                id: 'template-manage-in-table'
+            });
+
+            //支出表格头部监听事件
+            table.on('toolbar(template-manage-ex-table)', function (obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                var data = checkStatus.data;
+                if (obj.event === 'delete') {
+                    if (data.length !== 0) {
+                        var idList = [];//封装数组id
+                        for (var i = 0; i < data.length; i++) {
+                            idList[i] = data[i].id;
+                        }
+                        deleteDialog(idList);
+                    } else {
+                        layer.msg("请至少选择一个模板");
+                    }
+                }
+            });
+
+            //收入表格头部监听事件
+            table.on('toolbar(template-manage-in-table)', function (obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                var data = checkStatus.data;
+                if (obj.event === 'delete') {
+                    if (data.length !== 0) {
+                        var idList = [];//封装数组id
+                        for (var i = 0; i < data.length; i++) {
+                            idList[i] = data[i].id;
+                        }
+                        deleteDialog(idList);
+                    } else {
+                        layer.msg("请至少选择一个模板");
+                    }
+                }
+            });
+
+            //支出表格行内监听
+            table.on('tool(template-manage-ex-table)', function (obj) {
+                var data = obj.data;
+                var event = obj.event;
+                tableEvent(data, event);
+            });
+
+            //收入表格行内监听
+            table.on('tool(template-manage-in-table)', function (obj) {
+                var data = obj.data;
+                var event = obj.event;
+                tableEvent(data, event);
+            });
+
+            //事件判断
+            function tableEvent(data, event) {
+                if (event === 'edit') {
+                    editDialog(data);
+                } else if (event === 'delete') {
+                    deleteDialog([data.id]);//数组构建
+                }
+            }
+
+            //编辑对话框
+            function editDialog(data) {
+                layer.open({
+                    type: 2,
+                    title: '编辑模板',
+                    skin: 'layui-layer-demo', //加上边框
+                    area: ['580px', '280px'], //宽高
+                    content: '/editCategoryTemplate?inExStatus=' + inExStatus + '&templateName=' + data.templateName + '&firstCategoryName=' + data.firstCategoryName + '&secondCategoryName=' + data.secondCategoryName + '&accountTypeName=' + data.accountTypeName,
+                    end: function () {
+                        var isReload = window.localStorage.getItem('isReload');
+                        if (isReload === '1') {
+                            reloadTemplateManageTable();
+                            window.localStorage.removeItem('isReload');
+                        }
+                    }
+                });
+            }
+
+            //删除对话框
+            function deleteDialog(idList) {
+                layer.confirm("确定要删除已选择的模板吗？", function () {
+                    del(idList);
+                });
+            }
+
+            //删除模板
+            function del(idList) {
+                var index = layer.load(2);
+                $.ajax({
+                    url: '/categoryTemplate/deleteCategoryTemplate.do?idList=' + idList,
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.success) {
+                            layer.close(index);
+                            layer.msg(data.msg, {time: 1500}, function () {
+                                reloadTemplateManageTable();
+                            });
+                        } else {
+                            layer.msg(data.msg);
+                        }
+                    }
+                });
+            }
+        }
+    });
+</script>
+
+<!--账本管理操作工具板-->
+<script type="text/html" id="barAccountBookManage">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">
+        <i class="layui-icon layui-icon-edit"
+           style="font-size: 17px"></i>
+        编辑
+    </a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">
+        <i class="layui-icon layui-icon-delete"
+           style="font-size: 17px"></i>
+        删除
+    </a>
+</script>
+
+<!--账本管理头部操作工具板-->
+<script type="text/html" id="toolbarAccountBookManage">
+    <div class="layui-btn-container" style="text-align: right;">
+        <button class="layui-btn layui-btn-sm layui-btn-primary" id="batch-delete" lay-event="delete"
+                style="margin-top: 1px;margin-bottom: 0; margin-right: -9px; height: 28px; line-height: 28px">
+            <i class="layui-icon layui-icon-delete"></i>
+            批量删除
+        </button>
+    </div>
+</script>
+
+<!--一级分类管理行内操作工具板-->
+<script type="text/html" id="barCategoryManageF">
+    <a lay-event="editF" href="javascript:">
+        <i class="layui-icon layui-icon-edit" style="font-size: 17px; color: #009688"></i>
+    </a>
+    <a lay-event="deleteF" href="javascript:">
+        <i class="layui-icon layui-icon-delete" style="font-size: 17px; color: #FF5722"></i>
+    </a>
+</script>
+
+<!--二级分类管理行内操作工具板-->
+<script type="text/html" id="barCategoryManageS">
+    <a lay-event="editS" href="javascript:">
+        <i class="layui-icon layui-icon-edit" style="font-size: 17px; color: #009688"></i>
+    </a>
+    <a lay-event="deleteS" href="javascript:">
+        <i class="layui-icon layui-icon-delete" style="font-size: 17px; color: #FF5722"></i>
+    </a>
+</script>
+
+<!--分类管理头部操作工具板-->
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container" style="text-align: right;">
+        <button class="layui-btn layui-btn-sm layui-btn-primary" id="batch-deleteF" lay-event="deleteF"
+                style="margin-top: 1px;margin-bottom: 0; height: 28px; line-height: 28px">
+            <i class="layui-icon layui-icon-delete"></i>
+            批量删除一级分类
+        </button>
+        <button class="layui-btn layui-btn-sm layui-btn-primary" id="batch-deleteS" lay-event="deleteS"
+                style="margin-top: 1px;margin-bottom: 0; margin-right: -9px; height: 28px; line-height: 28px">
+            <i class="layui-icon layui-icon-delete"></i>
+            批量删除二级分类
+        </button>
+    </div>
+</script>
+
+<!--模板管理头部工具栏-->
+<script type="text/html" id="toolbarTemplateManage">
+    <div class="layui-btn-container" style="text-align: right;">
+        <button class="layui-btn layui-btn-sm layui-btn-primary" id="batch-delete" lay-event="delete"
+                style="margin-top: 1px;margin-bottom: 0; margin-right: -9px; height: 28px; line-height: 28px">
+            <i class="layui-icon layui-icon-delete"></i>
+            批量删除
+        </button>
+    </div>
+</script>
+
+<!--模板管理行内工具栏-->
+<script type="text/html" id="barCategoryManage">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">
+        <i class="layui-icon layui-icon-edit"
+           style="font-size: 17px"></i>
+        编辑
+    </a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">
+        <i class="layui-icon layui-icon-delete"
+           style="font-size: 17px"></i>
+        删除
+    </a>
+</script>
+</body>
+</html>

@@ -146,19 +146,21 @@
 
     <select id="selectAllByCategorySecond" parameterType="pers.elias.financial_management.model.CategorySecond"
             resultType="String">
-    select
-    second_category_name
-    from
-    category_second
-    where
-    account_book_id = #{accountBookId}
-    <if test="inExStatus != null">
-        and
-        in_ex_status = #{inExStatus}
-    </if>
-    and
-    first_category_id = #{firstCategoryId}
-  </select>
+        select
+        second_category_name
+        from
+        category_second
+        where
+        account_book_id = #{accountBookId}
+        <if test="inExStatus != null">
+            and
+            in_ex_status = #{inExStatus}
+        </if>
+        <if test="firstCategoryId != null">
+            and
+            first_category_id = #{firstCategoryId}
+        </if>
+    </select>
 
     <delete id="deleteByCategorySecond" parameterType="pers.elias.financial_management.model.CategorySecond">
     delete from category_second
@@ -177,9 +179,32 @@
     cs.user_name = #{userName}
     and
     cs.account_book_id = #{accountBookId}
-    and
-    cs.in_ex_status = #{inExStatus}
+    <if test="inExStatus != null">
+        and
+        cs.in_ex_status = #{inExStatus}
+    </if>
     and
     cs.second_category_name = #{secondCategoryName}
   </select>
+
+    <select id="selectIdByFirstCategoryId" parameterType="Integer" resultType="Integer">
+    select
+    cs.id
+    from category_second cs
+    where
+    cs.first_category_id = #{firstCategoryId}
+  </select>
+
+    <delete id="deleteByUserName" parameterType="String">
+        delete from category_second where user_name = #{userName}
+    </delete>
+
+    <delete id="deleteByAccountBookId" parameterType="Integer">
+        delete from category_second where account_book_id = #{accountBookId}
+    </delete>
+
+    <delete id="deleteByFirstCategoryId" parameterType="Integer">
+        delete from category_second where first_category_id = #{firstCategoryId}
+    </delete>
+
 </mapper>

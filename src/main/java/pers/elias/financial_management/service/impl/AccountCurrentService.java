@@ -8,6 +8,7 @@ import pers.elias.financial_management.model.AccountCurrentResult;
 import pers.elias.financial_management.service.IAccountCurrentService;
 import pers.elias.financial_management.utils.PageBean;
 
+import java.security.AccessControlContext;
 import java.util.List;
 import java.util.Map;
 
@@ -49,51 +50,55 @@ public class AccountCurrentService implements IAccountCurrentService {
     @Override
     public PageBean<AccountCurrentResult>selectAllByAccountCurrent(Map<String, Object> paramMap) {
         PageBean<AccountCurrentResult> pageBean = new PageBean<>((Integer) paramMap.get("pageno"),(Integer) paramMap.get("pagesize"));
-
         Integer startIndex = pageBean.getStartIndex();
         paramMap.put("startIndex",startIndex);
         List<AccountCurrentResult> datas = accountCurrentMapper.selectAllByAccountCurrent(paramMap);
         pageBean.setDatas(datas);
-
         Integer totalsize = accountCurrentMapper.selectCount(paramMap);
         pageBean.setTotalsize(totalsize);
         return pageBean;
     }
 
-
     @Override
-    public List<AccountCurrentResult> selectByConditions(AccountCurrent accountCurrent) {
-        return accountCurrentMapper.selectByConditions(accountCurrent);
+    public PageBean<AccountCurrentResult> selectByConditions(Map<String, Object> paramMap) {
+        PageBean<AccountCurrentResult> pageBean = new PageBean<>((Integer) paramMap.get("pageno"),(Integer) paramMap.get("pagesize"));
+        Integer startIndex = pageBean.getStartIndex();
+        paramMap.put("startIndex",startIndex);
+        List<AccountCurrentResult> datas = accountCurrentMapper.selectByConditions(paramMap);
+        pageBean.setDatas(datas);
+        Integer totalsize = accountCurrentMapper.selectSearchCount(paramMap);
+        pageBean.setTotalsize(totalsize);
+        return pageBean;
     }
 
     @Override
-    public List<Double> selectDailyExpense(AccountCurrent accountCurrent) {
-        return accountCurrentMapper.selectDailyExpense(accountCurrent);
+    public Integer selectCount(Map<String, Object> paramMap) {
+        return accountCurrentMapper.selectCount(paramMap);
     }
 
     @Override
-    public List<Double> selectMonthlyExpense(AccountCurrent accountCurrent) {
-        return accountCurrentMapper.selectMonthlyExpense(accountCurrent);
+    public Integer selectSubAccountCount(AccountCurrent accountCurrent) {
+        return accountCurrentMapper.selectSubAccountCount(accountCurrent);
     }
 
     @Override
-    public List<Double> selectYearlyExpense(AccountCurrent accountCurrent) {
-        return accountCurrentMapper.selectYearlyExpense(accountCurrent);
+    public int deleteByUserName(String userName) {
+        return accountCurrentMapper.deleteByUserName(userName);
     }
 
     @Override
-    public List<Double> selectDailyIncome(AccountCurrent accountCurrent) {
-        return accountCurrentMapper.selectDailyIncome(accountCurrent);
+    public int deleteByAccountBookId(Integer accountBookId) {
+        return accountCurrentMapper.deleteByAccountBookId(accountBookId);
     }
 
     @Override
-    public List<Double> selectMonthlyIncome(AccountCurrent accountCurrent) {
-        return accountCurrentMapper.selectMonthlyIncome(accountCurrent);
+    public int deleteByCategorySecondId(Integer categorySecondId) {
+        return accountCurrentMapper.deleteByCategorySecondId(categorySecondId);
     }
 
     @Override
-    public List<Double> selectYearlyIncome(AccountCurrent accountCurrent) {
-        return accountCurrentMapper.selectYearlyIncome(accountCurrent);
+    public int deleteByAccountTypeId(Integer accountTypeId) {
+        return accountCurrentMapper.deleteByAccountTypeId(accountTypeId);
     }
 
     @Override

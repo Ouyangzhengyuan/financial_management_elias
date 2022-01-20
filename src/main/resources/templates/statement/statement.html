@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Financial Management - 概览</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" th:href="@{/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/common.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/statement.css}" media="all">
+    <style>
+        /* 移动端 */
+        @media screen and (max-width: 768px) {
+            .layui-layout-admin .layui-layout-left,
+            .layui-layout-admin .layui-body,
+            .layui-layout-admin .layui-footer {
+                left: 0;
+            }
+
+            .layui-layout-admin .layui-side {
+                left: -300px;
+            }
+        }
+
+        .layui-elem-quote {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <!--头部区域-->
+    <div class="layui-header">
+        <div class="layui-logo layui-hide-xs" style="width: 300px; font-size: 21px">Financial Management - 记账</div>
+        <!-- 头部区域（可配合layui 已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left" style="padding-left: 150px">
+            <!-- 移动端显示 -->
+            <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft"
+                style="margin-left: -150px">
+                <a href="javascript:">
+                    账本
+                    <i class="layui-icon layui-icon-spread-left"></i>
+                </a>
+            </li>
+
+            <li class="layui-nav-item layui-hide-xs">
+                <a href="/overView">概览</a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs">
+                <a href="/keepAccounts">记账</a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs"><a href="/account">账户</a></li>
+            <li class="layui-nav-item layui-hide-xs layui-this"><a href="/statement">报表</a></li>
+            <li class="layui-nav-item layui-hide-xs"><a href="/setting">设置</a></li>
+        </ul>
+
+        <!--    账户设置    -->
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="">
+                    <div style="color: #009688">
+                        <i class="layui-icon layui-icon-username" style="font-size: 30px;"></i>
+                        <span th:text="${userName}"></span>
+                    </div>
+                    <!-- 个人中心 -->
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="/setting">
+                        <i class="layui-icon layui-icon-user" style="font-size: 20px; color: #5FB878"></i>
+                        基本资料</a></dd>
+                    <dd><a href="">
+                        <i class="layui-icon layui-icon-set" style="font-size: 20px; color: #2F4056"></i>
+                        安全设置</a></dd>
+                    <dd>
+                        <a th:href="@{/logout}">
+                            <i class="layui-icon layui-icon-logout" style="font-size: 20px; color: #FF5722"></i>
+                            安全退出
+                        </a>
+                    </dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll" id="account-book"></div>
+    </div>
+
+    <!--  内容主体 body  -->
+    <div class="layui-body layui-anim layui-anim-downbit">
+        <div id="div-out">
+            <div class="layui-card layui-panel">
+                <div id="inner-panel">
+                    <!--财务报表菜单-->
+                    <div id="financial-statement-menu">
+                        <div class="layui-panel">
+                            <ul class="layui-menu" id="setting-menu-on">
+                                <li class="layui-menu-item-group layui-menu-item-down" lay-options="{type: 'group'}">
+                                    <div class="layui-menu-body-title">
+                                        财务报表<i class="layui-icon layui-icon-up"></i>
+                                    </div>
+                                    <ul>
+                                        <li class="layui-menu-item-checked" lay-options="{id: 1, title: '日常收支表'}">日常收支表
+                                        </li>
+                                        <li lay-options="{id: 2, title: '收支趋势图'}">收支趋势图</li>
+                                        <li lay-options="{id: 3, title: '资产负债表'}">资产负债表</li>
+<!--                                        <li lay-options="{id: 4, title: '净资产趋势'}">净资产趋势</li>-->
+                                        <li lay-options="{id: 5, title: '对账报表'}">对账报表</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!--内容主体-->
+                    <div id="financial-statement-content">
+                        <!--日常收支报表面板-->
+                        <div id="daily-in-ex-panel" >
+                            <!-- 选项卡 -->
+                            <div class="layui-tab layui-tab-brief" lay-filter="daily-in-ex-tab">
+                                <!-- 选项卡标题 -->
+                                <ul class="layui-tab-title">
+                                    <li class="layui-this"><h3>支出报表</h3></li>
+                                    <li><h3>收入报表</h3></li>
+                                </ul>
+                                <!-- 选项卡容器 -->
+                                <div class="layui-tab-content">
+                                    <!-- 支出报表 -->
+                                    <div class="layui-tab-item layui-show">
+                                        <!--表单搜索-->
+                                        <div id="form-search">
+                                            <form class="layui-form">
+                                                <div class="layui-form-item">
+                                                    <label class="layui-form-label" for="search-first-category">
+                                                        一级分类：
+                                                    </label>
+                                                    <div class="layui-input-inline">
+                                                        <select name="first_category_name" class="first-category"
+                                                                id="search-first-category"
+                                                                lay-filter="search-first-category">
+                                                        </select>
+                                                    </div>
+
+                                                    <label class="layui-form-label" for="search-second-category">
+                                                        二级分类：
+                                                    </label>
+                                                    <div class="layui-input-inline">
+                                                        <select name="second_category_name" class="second-category"
+                                                                id="search-second-category">
+                                                        </select>
+                                                    </div>
+                                                    <label class="layui-form-label"
+                                                           for="search-account-type">金融账户：</label>
+                                                    <div class="layui-input-inline">
+                                                        <select name="account_type_name" class="account-type"
+                                                                id="search-account-type">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="layui-form-item">
+                                                    <label class="layui-form-label" for="search-date">
+                                                        日期时间：
+                                                    </label>
+                                                    <div class="layui-input-inline">
+                                                        <input type="text" class="layui-input date" id="search-date"
+                                                               name="dateRange"
+                                                               style="width: 120px" autocomplete="off"
+                                                               placeholder="选择日期">
+                                                    </div>
+
+                                                    <label class="layui-form-label" for="search-remarks">备注：
+                                                        <a><i class="layui-icon"
+                                                              style="font-size: 15px"></i></a></label>
+                                                    <div class="layui-input-inline"
+                                                         style="width: 120px; margin-right: 0">
+                                                        <input type="text" name="remarks" id="search-remarks"
+                                                               placeholder="备注"
+                                                               autocomplete="off"
+                                                               class="layui-input remarks" width="380px"
+                                                               lay-verify="remarks">
+                                                    </div>
+
+                                                    <button class="layui-btn" lay-submit lay-filter="search">
+                                                        <i class="layui-icon layui-icon-search"></i>
+                                                        确定
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+
+                                        <hr>
+
+                                        <div class="chart-title">
+                                            <h2>支出堆积表：</h2>
+                                            <span class="now-date"></span>
+                                        </div>
+
+                                        <hr>
+
+                                        <!--支出堆积表-->
+                                        <div class="chartContainer" id="chartContainer-ex"></div>
+
+                                        <!--支出数据表格-->
+                                        <div>
+                                            <table id="categoryExTable"></table>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- 收入报表 -->
+                                    <div class="layui-tab-item">
+                                        <!--表单搜索-->
+                                        <div id="form-search">
+                                            <form class="layui-form">
+                                                <div class="layui-form-item">
+                                                    <label class="layui-form-label" for="search-first-category-in">
+                                                        一级分类：
+                                                    </label>
+                                                    <div class="layui-input-inline">
+                                                        <select name="first_category_name" class="first-category"
+                                                                id="search-first-category-in"
+                                                                lay-filter="search-first-category-in">
+                                                        </select>
+                                                    </div>
+
+                                                    <label class="layui-form-label" for="search-second-category-in">
+                                                        二级分类：
+                                                    </label>
+                                                    <div class="layui-input-inline">
+                                                        <select name="second_category_name" class="second-category"
+                                                                id="search-second-category-in">
+                                                        </select>
+                                                    </div>
+                                                    <label class="layui-form-label"
+                                                           for="search-account-type-in">金融账户：</label>
+                                                    <div class="layui-input-inline">
+                                                        <select name="account_type_name" class="account-type"
+                                                                id="search-account-type-in">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="layui-form-item">
+                                                    <label class="layui-form-label" for="search-date-in">
+                                                        日期时间：
+                                                    </label>
+                                                    <div class="layui-input-inline">
+                                                        <input type="text" class="layui-input date" id="search-date-in"
+                                                               name="dateRange"
+                                                               style="width: 120px" autocomplete="off"
+                                                               placeholder="选择日期">
+                                                    </div>
+
+                                                    <label class="layui-form-label" for="search-remarks-in">备注：
+                                                        <a><i class="layui-icon"
+                                                              style="font-size: 15px"></i></a></label>
+                                                    <div class="layui-input-inline"
+                                                         style="width: 120px; margin-right: 0">
+                                                        <input type="text" name="remarks" id="search-remarks-in"
+                                                               placeholder="备注"
+                                                               autocomplete="off"
+                                                               class="layui-input remarks" width="380px"
+                                                               lay-verify="remarks">
+                                                    </div>
+                                                    <button class="layui-btn" lay-submit lay-filter="search-in">
+                                                        <i class="layui-icon layui-icon-search"></i>
+                                                        确定
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+
+                                        <hr>
+
+                                        <div class="chart-title">
+                                            <h2>收入堆积表：</h2>
+                                            <span class="now-date"></span>
+                                        </div>
+
+                                        <hr>
+
+                                        <div class="chartContainer" id="chartContainer-in"></div>
+
+                                        <!--数据表格-->
+                                        <div>
+                                            <table id="categoryInTable"></table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 收支趋势图面板 -->
+                        <div id="trend-in-ex-panel" style="display: none">
+                            <!-- 选项卡 -->
+                            <div class="layui-tab layui-tab-brief" lay-filter="trend-in-ex-tab">
+                                <!-- 选项卡标题 -->
+                                <ul class="layui-tab-title">
+                                    <li class="layui-this"><h3>支出趋势</h3></li>
+                                    <li><h3>收入趋势</h3></li>
+                                </ul>
+
+                                <!-- 选项卡容器 -->
+                                <div class="layui-tab-content">
+                                    <!-- 支出表单 -->
+                                    <div class="layui-tab-item layui-show">
+                                        <!--表单搜索-->
+                                        <div id="form-search">
+                                            <form class="layui-form">
+                                                <div class="layui-form-item">
+                                                    <label class="layui-form-label"
+                                                           for="search-first-category-trend-ex">
+                                                        一级分类：
+                                                    </label>
+                                                    <div class="layui-input-inline">
+                                                        <select name="first_category_name"
+                                                                id="search-first-category-trend-ex"
+                                                                lay-filter="search-first-category-trend-ex">
+                                                        </select>
+                                                    </div>
+
+                                                    <label class="layui-form-label"
+                                                           for="search-second-category-trend-ex">
+                                                        二级分类：
+                                                    </label>
+                                                    <div class="layui-input-inline">
+                                                        <select name="second_category_name"
+                                                                id="search-second-category-trend-ex">
+                                                        </select>
+                                                    </div>
+                                                    <label class="layui-form-label" for="search-date-trend-ex">
+                                                        日期时间：
+                                                    </label>
+                                                    <div class="layui-input-inline">
+                                                        <input type="text" class="layui-input" id="search-date-trend-ex"
+                                                               name="dateRange" autocomplete="off"
+                                                               placeholder="选择日期">
+                                                    </div>
+                                                    <button class="layui-btn" lay-submit lay-filter="search-trend-ex">
+                                                        <i class="layui-icon layui-icon-search"></i>
+                                                        确定
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <!-- 收入表单 -->
+                                    <div class="layui-tab-item">
+                                        <!--表单搜索-->
+                                        <div id="form-search">
+                                            <form class="layui-form">
+                                                <div class="layui-form-item">
+                                                    <label class="layui-form-label"
+                                                           for="search-first-category-trend-in">
+                                                        一级分类：
+                                                    </label>
+                                                    <div class="layui-input-inline">
+                                                        <select name="first_category_name"
+                                                                id="search-first-category-trend-in"
+                                                                lay-filter="search-first-category-trend-in">
+                                                        </select>
+                                                    </div>
+
+                                                    <label class="layui-form-label"
+                                                           for="search-second-category-trend-in">
+                                                        二级分类：
+                                                    </label>
+                                                    <div class="layui-input-inline">
+                                                        <select name="second_category_name"
+                                                                id="search-second-category-trend-in">
+                                                        </select>
+                                                    </div>
+                                                    <label class="layui-form-label" for="search-date-trend-in">
+                                                        日期时间：
+                                                    </label>
+                                                    <div class="layui-input-inline">
+                                                        <input type="text" class="layui-input" id="search-date-trend-in"
+                                                               name="dateRange" autocomplete="off"
+                                                               placeholder="选择日期">
+                                                    </div>
+                                                    <button class="layui-btn" lay-submit lay-filter="search-trend-in">
+                                                        <i class="layui-icon layui-icon-search"></i>
+                                                        确定
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <!-- 图表标题 -->
+                                    <hr>
+                                    <div class="chart-title">
+                                        <h2>收支趋势图：</h2>
+                                        <span class="now-date-trend"></span>
+                                    </div>
+                                    <hr>
+
+                                    <!-- 收支趋势图 -->
+                                    <div class="chartContainer" id="chartContainer-trend"></div>
+
+                                    <!-- 收支趋势表格 -->
+                                    <table id="trend-in-ex-table"></table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 资产负债表面板 -->
+                        <div id="balance-sheet" style="display: none">
+                            <!-- 选项卡 -->
+                            <div class="layui-tab layui-tab-brief">
+                                <!-- 选项卡标题 -->
+                                <ul class="layui-tab-title">
+                                    <li class="layui-this"><h3>资产负债表</h3></li>
+                                </ul>
+
+                                <!-- 选项卡容器 -->
+                                <div class="layui-tab-content">
+                                    <!-- 资产负债面板-->
+                                    <div class="layui-tab-item layui-show">
+                                        <!-- 资产图 -->
+                                        <div id="chartContainer-assets"
+                                             style="height: 250px; width: 445px; float:left;"></div>
+
+                                        <!-- 负债图 -->
+                                        <div id="chartContainer-debts"
+                                             style="height: 250px; width: 445px; float:left;"></div>
+
+                                        <!-- 资产表格 -->
+                                        <div style="float:left;margin-left: 30px; margin-top:30px">
+                                            <p id="assets-amount"></p>
+                                            <table id="total-assets"></table>
+                                        </div>
+
+                                        <!-- 负债表格 -->
+                                        <div style="float:left; margin-left: 30px;margin-top:30px">
+                                            <p id="debts-amount"></p>
+                                            <table id="total-debts"></table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 对账报表面板 -->
+                        <div id="reconciliation"  style="display: none">
+                            <!-- 选项卡 -->
+                            <div class="layui-tab layui-tab-brief">
+                                <!-- 选项卡标题 -->
+                                <ul class="layui-tab-title">
+                                    <li class="layui-this"><h3>对账报表</h3></li>
+                                </ul>
+
+                                <!-- 选项卡容器 -->
+                                <div class="layui-tab-content">
+                                    <!-- 资产负债面板-->
+                                    <div class="layui-tab-item layui-show">
+                                        <!-- 搜索表单 -->
+                                        <form class="layui-form">
+                                            <div class="layui-form-item">
+                                                <label class="layui-form-label"
+                                                       for="account-type-reconciliation">金融账户：</label>
+                                                <div class="layui-input-inline">
+                                                    <select name="account_type_name"
+                                                            id="account-type-reconciliation"></select>
+                                                </div>
+                                                <label class="layui-form-label" for="date-reconciliation">
+                                                    日期时间：
+                                                </label>
+                                                <div class="layui-input-inline">
+                                                    <input type="text" class="layui-input date" id="date-reconciliation"
+                                                           name="dateRange" autocomplete="off"
+                                                           placeholder="选择日期">
+                                                </div>
+
+                                                <button class="layui-btn" lay-submit lay-filter="submit-reconciliation">
+                                                    <i class="layui-icon layui-icon-search"></i>
+                                                    确定
+                                                </button>
+                                            </div>
+                                        </form>
+
+                                        <!-- 对账流水 -->
+                                        <div id="reconciliation-current"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script th:src="@{/layui.js}" charset="utf-8"></script>
+<script th:src="@{/canvasjs.min.js}" src="/canvasjs.min.js"></script>
+<script type="text/javascript">
+    //layui
+    layui.use(['laypage', 'dropdown', 'layer', 'element', 'jquery', 'util', 'upload', 'form', 'table', 'laydate'], function () {
+        var element = layui.element;
+        var layer = layui.layer;
+        var $ = layui.jquery;
+        var upload = layui.upload;
+        var util = layui.util;
+        var form = layui.form;
+        var table = layui.table;
+        var laydate = layui.laydate;
+        var laypage = layui.laypage;
+        var dropdown = layui.dropdown;
+        var inExStatus = "支"; //收支属性
+
+        //执行渲染账本
+        renderAccountBook();
+
+        //移动端账本渲染
+        util.event('lay-header-event', {
+            menuLeft: function (othis) {
+                layer.open({
+                    type: 1
+                    , title: false
+                    , content: '<div class="layui-side layui-bg-black">\n' +
+                        '        <div class="layui-side-scroll" id="menu-left-account-book"></div>\n' +
+                        '    </div>'
+                    , area: ['', '100%']
+                    , offset: 'lt' //右上角
+                    , anim: 5
+                    , shadeClose: true
+                    , scrollbar: false
+                    , success: function () {
+                        renderAccountBookMenuLeft();//渲染账本列表
+                    }
+                });
+            }
+        });
+
+        //账本监听
+        element.on('nav(all)', function (elem) {
+            var accountBookName = elem.text().trim(); //获取当前账本
+            if (accountBookName !== "所有账本" && accountBookName !== "添加账本") {
+                accountBookIndex(accountBookName);//设置当前 lay-this 账本索引
+                dailyInExPanelComponents(accountBookName, inExStatus);//刷新日常收支表组件
+                trendInExPanelComponents(accountBookName);//刷新收支趋势表
+                balanceSheetPanelComponents();//刷新资产负债表
+                reconciliationPanelComponents();//刷新对账报表
+            } else if (accountBookName === "添加账本") {
+                addAccountBook();
+            }
+        });
+
+        //财务报表菜单监听
+        dropdown.on('click(setting-menu-on)', function (options) {
+            var title = options.title;
+            if (title === '日常收支表') {
+                $("#daily-in-ex-panel").css('display', 'inline');
+                $("#trend-in-ex-panel").css('display', 'none');
+                $("#balance-sheet").css('display', 'none');
+                $("#reconciliation").css('display', 'none');
+                dailyInExPanelComponents(accountBookIndex(""), inExStatus);
+            }
+            if (title === '收支趋势图') {
+                $("#daily-in-ex-panel").css('display', 'none');
+                $("#trend-in-ex-panel").css('display', 'inline');
+                $("#balance-sheet").css('display', 'none');
+                $("#reconciliation").css('display', 'none');
+                trendInExPanelComponents(accountBookIndex(""));
+            }
+            if (title === '资产负债表') {
+                $("#daily-in-ex-panel").css('display', 'none');
+                $("#trend-in-ex-panel").css('display', 'none');
+                $("#balance-sheet").css('display', 'inline');
+                $("#reconciliation").css('display', 'none');
+                balanceSheetPanelComponents();
+            }
+            if (title === '净资产趋势') {
+                $("#daily-in-ex-panel").css('display', 'none');//隐藏收支表面板
+            }
+            if (title === '对账报表') {
+                $("#daily-in-ex-panel").css('display', 'none');//隐藏收支表面板
+                $("#trend-in-ex-panel").css('display', 'none');
+                $("#balance-sheet").css('display', 'none');
+                $("#reconciliation").css('display', 'inline');
+                reconciliationPanelComponents();//加载对账报表组件
+            }
+        });
+
+        //渲染账本组件
+        function renderAccountBook() {
+            $.ajax({
+                    url: '/accountBook/accountBookList',
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        var accountBook = $("#account-book");//获取账本id
+                        var accountBookIndexValue = accountBookIndex("");//获取当前账本索引
+                        accountBook.empty();
+                        accountBook.append(
+                            '<ul class="layui-nav layui-nav-tree layui-anim layui-anim-downbit" lay-filter="all">\n' +
+                            '<li class="layui-nav-item layui-nav-itemed" id="menu">\n' +
+                            '<a href="javascript:">\n' +
+                            '<i class="layui-icon layui-icon-read" style="font-size: 15px; margin-right: 15px">' +
+                            '</i>\n' +
+                            '所有账本\n' +
+                            '<i class="layui-icon layui-icon-down layui-nav-more"></i>\n' +
+                            ' </a>' +
+                            '<dl class="layui-nav-child" id="account-book-item">\n' +
+                            '</dl>\n' +
+                            '</li>\n' +
+                            '</ul>');
+                        //渲染导航账本子条目
+                        var accountBookItem = $("#account-book-item");
+                        for (var i = 0; i < data.data.length; i++) {
+                            if (accountBookIndexValue === data.data[i]) {
+                                accountBookItem.append('<dd class="layui-this">' +
+                                    '<a href="javascript:">' + data.data[i] + '</a></dd>');
+                            } else {
+                                accountBookItem.append('<dd>' +
+                                    '<a href="javascript:">' + data.data[i] + '</a></dd>');
+                            }
+                        }
+                        //渲染添加账本条目
+                        accountBookItem.append(
+                            '<dd class="layui-anim layui-anim-downbit">\n' +
+                            '<a href="javascript:" id="add-account-book">\n' +
+                            '<i class="layui-icon layui-icon-addition" style="font-size: 15px"></i>\n' +
+                            '添加账本\n' +
+                            '<i style="margin-right: 35px"></i>\n' +
+                            '</a>\n' +
+                            '</dd>'
+                        );
+                        element.render();
+                        dailyInExPanelComponents(accountBookIndexValue, inExStatus);
+                    }
+                }
+            );
+        }
+
+        //移动端菜单账本组件
+        function renderAccountBookMenuLeft() {
+            $.ajax({
+                    url: '/accountBook/accountBookList',
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        var accountBookIndexValue = accountBookIndex("");//获取当前账本索引
+                        var accountBook = $("#menu-left-account-book");//获取账本id
+                        var inExStatus = $("#in-ex-status").val();//获取支出属性
+                        accountBook.empty();
+                        //渲染侧边导航栏
+                        accountBook.append(
+                            '<ul class="layui-nav layui-nav-tree" lay-filter="all">\n' +
+                            '<li class="layui-nav-item layui-nav-itemed" id="menu">\n' +
+                            '<a href="javascript:">\n' +
+                            '<i class="layui-icon layui-icon-read" style="font-size: 15px; margin-right: 15px">' +
+                            '</i>\n' +
+                            '所有账本\n' +
+                            '<i class="layui-icon layui-icon-down layui-nav-more"></i>\n' +
+                            ' </a>' +
+                            '<dl class="layui-nav-child" id="menu-left-account-book-item">\n' +
+                            '</dl>\n' +
+                            '</li>\n' +
+                            '</ul>');
+
+                        //渲染导航账本子条目
+                        var accountBookItem = $("#menu-left-account-book-item");
+                        for (var i = 0; i < data.data.length; i++) {
+                            if (accountBookIndexValue === data.data[i]) {
+                                accountBookItem.append('<dd class="layui-this">' +
+                                    '<a href="javascript:">' + data.data[i] + '</a></dd>');
+                            } else {
+                                accountBookItem.append('<dd>' +
+                                    '<a href="javascript:">' + data.data[i] + '</a></dd>');
+                            }
+                        }
+                        //渲染添加账本条目
+                        accountBookItem.append(
+                            '<dd class="layui-anim layui-anim-downbit">\n' +
+                            '<a href="javascript:" id="add-account-book">\n' +
+                            '<i class="layui-icon layui-icon-addition" style="font-size: 15px"></i>\n' +
+                            '添加账本\n' +
+                            '<i style="margin-right: 35px"></i>\n' +
+                            '</a>\n' +
+                            '</dd>'
+                        );
+                        element.render();
+                    }
+                }
+            );
+        }
+
+        //添加账本
+        function addAccountBook() {
+            layer.open({
+                type: 2,
+                title: '添加账本',
+                skin: 'layui-layer-demo', //加上边框
+                area: ['400px', '220px'], //宽高
+                content: '/addAccountBook',
+                end: function () {
+                    var isReload = window.localStorage.getItem('isReload');
+                    if (isReload === '1') {
+                        renderAccountBook();//重载账本
+                    }
+                }
+            });
+        }
+
+        //账本索引
+        function accountBookIndex(accountBookName) {
+            var indexValue = "";
+            $.ajax({
+                url: '/accountIndex/accountBookIndex?accountBookName=' + accountBookName,
+                async: false, //同步
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    if (data.success) {
+                        indexValue = data.accountBookIndex;
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }
+            });
+            return indexValue;
+        }
+
+        //获取当前日期范围
+        function getNowDate() {
+            var date = new Date();
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            var d = new Date(year, month, 0);
+            if (month < 10) {
+                return year + "-" + "0" + month + "-" + "01" + " - " + year + "-" + "0" + month + "-" + d.getDate();
+            } else {
+                return year + "-" + month + "-" + "01" + " - " + year + "-" + month + "-" + d.getDate();
+            }
+        }
+
+        //日常收支报表面板组件
+        function dailyInExPanelComponents(accountBookName, inExStatus) {
+            //选项卡监听
+            element.on('tab(daily-in-ex-tab)', function (obj) {
+                var tabIndex = obj.index;
+                if (tabIndex === 0) {
+                    inExStatus = "支";//修改收支属性
+                }
+                if (tabIndex === 1) {
+                    inExStatus = "收";//修改收支属性
+                    //渲染收入表单
+                    renderSearchFormIn(accountBookName, "收");
+
+                    //初始化收入堆积表
+                    $.ajax({
+                        url: '/statement/dailyInExGraphByConditions?in_ex_status=' + "收" + '&dateRange=' + getNowDate(),
+                        dataType: 'json',
+                        type: 'post',
+                        success: function (data) {
+                            if (data.code === 0) {
+                                var dataPoints = [];
+                                for (var i = 0; i < data.firstCategoryData.length; i++) {
+                                    if (data.firstCategoryData[i].allAmount !== '0.00') {
+                                        dataPoints.push({
+                                            y: parseInt(data.firstCategoryData[i].allAmount),
+                                            label: data.firstCategoryData[i].firstCategoryName,
+                                            indexLabel: data.firstCategoryData[i].allAmount + ""
+                                        });
+                                    }
+                                }
+                                renderGraphIn(dataPoints);
+                            }
+                        }
+                    });
+
+                    //一级分类监听（收入）
+                    form.on('select(search-first-category-in)', function (data) {
+                        //提交数据 返回后台 查询对应的二级分类
+                        var firstCategoryName = data.value;
+                        var s_e_c = $("#search-second-category-in");
+                        if (firstCategoryName !== '所有分类') {
+                            $.ajax({
+                                url: '/category/secondCategoryAllList?firstCategoryName=' + firstCategoryName,
+                                data: firstCategoryName,
+                                dataType: 'json',
+                                type: 'post',
+                                success: function (data) {
+                                    if (data.msg === "操作成功") {
+                                        s_e_c.empty(); //防止重复渲染
+                                        s_e_c.append('<option>所有分类</option>');
+                                        for (var i = 0; i < data.data.length; i++) {
+                                            s_e_c.append("<option>" + data.data[i] + "</option>");
+                                        }
+                                        form.render('select'); //刷新渲染列表
+                                    } else {
+                                        layer.msg(data.msg);
+                                    }
+                                }
+                            });
+                        } else {
+                            s_e_c.empty();
+                            s_e_c.append('<option>所有分类</option>');
+                            form.render('select');
+                        }
+                    });
+
+                    //初始化收入表格
+                    table.render({
+                        elem: '#categoryInTable',
+                        url: '/statement/dailyInExGraphByConditions?in_ex_status=' + "收" + '&dateRange=' + getNowDate(),
+                        skin: 'line',
+                        cols: [
+                            [   //表头
+                                {field: 'firstCategoryName', title: '一级分类', align: "center"},
+                                {field: 'secondCategoryName', title: '二级分类', align: "center"},
+                                {field: 'allAmount', title: '支出统计', align: "center"}
+                            ]
+                        ],
+                        id: "categoryInTable"
+                    });
+
+                    //表单提交
+                    form.on('submit(search-in)', function (data) {
+                        var first_category_name = data.field.first_category_name;
+                        var second_category_name = data.field.second_category_name;
+                        var account_type_name = data.field.account_type_name;
+                        var dateRange = data.field.dateRange;
+                        var remarks = data.field.remarks;
+                        var url;
+
+                        //判断表单值 执行渲染
+                        if (first_category_name !== '所有分类' || second_category_name !== '所有分类' || account_type_name !== '所有账户' || dateRange !== '' || remarks !== '') {
+                            if (dateRange !== '') {
+                                //显示选择的时间段
+                                $(".now-date").text(dateRange);
+                                //重载指定数据
+                                url = '/statement/dailyInExGraphByConditions?in_ex_status=' + inExStatus;
+                                tableReload(url);
+                                renderG(url);
+                            } else {
+                                $(".now-date").text(getNowDate());
+                                //重载指定数据
+                                url = '/statement/dailyInExGraphByConditions?in_ex_status=' + inExStatus + '&dateRange=' + getNowDate();
+                                tableReload(url);
+                                renderG(url);
+                            }
+                        } else {
+                            $(".now-date").text(getNowDate());
+                            //重载所有数据
+                            url = '/statement/dailyInExGraphByConditions?in_ex_status=' + inExStatus + '&dateRange=' + getNowDate();
+                            tableReload(url);
+                            renderG(url);
+                        }
+
+                        //堆积表组件
+                        function renderG(url) {
+                            $.ajax({
+                                url: url,
+                                dataType: 'json',
+                                data: data.field,
+                                type: 'post',
+                                success: function (data) {
+                                    console.log(data.firstCategoryData);
+                                    if (data.code === 0) {
+                                        var dataPoints = [];
+                                        for (var i = 0; i < data.firstCategoryData.length; i++) {
+                                            if (data.firstCategoryData[i].allAmount !== '0.00') {
+                                                dataPoints.push({
+                                                    y: parseInt(data.firstCategoryData[i].allAmount),
+                                                    label: data.firstCategoryData[i].firstCategoryName,
+                                                    indexLabel: data.firstCategoryData[i].allAmount + ""
+                                                });
+                                            }
+                                        }
+                                        renderGraphIn(dataPoints);
+                                    }
+                                }
+                            });
+                        }
+
+                        //表格重载组件
+                        function tableReload(url) {
+                            table.reload('categoryInTable', {
+                                url: url,
+                                method: 'post',
+                                where: {
+                                    first_category_name: data.field.first_category_name,
+                                    second_category_name: data.field.second_category_name,
+                                    account_type_name: data.field.account_type_name,
+                                    dateRange: data.field.dateRange,
+                                    remarks: data.field.remarks
+                                }
+                            });
+                        }
+
+                        return false;
+                    });
+                }
+            });
+
+            //渲染支出表单
+            renderSearchForm(accountBookName, "支");
+
+            //一级分类监听（支出）
+            form.on('select(search-first-category)', function (data) {
+                //提交数据 返回后台 查询对应的二级分类
+                var firstCategoryName = data.value;
+                var s_e_c = $("#search-second-category");
+                if (firstCategoryName !== '所有分类') {
+                    $.ajax({
+                        url: '/category/secondCategoryAllList?firstCategoryName=' + firstCategoryName,
+                        data: firstCategoryName,
+                        dataType: 'json',
+                        type: 'post',
+                        success: function (data) {
+                            if (data.msg === "操作成功") {
+                                s_e_c.empty(); //防止重复渲染
+                                s_e_c.append('<option>所有分类</option>');
+                                for (var i = 0; i < data.data.length; i++) {
+                                    s_e_c.append("<option>" + data.data[i] + "</option>");
+                                }
+                                form.render('select'); //刷新渲染列表
+                            } else {
+                                layer.msg(data.msg);
+                            }
+                        }
+                    });
+                } else {
+                    s_e_c.empty();
+                    s_e_c.append('<option>所有分类</option>');
+                    form.render('select');
+                }
+            });
+
+            //渲染当前时间范围
+            $(".now-date").text(getNowDate());
+
+            //初始化支出堆积表
+            $.ajax({
+                url: '/statement/dailyInExGraphByConditions?in_ex_status=' + "支" + "&dateRange=" + getNowDate(),
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    if (data.code === 0) {
+                        var dataPoints = [];
+                        for (var i = 0; i < data.firstCategoryData.length; i++) {
+                            if (data.firstCategoryData[i].allAmount !== '0.00') {
+                                dataPoints.push({
+                                    y: parseInt(data.firstCategoryData[i].allAmount),
+                                    label: data.firstCategoryData[i].firstCategoryName,
+                                    indexLabel: data.firstCategoryData[i].allAmount + ""
+                                });
+                            }
+                        }
+                        renderGraph(dataPoints);
+                    }
+                }
+            });
+
+            //初始化支出表格
+            table.render({
+                elem: '#categoryExTable',
+                url: '/statement/dailyInExGraphByConditions?in_ex_status=' + "支" + "&dateRange=" + getNowDate(),
+                skin: 'line',
+                cols: [
+                    [   //表头
+                        {field: 'firstCategoryName', title: '一级分类', align: "center"},
+                        {field: 'secondCategoryName', title: '二级分类', align: "center"},
+                        {field: 'allAmount', title: '支出统计', align: "center"}
+                    ]
+                ],
+                id: "categoryExTable"
+            });
+
+            //表单提交
+            form.on('submit(search)', function (data) {
+                var first_category_name = data.field.first_category_name;
+                var second_category_name = data.field.second_category_name;
+                var account_type_name = data.field.account_type_name;
+                var dateRange = data.field.dateRange;
+                var remarks = data.field.remarks;
+                var url;
+
+                //判断表单值 执行渲染
+                if (first_category_name !== '所有分类' || second_category_name !== '所有分类' || account_type_name !== '所有账户' || dateRange !== '' || remarks !== '') {
+                    if (dateRange !== '') {
+                        //显示选择的时间段
+                        $(".now-date").text(dateRange);
+                        //重载指定数据
+                        url = '/statement/dailyInExGraphByConditions?in_ex_status=' + inExStatus;
+                        tableReload(url);
+                        renderG(url);
+                    } else {
+                        $(".now-date").text(getNowDate());
+                        //重载指定数据
+                        url = '/statement/dailyInExGraphByConditions?in_ex_status=' + inExStatus + '&dateRange=' + getNowDate();
+                        tableReload(url);
+                        renderG(url);
+                    }
+                } else {
+                    $(".now-date").text(getNowDate());
+                    //重载所有数据
+                    url = '/statement/dailyInExGraphByConditions?in_ex_status=' + inExStatus + '&dateRange=' + getNowDate();
+                    tableReload(url);
+                    renderG(url);
+                }
+
+                //堆积表组件
+                function renderG(url) {
+                    $.ajax({
+                        url: url,
+                        dataType: 'json',
+                        data: data.field,
+                        type: 'post',
+                        success: function (data) {
+                            console.log(data.firstCategoryData);
+                            if (data.code === 0) {
+                                var dataPoints = [];
+                                for (var i = 0; i < data.firstCategoryData.length; i++) {
+                                    if (data.firstCategoryData[i].allAmount !== '0.00') {
+                                        dataPoints.push({
+                                            y: parseInt(data.firstCategoryData[i].allAmount),
+                                            label: data.firstCategoryData[i].firstCategoryName,
+                                            indexLabel: data.firstCategoryData[i].allAmount + ""
+                                        });
+                                    }
+                                }
+                                renderGraph(dataPoints);
+                            }
+                        }
+                    });
+                }
+
+                //表格重载组件
+                function tableReload(url) {
+                    table.reload('categoryExTable', {
+                        url: url,
+                        method: 'post',
+                        where: {
+                            first_category_name: data.field.first_category_name,
+                            second_category_name: data.field.second_category_name,
+                            account_type_name: data.field.account_type_name,
+                            dateRange: data.field.dateRange,
+                            remarks: data.field.remarks
+                        }
+                    });
+                }
+
+                return false;
+            });
+
+            //支出堆积表组件
+            function renderGraph(dataPoints) {
+                var chart = new CanvasJS.Chart("chartContainer-ex", {
+                    animationEnabled: true,
+                    theme: "light2", // "light1", "light2", "dark1", "dark2"
+                    title: {
+                        text: ""
+                    },
+                    axisY: {
+                        title: ""
+                    },
+                    axisX: {
+                        title: ""
+                    },
+                    data: [{
+                        type: "column",
+                        showInLegend: false,
+                        dataPoints: dataPoints
+                    }]
+                });
+                chart.render();
+            }
+
+            //收入堆积表组件
+            function renderGraphIn(dataPoints) {
+                var chart = new CanvasJS.Chart("chartContainer-in", {
+                    animationEnabled: true,
+                    theme: "light2", // "light1", "light2", "dark1", "dark2"
+                    title: {
+                        text: ""
+                    },
+                    axisY: {
+                        title: ""
+                    },
+                    data: [{
+                        type: "column",
+                        showInLegend: false,
+                        dataPoints: dataPoints
+                    }]
+                });
+                chart.render();
+            }
+
+            //支出表单组件
+            function renderSearchForm(accountBookName, inExStatus) {
+                //渲染一级分类
+                $.ajax({
+                    url: '/category/firstCategoryList',
+                    data: {accountBookName: accountBookName, inExStatus: inExStatus},
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        var f_c = $("#search-first-category");
+                        if (data.msg === "操作成功") {
+                            f_c.empty(); //清空列表 避免重复提交渲染
+                            f_c.append('<option>所有分类</option>');
+                            for (var i = 0; i < data.data.length; i++) {
+                                f_c.append("<option>" + data.data[i] + "</option>");
+                            }
+                            form.render('select'); //刷新渲染
+                            renderSecondCategory(f_c.val(), inExStatus); //渲染二级分类
+                        } else {
+                            console.log(data.msg);
+                        }
+                    }
+                });
+
+                //渲染二级分类
+                function renderSecondCategory(firstCategoryName, inExStatus) {
+                    var s_e_c = $("#search-second-category");
+                    if (firstCategoryName !== '所有分类') {
+                        $.ajax({
+                            url: '/category/secondCategoryList',
+                            data: {firstCategoryName: firstCategoryName, inExStatus: inExStatus},
+                            dataType: 'json',
+                            type: 'post',
+                            success: function (data) {
+                                if (data.msg === "操作成功") {
+                                    s_e_c.empty(); //防止重复渲染
+                                    s_e_c.append('<option>所有分类</option>');
+                                    for (var i = 0; i < data.data.length; i++) {
+                                        s_e_c.append("<option>" + data.data[i] + "</option>");
+                                    }
+                                    form.render('select'); //刷新渲染列表
+                                } else {
+                                    console.log(data.msg);
+                                }
+                            }
+                        });
+                    } else {
+                        s_e_c.empty();
+                        s_e_c.append('<option>所有分类</option>');
+                        form.render('select');
+                    }
+                }
+
+                //渲染金融账户
+                $.ajax({
+                    url: '/accountType/accountType.json?accountBookName=' + accountBookName,
+                    data: accountBookName,
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        var a_t = $("#search-account-type");
+                        if (data.success) {
+                            a_t.empty();//防止重复渲染
+                            a_t.append('<option>所有账户</option>');
+                            for (var i = 0; i < data.data.length; i++) {
+                                a_t.append("<option>" + data.data[i] + "</option>");
+                            }
+                            form.render('select'); //刷新渲染
+                        } else {
+                            console.log(data.msg);
+                        }
+                    }
+                });
+
+                //日期选择（搜索面板）
+                laydate.render({
+                    elem: '#search-date',//指定元素
+                    type: 'date',
+                    theme: '#393D49',
+                    range: true
+                });
+            }
+
+            //收入表单组件
+            function renderSearchFormIn(accountBookName, inExStatus) {
+                //渲染一级分类
+                $.ajax({
+                    url: '/category/firstCategoryList',
+                    data: {accountBookName: accountBookName, inExStatus: inExStatus},
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        var f_c = $("#search-first-category-in");
+                        if (data.msg === "操作成功") {
+                            f_c.empty(); //清空列表 避免重复提交渲染
+                            f_c.append('<option>所有分类</option>');
+                            for (var i = 0; i < data.data.length; i++) {
+                                f_c.append("<option>" + data.data[i] + "</option>");
+                            }
+                            form.render('select'); //刷新渲染
+                            renderSecondCategory(f_c.val(), inExStatus); //渲染二级分类
+                        } else {
+                            console.log(data.msg);
+                        }
+                    }
+                });
+
+                //渲染二级分类
+                function renderSecondCategory(firstCategoryName, inExStatus) {
+                    var s_e_c = $("#search-second-category-in");
+                    if (firstCategoryName !== '所有分类') {
+                        $.ajax({
+                            url: '/category/secondCategoryList',
+                            data: {firstCategoryName: firstCategoryName, inExStatus: inExStatus},
+                            dataType: 'json',
+                            type: 'post',
+                            success: function (data) {
+                                if (data.msg === "操作成功") {
+                                    s_e_c.empty(); //防止重复渲染
+                                    s_e_c.append('<option>所有分类</option>');
+                                    for (var i = 0; i < data.data.length; i++) {
+                                        s_e_c.append("<option>" + data.data[i] + "</option>");
+                                    }
+                                    form.render('select'); //刷新渲染列表
+                                } else {
+                                    console.log(data.msg);
+                                }
+                            }
+                        });
+                    } else {
+                        s_e_c.empty();
+                        s_e_c.append('<option>所有分类</option>');
+                        form.render('select');
+                    }
+                }
+
+                //渲染金融账户
+                $.ajax({
+                    url: '/accountType/accountType.json?accountBookName=' + accountBookName,
+                    data: accountBookName,
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        var a_t = $("#search-account-type-in");
+                        if (data.success) {
+                            a_t.empty();//防止重复渲染
+                            a_t.append('<option>所有账户</option>');
+                            for (var i = 0; i < data.data.length; i++) {
+                                a_t.append("<option>" + data.data[i] + "</option>");
+                            }
+                            form.render('select'); //刷新渲染
+                        } else {
+                            console.log(data.msg);
+                        }
+                    }
+                });
+
+                //日期选择（搜索面板）
+                laydate.render({
+                    elem: '#search-date-in',//指定元素
+                    type: 'date',
+                    theme: '#393D49',
+                    range: true
+                });
+            }
+        }
+
+        //收支趋势面板组件
+        function trendInExPanelComponents(accountBookName) {
+            //选项卡监听
+            element.on('tab(trend-in-ex-tab)', function (obj) {
+                var tabIndex = obj.index;
+                if (tabIndex === 1) {
+                    //初始化支出表单
+                    renderFormEx(accountBookName, "收");
+
+                    //支出表单组件
+                    function renderFormEx(accountBookName, inExStatus) {
+                        //渲染一级分类
+                        $.ajax({
+                            url: '/category/firstCategoryList',
+                            data: {accountBookName: accountBookName, inExStatus: inExStatus},
+                            dataType: 'json',
+                            type: 'post',
+                            success: function (data) {
+                                var f_c = $("#search-first-category-trend-in");
+                                if (data.msg === "操作成功") {
+                                    f_c.empty(); //清空列表 避免重复提交渲染
+                                    f_c.append('<option>所有分类</option>');
+                                    for (var i = 0; i < data.data.length; i++) {
+                                        f_c.append("<option>" + data.data[i] + "</option>");
+                                    }
+                                    form.render('select'); //刷新渲染
+                                    renderSecondCategory(f_c.val(), inExStatus); //渲染二级分类
+                                } else {
+                                    console.log(data.msg);
+                                }
+                            }
+                        });
+
+                        //渲染二级分类
+                        function renderSecondCategory(firstCategoryName, inExStatus) {
+                            var s_e_c = $("#search-second-category-trend-in");
+                            if (firstCategoryName !== '所有分类') {
+                                $.ajax({
+                                    url: '/category/secondCategoryList',
+                                    data: {firstCategoryName: firstCategoryName, inExStatus: inExStatus},
+                                    dataType: 'json',
+                                    type: 'post',
+                                    success: function (data) {
+                                        if (data.msg === "操作成功") {
+                                            s_e_c.empty(); //防止重复渲染
+                                            s_e_c.append('<option>所有分类</option>');
+                                            for (var i = 0; i < data.data.length; i++) {
+                                                s_e_c.append("<option>" + data.data[i] + "</option>");
+                                            }
+                                            form.render('select'); //刷新渲染列表
+                                        } else {
+                                            console.log(data.msg);
+                                        }
+                                    }
+                                });
+                            } else {
+                                s_e_c.empty();
+                                s_e_c.append('<option>所有分类</option>');
+                                form.render('select');
+                            }
+                        }
+
+                        //日期选择（搜索面板）
+                        laydate.render({
+                            elem: '#search-date-trend-in',//指定元素
+                            type: 'date',
+                            theme: '#393D49',
+                            range: true
+                        });
+                    }
+
+                    //一级分类监听（支出）
+                    form.on('select(search-first-category-trend-in)', function (data) {
+                        //提交数据 返回后台 查询对应的二级分类
+                        var firstCategoryName = data.value;
+                        var s_e_c = $("#search-second-category-trend-in");
+                        if (firstCategoryName !== '所有分类') {
+                            $.ajax({
+                                url: '/category/secondCategoryAllList?firstCategoryName=' + firstCategoryName,
+                                data: firstCategoryName,
+                                dataType: 'json',
+                                type: 'post',
+                                success: function (data) {
+                                    if (data.msg === "操作成功") {
+                                        s_e_c.empty(); //防止重复渲染
+                                        s_e_c.append('<option>所有分类</option>');
+                                        for (var i = 0; i < data.data.length; i++) {
+                                            s_e_c.append("<option>" + data.data[i] + "</option>");
+                                        }
+                                        form.render('select'); //刷新渲染列表
+                                    } else {
+                                        layer.msg(data.msg);
+                                    }
+                                }
+                            });
+                        } else {
+                            s_e_c.empty();
+                            s_e_c.append('<option>所有分类</option>');
+                            form.render('select');
+                        }
+                    });
+
+                    //表单提交
+                    form.on('submit(search-trend-in)', function (data) {
+                        var first_category_name = data.field.first_category_name;
+                        var second_category_name = data.field.second_category_name;
+                        var dateRange = data.field.dateRange;
+
+                        //防止日期范围等于空值
+                        if (dateRange === null || dateRange.trim() === '') {
+                            dateRange = getMonthRange();
+                        }
+
+                        //刷新标题日期范围
+                        $(".now-date-trend").text(dateRange);
+
+                        //重载趋势图
+                        $.ajax({
+                            url: '/statement/inExTrendGraph',
+                            data: {
+                                first_category_name: first_category_name,
+                                second_category_name: second_category_name,
+                                dateRange: dateRange
+                            },
+                            dataType: 'json',
+                            type: 'post',
+                            success: function (data) {
+                                if (data.code === 0) {
+                                    reconciliationGraph(data);
+                                }
+                            }
+                        });
+
+                        //重载表格数据
+                        table.reload('trend-in-ex-table', {
+                            url: '/statement/inExTrendGraph',
+                            method: 'post',
+                            where: {
+                                first_category_name: data.field.first_category_name,
+                                second_category_name: data.field.second_category_name,
+                                dateRange: dateRange
+                            }
+                        });
+
+                        return false;
+                    });
+                }
+            });
+
+            //初始化支出表单
+            renderFormEx(accountBookName, "支");
+
+            //支出表单组件
+            function renderFormEx(accountBookName, inExStatus) {
+                //渲染一级分类
+                $.ajax({
+                    url: '/category/firstCategoryList',
+                    data: {accountBookName: accountBookName, inExStatus: inExStatus},
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        var f_c = $("#search-first-category-trend-ex");
+                        if (data.msg === "操作成功") {
+                            f_c.empty(); //清空列表 避免重复提交渲染
+                            f_c.append('<option>所有分类</option>');
+                            for (var i = 0; i < data.data.length; i++) {
+                                f_c.append("<option>" + data.data[i] + "</option>");
+                            }
+                            form.render('select'); //刷新渲染
+                            renderSecondCategory(f_c.val(), inExStatus); //渲染二级分类
+                        } else {
+                            console.log(data.msg);
+                        }
+                    }
+                });
+
+                //渲染二级分类
+                function renderSecondCategory(firstCategoryName, inExStatus) {
+                    var s_e_c = $("#search-second-category-trend-ex");
+                    if (firstCategoryName !== '所有分类') {
+                        $.ajax({
+                            url: '/category/secondCategoryList',
+                            data: {firstCategoryName: firstCategoryName, inExStatus: inExStatus},
+                            dataType: 'json',
+                            type: 'post',
+                            success: function (data) {
+                                if (data.msg === "操作成功") {
+                                    s_e_c.empty(); //防止重复渲染
+                                    s_e_c.append('<option>所有分类</option>');
+                                    for (var i = 0; i < data.data.length; i++) {
+                                        s_e_c.append("<option>" + data.data[i] + "</option>");
+                                    }
+                                    form.render('select'); //刷新渲染列表
+                                } else {
+                                    console.log(data.msg);
+                                }
+                            }
+                        });
+                    } else {
+                        s_e_c.empty();
+                        s_e_c.append('<option>所有分类</option>');
+                        form.render('select');
+                    }
+                }
+
+                //日期选择（搜索面板）
+                laydate.render({
+                    elem: '#search-date-trend-ex',//指定元素
+                    type: 'date',
+                    theme: '#393D49',
+                    range: true
+                });
+            }
+
+            //一级分类监听（支出）
+            form.on('select(search-first-category-trend-ex)', function (data) {
+                //提交数据 返回后台 查询对应的二级分类
+                var firstCategoryName = data.value;
+                var s_e_c = $("#search-second-category-trend-ex");
+                if (firstCategoryName !== '所有分类') {
+                    $.ajax({
+                        url: '/category/secondCategoryAllList?firstCategoryName=' + firstCategoryName,
+                        data: firstCategoryName,
+                        dataType: 'json',
+                        type: 'post',
+                        success: function (data) {
+                            if (data.msg === "操作成功") {
+                                s_e_c.empty(); //防止重复渲染
+                                s_e_c.append('<option>所有分类</option>');
+                                for (var i = 0; i < data.data.length; i++) {
+                                    s_e_c.append("<option>" + data.data[i] + "</option>");
+                                }
+                                form.render('select'); //刷新渲染列表
+                            } else {
+                                layer.msg(data.msg);
+                            }
+                        }
+                    });
+                } else {
+                    s_e_c.empty();
+                    s_e_c.append('<option>所有分类</option>');
+                    form.render('select');
+                }
+            });
+
+            //表单提交
+            form.on('submit(search-trend-ex)', function (data) {
+                var first_category_name = data.field.first_category_name;
+                var second_category_name = data.field.second_category_name;
+                var dateRange = data.field.dateRange;
+
+                //防止日期范围等于空值
+                if (dateRange === null || dateRange.trim() === '') {
+                    dateRange = getMonthRange();
+                }
+
+                //刷新标题日期范围
+                $(".now-date-trend").text(dateRange);
+
+                //重载趋势图
+                $.ajax({
+                    url: '/statement/inExTrendGraph',
+                    data: {
+                        first_category_name: first_category_name,
+                        second_category_name: second_category_name,
+                        dateRange: dateRange
+                    },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.code === 0) {
+                            reconciliationGraph(data);
+                        }
+                    }
+                });
+
+                //重载表格数据
+                table.reload('trend-in-ex-table', {
+                    url: '/statement/inExTrendGraph',
+                    method: 'post',
+                    where: {
+                        first_category_name: data.field.first_category_name,
+                        second_category_name: data.field.second_category_name,
+                        dateRange: dateRange
+                    }
+                });
+
+                return false;
+            });
+
+            //渲染当前时间
+            $(".now-date-trend").text(getMonthRange());
+
+            //获取今年年份：2021
+            function getThisYear() {
+                return new Date().getFullYear();
+            }
+
+            //获取今年1月到当前完整日期：2021-01-01 - 2021-10-31
+            function getMonthRange() {
+                var date = new Date();
+                var year = date.getFullYear();
+                var month = date.getMonth() + 1;
+                var day = date.getDate();
+                if (month < 10) {
+                    return "2021-01-01" + " - " + year + "-" + "0" + month + "-" + day;
+                } else {
+                    return "2021-01-01" + " - " + year + "-" + month + "-" + day;
+                }
+            }
+
+            //初始化趋势图
+            $.ajax({
+                url: '/statement/inExTrendGraph?dateRange=' + getMonthRange(),
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    if (data.code === 0) {
+                        reconciliationGraph(data);
+                    }
+                }
+            });
+
+            //初始化表格
+            table.render({
+                elem: '#trend-in-ex-table',
+                url: '/statement/inExTrendGraph?dateRange=' + getMonthRange(),
+                skin: 'line',
+                cols: [
+                    [   //表头
+                        {field: 'year', align: 'center'},
+                        {field: 'time', title: '时间', align: 'center'},
+                        {field: 'in', title: '收入', align: "center", style: 'color: #FF5722'},
+                        {field: 'ex', title: '支出', align: "center", style: 'color: #5FB878'},
+                        {field: 'balance', title: '结余', align: "center"}
+                    ]
+                ],
+                id: "trend-in-ex-table"
+            });
+
+            //趋势图组件
+            function reconciliationGraph(data) {
+                var dataPointIn = [];
+                var dataPointEx = [];
+                var dataPointBa = [];
+                //解析收入数据
+                for (var x = 0; x < data.graphDataMap.inData.length; x++) {
+                    dataPointIn.push({
+                        label: data.graphDataMap.inData[x].time,
+                        y: data.graphDataMap.inData[x].in
+                    });
+                }
+                //解析支出数据
+                for (var y = 0; y < data.graphDataMap.exData.length; y++) {
+                    dataPointEx.push({
+                        label: data.graphDataMap.exData[y].time,
+                        y: data.graphDataMap.exData[y].ex
+                    });
+                }
+                //解析结余数据
+                for (var z = 0; z < data.graphDataMap.baData.length; z++) {
+                    dataPointBa.push({
+                        label: data.graphDataMap.baData[z].time,
+                        y: data.graphDataMap.baData[z].balance
+                    });
+                }
+                //封装图表数据
+                var dataGraph = [{
+                    name: "收入",
+                    type: "spline",
+                    yValueFormatString: "¥ #0.##",
+                    showInLegend: true,
+                    dataPoints: dataPointIn
+                }, {
+                    name: "支出",
+                    type: "spline",
+                    yValueFormatString: "¥ #0.##",
+                    showInLegend: true,
+                    dataPoints: dataPointEx
+                }, {
+                    name: "结余",
+                    type: "spline",
+                    yValueFormatString: "¥ #0.##",
+                    showInLegend: true,
+                    dataPoints: dataPointBa
+                }
+                ];
+                //渲染图表
+                var chart = new CanvasJS.Chart("chartContainer-trend", {
+                    animationEnabled: true,
+                    title: {
+                    },
+                    axisX: {},
+                    axisY: {},
+                    legend: {
+                        cursor: "pointer",
+                        fontSize: 16,
+                        itemclick: toggleDataSeries
+                    },
+                    toolTip: {
+                        shared: true
+                    },
+                    data: dataGraph
+                });
+                function toggleDataSeries(e){
+                    e.dataSeries.visible = !(typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible);
+                    chart.render();
+                }
+                chart.render();
+            }
+        }
+
+        //资产负债表面板组件
+        function balanceSheetPanelComponents() {
+            //渲染资产扇形图
+            $.ajax({
+                url: '/statement/totalAssets',
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    var dataPoints = [];
+                    var exploded = true;
+                    for (var i = 0; i < data.data.length; i++) {
+                        if (data.data[i].percent !== '0.00' && exploded) {
+                            dataPoints.push({
+                                y: data.data[i].percent,
+                                label: data.data[i].accountTypeName,
+                                exploded: true
+                            });
+                            exploded = false;
+                            continue;//结束本次循环 进入下一循环
+                        }
+                        if (data.data[i].percent !== '0.00') {
+                            dataPoints.push({
+                                y: data.data[i].percent,
+                                label: data.data[i].accountTypeName
+                            });
+                        }
+                    }
+                    renderGraphAssets(dataPoints);
+                }
+            });
+
+            //渲染负债扇形图
+            $.ajax({
+                url: '/statement/totalDebts',
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    var dataPoints = [];
+                    var exploded = true;
+                    for (var i = 0; i < data.data.length; i++) {
+                        if (data.data[i].percent !== '0.00' && exploded) {
+                            dataPoints.push({
+                                y: data.data[i].percent,
+                                name: data.data[i].accountTypeName,
+                                exploded: true
+                            });
+                            exploded = false;
+                            continue;
+                        }
+                        if (data.data[i].percent !== '0.00') {
+                            dataPoints.push({
+                                y: data.data[i].percent,
+                                name: data.data[i].accountTypeName
+                            });
+                        }
+                    }
+                    renderGraphDebts(dataPoints);
+                }
+            });
+
+            //渲染资产总额
+            $.ajax({
+                url: '/statement/totalAssets',
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    var assets_amount = $("#assets-amount");
+                    assets_amount.empty();
+                    if (data.code === 0) {
+                        assets_amount.empty();
+                        assets_amount.append("<span>总资产：" +
+                            "<span style='font-size: 22px; color:#FF5722'>¥" + data.totalAssets + "</span>" +
+                            "</span>"
+                        );
+                    }
+                }
+            });
+
+            //渲染负债总额
+            $.ajax({
+                url: '/statement/totalDebts',
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    var debts_amount = $("#debts-amount");
+                    if (data.code === 0) {
+                        debts_amount.empty();
+                        debts_amount.append("<span>总负债：" +
+                            "<span style='font-size: 22px; color:#FF5722'>¥" + data.totalDebts + "</span>" +
+                            "</span>"
+                        );
+                    }
+                }
+            });
+
+            //加载资产表格
+            table.render({
+                elem: '#total-assets',
+                url: '/statement/totalAssets',
+                skin: 'line',
+                width: 400,
+                cols: [
+                    [   //表头
+                        {field: 'accountTypeName', title: '资产', align: 'center', style: 'background-color: #F6F6F6'},
+                        {field: 'accountTypeTotalAssets', title: '金额', align: 'center'},
+                        {
+                            field: 'percent', title: '占比', align: "center", templet: function (d) {
+                                if (d.percent !== "0.00") {
+                                    console.log(d.percent);
+                                    return d.percent + "%";
+                                } else {
+                                    return "--";
+                                }
+                            }
+                        }
+                    ]
+                ]
+            });
+
+            //加载负债表格
+            table.render({
+                elem: '#total-debts',
+                url: '/statement/totalDebts',
+                skin: 'line',
+                width: 400,
+                cols: [
+                    [   //表头
+                        {field: 'accountTypeName', title: '资产', align: 'center', style: 'background-color: #F6F6F6'},
+                        {field: 'accountTypeTotalDebts', title: '金额', align: 'center'},
+                        {
+                            field: 'percent', title: '占比', align: "center", templet: function (d) {
+                                if (d.percent !== "0.00") {
+                                    return d.percent + "%";
+                                } else {
+                                    return "--";
+                                }
+                            }
+                        }
+                    ]
+                ]
+            });
+
+            //资产图组件
+            function renderGraphAssets(dataPoints) {
+                var chart = new CanvasJS.Chart("chartContainer-assets", {
+                    theme: "light1", // "light1", "light2", "dark1", "dark2"
+                    animationEnabled: true,
+                    title: {
+                        text: "资产概况",
+                        fontSize: 16
+                    },
+                    data: [{
+                        type: "pie",
+                        startAngle: 25,
+                        toolTipContent: "<b>{label}</b>: {y}%",
+                        legendText: "{label}",
+                        indexLabelFontSize: 13,
+                        indexLabel: "{label} - {y}%",
+                        dataPoints: dataPoints
+                    }]
+                });
+                chart.render();
+            }
+
+            //负债图组件
+            function renderGraphDebts(dataPoints) {
+                var chart = new CanvasJS.Chart("chartContainer-debts", {
+                    theme: "light1", // "light1", "light2", "dark1", "dark2"
+                    animationEnabled: true,
+                    title: {
+                        text: "负债概况",
+                        fontSize: 16
+                    },
+                    data: [{
+                        type: "pie",
+                        toolTipContent: "{name}: <strong>{y}%</strong>",
+                        indexLabel: "{name} - {y}%",
+                        indexLabelFontSize: 13,
+                        dataPoints: dataPoints
+                    }]
+                });
+                chart.render();
+            }
+
+        }
+
+        //对账报表面板组件
+        function reconciliationPanelComponents() {
+            //渲染金融账户、加载对账流水
+            $.ajax({
+                url: '/accountType/accountType.json',
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    var a_t = $("#account-type-reconciliation");
+                    if (data.success) {
+                        a_t.empty();//防止重复渲染
+                        for (var i = 0; i < data.data.length; i++) {
+                            a_t.append("<option>" + data.data[i] + "</option>");
+                        }
+                        form.render('select'); //刷新渲染
+                        renderReconciliationCurrent(a_t.val(), getNowDate());//加载对账流水
+                    } else {
+                        console.log(data.msg);
+                    }
+                }
+            });
+
+            //渲染当前日期
+            $("#date-reconciliation").val(getNowDate());
+
+            //日期选择（搜索面板）
+            laydate.render({
+                elem: '#date-reconciliation',//指定元素
+                type: 'date',
+                theme: '#393D49',
+                range: true
+            });
+
+            //表单提交
+            form.on('submit(submit-reconciliation)', function (data) {
+                var accountTypeName = data.field.account_type_name;
+                var dateRange = data.field.dateRange;
+                renderReconciliationCurrent(accountTypeName, dateRange);
+                return false;
+            });
+
+            //加载对账流水
+            $(document).ready(function () {
+                renderReconciliationCurrent($("#account-type-reconciliation").val(), getNowDate());
+            });
+
+            //对账流水组件
+            function renderReconciliationCurrent(accountTypeName, dateRange) {
+                //渲染流水面板
+                $.ajax({
+                    url: '/statement/reconciliation?dateRange=' + dateRange + '&accountTypeName=' + accountTypeName,
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        var reconciliation_current = $("#reconciliation-current");
+                        if (data.success) {
+                            reconciliation_current.empty();
+                            for (var i = 0; i < data.data.length; i++) {
+                                reconciliation_current.append(
+                                    '<div class="layui-collapse" style="margin-bottom: 5px">' +
+                                    '<div class="layui-colla-item">' +
+                                    '<h2 class="layui-colla-title">' +
+                                    '<div style="float:left;">日期：' + data.data[i].date + '</div>' +
+                                    '<div style="float:right;">' +
+                                    '<div style="display: inline-block; width: 150px">流入：<span style="color: #FF5722">' + data.data[i].in + '</span></div>' +
+                                    '<span style="margin-right: 10px; margin-left: 10px;">|</span>' +
+                                    '<div style="display: inline-block; width: 150px">流出：<span style="color: #5FB878">' + data.data[i].ex + '</span></div>' +
+                                    '<span style="margin-right: 10px; margin-left: 10px;">|</span>' +
+                                    '<div style="display: inline-block; width: 150px">余额：' + data.data[i].balance + '</div>' +
+                                    '</div>' +
+                                    '</h2>' +
+                                    '<div class="layui-colla-content">' +
+                                    '<table class="layui-table" id="reconciliation-table' + i + '"></table>' +
+                                    '</div>' +
+                                    '</div>' +
+                                    '</div>'
+                                );
+                                renderReconciliationTable(data.data[i].date, i);
+                            }
+                            element.render();
+                        }
+                    }
+                });
+
+                function renderReconciliationTable(date, i) {
+                    table.render({
+                        elem: '#reconciliation-table' + i,
+                        url: '/statement/reconciliationTable?date=' + date + '&accountTypeName=' +accountTypeName, //数据接口
+                        limit: 10,
+                        limits: [10, 20, 30, 40],
+                        skin: 'line',
+                        cols: [
+                            [   //表头
+                                {field: 'dateConverted', title: '日期', sort: true},
+                                {field: 'second_category_name', title: '分类', sort: true},
+                                {
+                                    field: 'in_ex_status', title: '收支', sort: true,
+                                    templet: function (d) {
+                                        if (d.in_ex_status === "收") {
+                                            return "<span style='color: #f1523a'>" + d.in_ex_status + "</span>";
+                                        } else {
+                                            return "<span style='color: #14ba89'>" + d.in_ex_status + "</span>";
+                                        }
+                                    }
+                                },
+                                {field: 'amountString', title: '金额', sort: true},
+                                {field: 'account_type_name', title: '账户', sort: true},
+                                {field: 'remarks', title: '备注'}
+                            ]
+                        ]
+                    });
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

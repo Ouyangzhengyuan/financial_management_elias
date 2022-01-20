@@ -49,6 +49,11 @@ public class CategoryTemplateService implements ICategoryTemplateService {
     }
 
     @Override
+    public List<CategoryTemplate> selectAllTemplate(CategoryTemplate categoryTemplate) {
+        return categoryTemplateMapper.selectAllTemplate(categoryTemplate);
+    }
+
+    @Override
     public int deleteByCategoryTemplate(CategoryTemplate categoryTemplate) {
         return categoryTemplateMapper.deleteByCategoryTemplate(categoryTemplate);
     }
@@ -66,5 +71,30 @@ public class CategoryTemplateService implements ICategoryTemplateService {
     @Override
     public CategoryTemplate selectByCategoryTemplate(CategoryTemplate categoryTemplate) {
         return categoryTemplateMapper.selectByCategoryTemplate(categoryTemplate);
+    }
+
+    @Override
+    public int deleteByUserName(String userName) {
+        return categoryTemplateMapper.deleteByUserName(userName);
+    }
+
+    @Override
+    public int deleteByAccountBookId(Integer accountBookId) {
+        return categoryTemplateMapper.deleteByAccountBookId(accountBookId);
+    }
+
+    @Override
+    public int deleteByCategorySecondId(Integer categorySecondId) {
+        return categoryTemplateMapper.deleteByCategorySecondId(categorySecondId);
+    }
+
+    @Override
+    public int deleteByFirstCategoryId(Integer firstCategoryId) {
+        return categoryTemplateMapper.deleteByFirstCategoryId(firstCategoryId);
+    }
+
+    @Override
+    public int deleteByAccountTypeId(Integer accountTypeId) {
+        return categoryTemplateMapper.deleteByAccountTypeId(accountTypeId);
     }
 }

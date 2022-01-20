@@ -1,16 +1,19 @@
 package pers.elias.financial_management.controller;
 
 import cn.hutool.json.JSONObject;
+import jdk.nashorn.internal.ir.debug.PrintVisitor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import pers.elias.financial_management.component.AjaxResult;
-import pers.elias.financial_management.component.GlobalAccountInfo;
+import pers.elias.financial_management.bean.AjaxResult;
+import pers.elias.financial_management.bean.GlobalAccountInfo;
 import pers.elias.financial_management.model.AccountType;
 import pers.elias.financial_management.model.CategoryFirst;
 import pers.elias.financial_management.model.CategorySecond;
 import pers.elias.financial_management.model.CategoryTemplate;
+import pers.elias.financial_management.model.template_account_book.Template;
 import pers.elias.financial_management.service.impl.*;
 
 import java.util.*;
@@ -39,6 +42,9 @@ public class CategoryTemplateController {
     @Autowired // 二级分类服务
     private CategorySecondService categorySecondService;
 
+    @Autowired
+    private AccountIndexService accountIndexService;
+
     /**
      * 查询所有分类模板
      */
@@ -47,8 +53,15 @@ public class CategoryTemplateController {
     public String categoryTemplateList(String accountBookName, String inExStatus) {
         JSONObject jsonObject = new JSONObject();
         try {
-            globalAccountInfo.setAccountBookName(accountBookName);
+            //获取当前登录的用户
+            String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+            //设置当前登录的用户
+            globalAccountInfo.setUserName(userName);
+            //设置当前用户账本
+            globalAccountInfo.setAccountBookName(accountIndexService.selectByPrimaryKey(userName).getAccountBookIndex());
+            //查询账本 id
             Integer accountBookId = accountBookService.selectIdByUserNameAndBook(globalAccountInfo);
+            //模板实体
             CategoryTemplate categoryTemplate = new CategoryTemplate();
             categoryTemplate.setUserName(globalAccountInfo.getUserName());
             categoryTemplate.setAccountBookId(accountBookId);
@@ -74,10 +87,18 @@ public class CategoryTemplateController {
     public String categoryTemplateSingle(String categoryTemplateName, String inExStatus){
         JSONObject jsonObject = new JSONObject();
         try{
+            //获取当前登录的用户
+            String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+            //设置当前登录的用户
+            globalAccountInfo.setUserName(userName);
+            //设置当前用户账本
+            globalAccountInfo.setAccountBookName(accountIndexService.selectByPrimaryKey(userName).getAccountBookIndex());
+            //查询账本id
+            Integer accountBookId = accountBookService.selectIdByUserNameAndBook(globalAccountInfo);
             //创建分类模板实体
             CategoryTemplate categoryTemplate = new CategoryTemplate();
             categoryTemplate.setUserName(globalAccountInfo.getUserName());
-            categoryTemplate.setAccountBookId(globalAccountInfo.getAccountBookId());
+            categoryTemplate.setAccountBookId(accountBookId);
             categoryTemplate.setInExStatus(inExStatus);
             categoryTemplate.setTemplateName(categoryTemplateName);
             //执行分类模板查询
@@ -95,13 +116,13 @@ public class CategoryTemplateController {
             dataList.add(accountTypeName);
             //响应头
             jsonObject.put("success", true);
-            jsonObject.put("msg", "分类模板查询成功！");
+            jsonObject.put("msg", "分类模板查询成功");
             jsonObject.put("data", dataList);
             return jsonObject.toString();
         }catch (Exception e){
             e.printStackTrace();
             jsonObject.put("success", false);
-            jsonObject.put("msg", "分类模板查询失败！");
+            jsonObject.put("msg", "分类模板查询失败");
             return jsonObject.toString();
         }
     }
@@ -112,39 +133,39 @@ public class CategoryTemplateController {
     @RequestMapping("/addCategoryTemplate.do")
     @ResponseBody
     public AjaxResult addCategoryTemplate(String templateName, String accountTypeName, String firstCategoryName, String secondCategoryName, String inExStatus) {
-        System.out.println(templateName);
-        System.out.println(accountTypeName);
-        System.out.println(firstCategoryName);
-        System.out.println(secondCategoryName);
-        System.out.println(inExStatus);
         try {
+            //获取当前登录的用户
+            String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+            //设置当前登录的用户
+            globalAccountInfo.setUserName(userName);
+            //设置当前用户账本
+            globalAccountInfo.setAccountBookName(accountIndexService.selectByPrimaryKey(userName).getAccountBookIndex());
             //反向查询 账本id
             Integer accountBookId = accountBookService.selectIdByUserNameAndBook(globalAccountInfo);
-            globalAccountInfo.setAccountBookId(accountBookId);
             //反向查询 金融账户 id
             AccountType accountType = new AccountType();
             accountType.setUserName(globalAccountInfo.getUserName());
-            accountType.setAccountBookId(globalAccountInfo.getAccountBookId());
+            accountType.setAccountBookId(accountBookId);
             accountType.setAccountTypeName(accountTypeName);
             Integer accountTypeId = accountTypeService.selectIdByAccountType(accountType);
             //反向查询 一级分类 id
             CategoryFirst categoryFirst = new CategoryFirst();
             categoryFirst.setUserName(globalAccountInfo.getUserName());
-            categoryFirst.setAccountBookId(globalAccountInfo.getAccountBookId());
+            categoryFirst.setAccountBookId(accountBookId);
             categoryFirst.setInExStatus(inExStatus);
             categoryFirst.setFirstCategoryName(firstCategoryName);
             Integer categoryFirstId = categoryFirstService.selectIdByCategoryFirst(categoryFirst);
             //反向查询 二级分类 id
             CategorySecond categorySecond = new CategorySecond();
             categorySecond.setUserName(globalAccountInfo.getUserName());
-            categorySecond.setAccountBookId(globalAccountInfo.getAccountBookId());
+            categorySecond.setAccountBookId(accountBookId);
             categorySecond.setInExStatus(inExStatus);
             categorySecond.setSecondCategoryName(secondCategoryName);
             Integer categorySecondId = categorySecondService.selectIdByCategorySecond(categorySecond);
             //创建模板实体对象
             CategoryTemplate categoryTemplate = new CategoryTemplate();
             categoryTemplate.setUserName(globalAccountInfo.getUserName());
-            categoryTemplate.setAccountBookId(globalAccountInfo.getAccountBookId());
+            categoryTemplate.setAccountBookId(accountBookId);
             categoryTemplate.setInExStatus(inExStatus);
             categoryTemplate.setAccountTypeId(accountTypeId);
             categoryTemplate.setCategoryFirstId(categoryFirstId);
@@ -153,23 +174,122 @@ public class CategoryTemplateController {
             //判断模板是否存在
             if(categoryTemplateService.isExists(categoryTemplate)){
                 ajaxResult.setSuccess(false);
-                ajaxResult.setMessage("该分类模板已存在！");
+                ajaxResult.setMessage("该分类模板已存在");
                 return ajaxResult;
             }
             //添加模板
             if(categoryTemplateService.insert(categoryTemplate) != 1) {
                 ajaxResult.setSuccess(false);
-                ajaxResult.setMessage("添加失败！");
+                ajaxResult.setMessage("添加失败");
                 return ajaxResult;
             }
             ajaxResult.setSuccess(true);
-            ajaxResult.setMessage("添加成功！");
+            ajaxResult.setMessage("添加成功");
             return ajaxResult;
         } catch (Exception e) {
             e.printStackTrace();
             ajaxResult.setSuccess(false);
-            ajaxResult.setMessage("添加失败！服务器出错！");
+            ajaxResult.setMessage("添加失败");
             return ajaxResult;
+        }
+    }
+
+    /**
+     * 编辑模板
+     */
+    @ResponseBody
+    @RequestMapping("/editCategoryTemplate.do")
+    public AjaxResult editCategoryTemplate(String templateName, String accountTypeName, String firstCategoryName, String secondCategoryName, String inExStatus, String oldTemplateName){
+        try {
+            //获取当前登录的用户
+            String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+            //设置当前登录的用户
+            globalAccountInfo.setUserName(userName);
+            //设置当前用户账本
+            globalAccountInfo.setAccountBookName(accountIndexService.selectByPrimaryKey(userName).getAccountBookIndex());
+            //反向查询 账本id
+            Integer accountBookId = accountBookService.selectIdByUserNameAndBook(globalAccountInfo);
+            //查询当前模板 id
+            CategoryTemplate oldTemplate = new CategoryTemplate();
+            oldTemplate.setUserName(globalAccountInfo.getUserName());
+            oldTemplate.setAccountBookId(accountBookId);
+            oldTemplate.setInExStatus(inExStatus);
+            oldTemplate.setTemplateName(oldTemplateName);
+            Integer templateId = categoryTemplateService.selectByCategoryTemplate(oldTemplate).getId();
+            //反向查询 金融账户 id
+            AccountType accountType = new AccountType();
+            accountType.setUserName(globalAccountInfo.getUserName());
+            accountType.setAccountBookId(accountBookId);
+            accountType.setAccountTypeName(accountTypeName);
+            Integer accountTypeId = accountTypeService.selectIdByAccountType(accountType);
+            //反向查询 一级分类 id
+            CategoryFirst categoryFirst = new CategoryFirst();
+            categoryFirst.setUserName(globalAccountInfo.getUserName());
+            categoryFirst.setAccountBookId(accountBookId);
+            categoryFirst.setInExStatus(inExStatus);
+            categoryFirst.setFirstCategoryName(firstCategoryName);
+            Integer categoryFirstId = categoryFirstService.selectIdByCategoryFirst(categoryFirst);
+            //反向查询 二级分类 id
+            CategorySecond categorySecond = new CategorySecond();
+            categorySecond.setUserName(globalAccountInfo.getUserName());
+            categorySecond.setAccountBookId(accountBookId);
+            categorySecond.setInExStatus(inExStatus);
+            categorySecond.setSecondCategoryName(secondCategoryName);
+            Integer categorySecondId = categorySecondService.selectIdByCategorySecond(categorySecond);
+            //创建模板实体对象
+            CategoryTemplate categoryTemplate = new CategoryTemplate();
+            categoryTemplate.setUserName(globalAccountInfo.getUserName());
+            categoryTemplate.setAccountBookId(accountBookId);
+            categoryTemplate.setInExStatus(inExStatus);
+            categoryTemplate.setAccountTypeId(accountTypeId);
+            categoryTemplate.setCategoryFirstId(categoryFirstId);
+            categoryTemplate.setCategorySecondId(categorySecondId);
+            categoryTemplate.setId(templateId);
+            categoryTemplate.setTemplateName(templateName);
+            //判断模板是否修改
+            if(oldTemplateName.equals(templateName)) {
+                //执行更新
+                categoryTemplateService.updateByPrimaryKeySelective(categoryTemplate);
+                ajaxResult.setSuccess(true);
+                ajaxResult.setMessage("修改成功");
+                return ajaxResult;
+                //新模板是否存在
+            }else if(categoryTemplateService.isExists(categoryTemplate)){
+                ajaxResult.setSuccess(false);
+                ajaxResult.setMessage("该分类模板已存在");
+                return ajaxResult;
+            }
+            //执行更新
+            categoryTemplateService.updateByPrimaryKeySelective(categoryTemplate);
+            ajaxResult.setSuccess(true);
+            ajaxResult.setMessage("修改成功");
+            return ajaxResult;
+        } catch (Exception e) {
+            e.printStackTrace();
+            ajaxResult.setSuccess(false);
+            ajaxResult.setMessage("修改失败");
+            return ajaxResult;
+        }
+    }
+
+    /**
+     * 删除模板
+     */
+    @ResponseBody
+    @RequestMapping("/deleteCategoryTemplate.do")
+    public String deleteCategoryTemplate(Integer[] idList, String inExStatus){
+        JSONObject jsonObject = new JSONObject();
+        try{
+            for(int id: idList){
+                categoryTemplateService.deleteByPrimaryKey(id);
+            }
+            jsonObject.put("success", true);
+            jsonObject.put("msg", "删除成功");
+            return jsonObject.toString();
+        }catch (Exception e){
+            jsonObject.put("success", false);
+            jsonObject.put("msg", "删除失败");
+            return jsonObject.toString();
         }
     }
 }

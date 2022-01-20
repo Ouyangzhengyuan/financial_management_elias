@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/common.css}" media="all">
+    <title></title>
+</head>
+<body>
+<form class="layui-form" style="margin: 38px">
+    <div class="layui-form-item">
+        <label class="layui-form-label" for="new-category-name">分类名称：</label>
+        <div class="layui-input-inline">
+            <input type="hidden" th:value="${categoryType}" id="category-type">
+            <input type="hidden" th:value="${inExStatus}" id="in-ex-status">
+            <input type="hidden" th:value="${categoryName}" id="old-category-name">
+            <input type="text" name="newCategoryName" th:value="${categoryName}" required lay-verify="newCategoryName" placeholder="请输入分类名称"
+                   autocomplete="off" class="layui-input" style="width: 180px" id="new-category-name"/>
+        </div>
+    </div>
+
+    <div class="layui-form-item" style="text-align: center; margin: 0">
+        <div class="layui-input-block" style="text-align: center; margin: 0">
+            <button class="layui-btn" lay-submit lay-filter="submit">立即提交</button>
+        </div>
+    </div>
+</form>
+
+<script th:src="@{/layui.js}" charset="utf-8"></script>
+<script type="text/javascript">
+    //使用 layui 框架
+    layui.use(['layer', 'element', 'jquery', 'form'], function () {
+        var element = layui.element;
+        var layer = layui.layer;
+        var $ = layui.jquery;
+        var form = layui.form;
+
+        //表单验证
+        form.verify({
+            newCategoryName: function (value, item) {
+                if (value.trim() === '') {
+                    layer.tips("请输入分类名", '#category-name');
+                    return true;
+                }
+            }
+        });
+
+        //提交表单
+        form.on('submit(submit)', function (data) {
+            var oldCategoryName = $("#old-category-name").val();//旧名称
+            var newCategoryName = $("#new-category-name").val();//新名称
+            var categoryType = $("#category-type").val();//分类类型
+            var inExStatus = $("#in-ex-status").val();//收支属性
+            var url = '';//url
+            //判断分类类型
+            if(categoryType === '一级分类'){
+                url = '/category/editFirstCategory.do';
+            }else if(categoryType === '二级分类'){
+                url = '/category/editSecondCategory.do';
+            }
+            //执行更新
+            $.ajax({
+                url: url,
+                dataType: 'json',
+                data: {oldCategoryName: oldCategoryName, newCategoryName: newCategoryName, inExStatus: inExStatus},
+                type: 'post',
+                success: function (data) {
+                    if (data.success) {
+                        layer.msg(
+                            data.msg,
+                            {time: 1000},
+                            function(){
+                                //更新修改后的结果
+                                window.localStorage.setItem('isReload', '1');
+                                // 获取当前窗口索引
+                                var index = parent.layer.getFrameIndex(window.name);
+                                // 关闭当前窗口
+                                window.parent.layer.close(index);//关闭当前窗口
+                            });
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

@@ -218,7 +218,47 @@
           ct.account_book_id = #{accountBookId}
           and
           ct.in_ex_status = #{inExStatus}
-          and
-          ct.template_name = #{templateName}
+              and
+              ct.template_name = #{templateName}
   </select>
+
+    <select id="selectAllTemplate" parameterType="pers.elias.financial_management.model.CategoryTemplate"
+            resultMap="categoryTemplateResultMap">
+          select
+          ct.id,
+          ct.user_name,
+          ct.account_book_id,
+          ct.category_first_id,
+          ct.category_second_id,
+          ct.account_type_id,
+          ct.in_ex_status,
+          ct.template_name
+          from category_template ct
+          where
+          ct.user_name = #{userName}
+          and
+          ct.account_book_id = #{accountBookId}
+          and
+          ct.in_ex_status = #{inExStatus}
+  </select>
+
+    <delete id="deleteByUserName" parameterType="String">
+        delete from category_template where user_name = #{userName}
+    </delete>
+
+    <delete id="deleteByAccountBookId" parameterType="Integer">
+        delete from category_template where account_book_id = #{accountBookId}
+    </delete>
+
+    <delete id="deleteByCategorySecondId" parameterType="Integer">
+        delete from category_template where category_second_id = #{categorySecondId}
+    </delete>
+
+    <delete id="deleteByFirstCategoryId" parameterType="Integer">
+        delete from category_template where category_first_id = #{firstCategoryId}
+    </delete>
+
+    <delete id="deleteByAccountTypeId" parameterType="Integer">
+        delete from category_template where account_type_id = #{accountTypeId}
+    </delete>
 </mapper>
